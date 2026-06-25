@@ -59,5 +59,8 @@
     <ClInclude Include="Map.h">
       <Filter>Header Files\map</Filter>
     </ClInclude>
+    <ClInclude Include="ConsoleHandle.h">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
