@@ -71,6 +71,9 @@
     <ClInclude Include="ConsoleHandle.h">
       <Filter>Header Files\ui</Filter>
     </ClInclude>
+    <ClInclude Include="Animal.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="C:\Users\ADMIN\Downloads\Piglin_Obstacle.png">
