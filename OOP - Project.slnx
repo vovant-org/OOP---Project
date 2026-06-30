@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="OOP - CrossingGame/OOP - CrossingGame.vcxproj" />
+  <Project Path="OOP - CrossingGame/OOP - CrossingGame.vcxproj" Id="9e19ec08-814b-4c3f-803f-d0c6ea2ca8b9" />
 </Solution>
