@@ -46,6 +46,9 @@
     <Filter Include="Resource Files\Map">
       <UniqueIdentifier>{72af942e-9c02-41de-bb7a-aec6f8d9da0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Sound">
+      <UniqueIdentifier>{e805996b-2a38-44fd-b712-dcae2166b118}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -71,7 +74,19 @@
     <ClInclude Include="ConsoleHandle.h">
       <Filter>Header Files\ui</Filter>
     </ClInclude>
-    <ClInclude Include="Animal.h">
+    <ClInclude Include="CANIMAL.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CPEOPLE.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CVEHICLE.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CDINASOUR.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CBIRD.h">
       <Filter>Header Files\entities</Filter>
     </ClInclude>
   </ItemGroup>

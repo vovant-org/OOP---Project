@@ -152,8 +152,12 @@
     <ClCompile Include="Map.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Animal.h" />
+    <ClInclude Include="CANIMAL.h" />
+    <ClInclude Include="CBIRD.h" />
+    <ClInclude Include="CDINASOUR.h" />
     <ClInclude Include="ConsoleHandle.h" />
+    <ClInclude Include="CPEOPLE.h" />
+    <ClInclude Include="CVEHICLE.h" />
     <ClInclude Include="Map.h" />
   </ItemGroup>
   <ItemGroup>
