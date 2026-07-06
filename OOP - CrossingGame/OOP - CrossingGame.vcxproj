@@ -161,9 +161,7 @@
     <ClInclude Include="Map.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="C:\Users\ADMIN\Downloads\HellMotor_Obstacle.png" />
-    <Image Include="C:\Users\ADMIN\Downloads\Kight_Character.png" />
-    <Image Include="C:\Users\ADMIN\Downloads\Piglin_Obstacle.png" />
+    <Image Include="..\..\Obstacles\Piglin_Obstacle.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

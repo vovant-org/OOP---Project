@@ -91,13 +91,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="C:\Users\ADMIN\Downloads\Piglin_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="C:\Users\ADMIN\Downloads\Kight_Character.png">
-      <Filter>Resource Files\Charater</Filter>
-    </Image>
-    <Image Include="C:\Users\ADMIN\Downloads\HellMotor_Obstacle.png">
+    <Image Include="..\..\Obstacles\Piglin_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
   </ItemGroup>
