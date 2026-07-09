@@ -146,7 +146,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CANIMAL.cpp" />
+    <ClCompile Include="CBIRD.cpp" />
+    <ClCompile Include="CDINOSAUR.cpp" />
+    <ClCompile Include="CGAME.cpp" />
+    <ClCompile Include="CMOTOR.cpp" />
     <ClCompile Include="CPEOPLE.cpp" />
+    <ClCompile Include="CTRAIN.cpp" />
+    <ClCompile Include="CTRUCK.cpp" />
+    <ClCompile Include="CVEHICLE.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
@@ -155,10 +162,15 @@
     <ClInclude Include="CANIMAL.h" />
     <ClInclude Include="CBIRD.h" />
     <ClInclude Include="CDINASOUR.h" />
+    <ClInclude Include="CGAME.h" />
+    <ClInclude Include="CMOTOR.h" />
     <ClInclude Include="ConsoleHandle.h" />
     <ClInclude Include="CPEOPLE.h" />
+    <ClInclude Include="CTRAIN.h" />
+    <ClInclude Include="CTRUCK.h" />
     <ClInclude Include="CVEHICLE.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="TrafficLight.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Character\Chicken_character.png" />
