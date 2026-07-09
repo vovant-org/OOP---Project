@@ -91,17 +91,29 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\Obstacles\Piglin_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="..\..\Character\Kight_Character.png">
+    <Image Include="Character\Kight_Character.png">
       <Filter>Resource Files\Charater</Filter>
     </Image>
-    <Image Include="..\..\Obstacles\HellTrain_Obstacle.png">
+    <Image Include="Obstacles\HellMotor_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
-    <Image Include="..\..\Obstacles\HellMotor_Obstacle.png">
+    <Image Include="Obstacles\HellTrain_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Piglin_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Bike_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Motor_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Truck_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Character\Chicken_character.png">
+      <Filter>Resource Files\Charater</Filter>
     </Image>
   </ItemGroup>
 </Project>

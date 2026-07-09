@@ -161,10 +161,14 @@
     <ClInclude Include="Map.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\Character\Kight_Character.png" />
-    <Image Include="..\..\Obstacles\HellMotor_Obstacle.png" />
-    <Image Include="..\..\Obstacles\HellTrain_Obstacle.png" />
-    <Image Include="..\..\Obstacles\Piglin_Obstacle.png" />
+    <Image Include="Character\Chicken_character.png" />
+    <Image Include="Character\Kight_Character.png" />
+    <Image Include="Obstacles\Bike_Obstacle.png" />
+    <Image Include="Obstacles\HellMotor_Obstacle.png" />
+    <Image Include="Obstacles\HellTrain_Obstacle.png" />
+    <Image Include="Obstacles\Motor_Obstacle.png" />
+    <Image Include="Obstacles\Piglin_Obstacle.png" />
+    <Image Include="Obstacles\Truck_Obstacle.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
