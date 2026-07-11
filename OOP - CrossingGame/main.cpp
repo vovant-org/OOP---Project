@@ -1,24 +1,30 @@
 #include <SFML/Graphics.hpp>
 
-int main()
-{
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+int main() {
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Crossing Game");
+    window.setFramerateLimit(60);
 
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-
-        window.clear();
-        window.draw(shape);
-        window.display();
+    sf::Texture tex;
+    if (!tex.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/Kight_Character.png")) {
+        return -1;
     }
 
+    sf::Sprite sprite(tex);
+
+    // Scale vừa phải để thấy toàn bộ sprite sheet
+    sprite.setScale(2.f, 2.f);
+
+    // Đặt vị trí giữa màn hình
+    sprite.setPosition(100.f, 100.f);
+
+    while (window.isOpen()) {
+        sf::Event e;
+        while (window.pollEvent(e))
+            if (e.type == sf::Event::Closed) window.close();
+
+        window.clear(sf::Color(20, 30, 50));
+        window.draw(sprite);
+        window.display();
+    }
     return 0;
 }
