@@ -151,5 +151,17 @@
     <Image Include="Character\Chicken_character.png">
       <Filter>Resource Files\Charater</Filter>
     </Image>
+    <Image Include="Obstacles\Bird_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Cloud_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Plane_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Character\Sky_Character.png">
+      <Filter>Resource Files\Charater</Filter>
+    </Image>
   </ItemGroup>
 </Project>
