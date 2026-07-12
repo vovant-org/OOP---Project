@@ -173,6 +173,7 @@
     <ClInclude Include="TrafficLight.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\..\Downloads\Luffy_Charater.png" />
     <Image Include="Character\Chicken_character.png" />
     <Image Include="Character\Kight_Character.png" />
     <Image Include="Character\Sky_Character.png" />
