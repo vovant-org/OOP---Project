@@ -184,6 +184,7 @@
     <Image Include="Obstacles\Cloud_Obstacle.png" />
     <Image Include="Obstacles\Dinosaur.png" />
     <Image Include="Obstacles\Fish.png" />
+    <Image Include="Obstacles\HellGiant_Obstacle.png" />
     <Image Include="Obstacles\HellMotor_Obstacle.png" />
     <Image Include="Obstacles\HellTrain_Obstacle.png" />
     <Image Include="Obstacles\Light.png" />

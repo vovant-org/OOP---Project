@@ -181,5 +181,8 @@
     <Image Include="Obstacles\Light.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
+    <Image Include="Obstacles\HellGiant_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
   </ItemGroup>
 </Project>
