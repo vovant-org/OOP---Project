@@ -148,8 +148,10 @@
     <ClCompile Include="CANIMAL.cpp" />
     <ClCompile Include="CBIRD.cpp" />
     <ClCompile Include="CDINOSAUR.cpp" />
+    <ClCompile Include="CFISH.cpp" />
     <ClCompile Include="CGAME.cpp" />
     <ClCompile Include="CMOTOR.cpp" />
+    <ClCompile Include="COldBird.cpp" />
     <ClCompile Include="CPEOPLE.cpp" />
     <ClCompile Include="CTRAIN.cpp" />
     <ClCompile Include="CTRUCK.cpp" />
@@ -160,10 +162,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CANIMAL.h" />
+    <ClInclude Include="CBeast.h" />
     <ClInclude Include="CBIRD.h" />
     <ClInclude Include="CDINASOUR.h" />
     <ClInclude Include="CGAME.h" />
     <ClInclude Include="CMOTOR.h" />
+    <ClInclude Include="CObstacle.h" />
     <ClInclude Include="ConsoleHandle.h" />
     <ClInclude Include="CPEOPLE.h" />
     <ClInclude Include="CTRAIN.h" />

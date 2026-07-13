@@ -87,6 +87,12 @@
     <ClCompile Include="CBIRD.cpp">
       <Filter>Source Files\entities</Filter>
     </ClCompile>
+    <ClCompile Include="COldBird.cpp">
+      <Filter>Header Files\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="CFISH.cpp">
+      <Filter>Header Files\entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -123,6 +129,12 @@
       <Filter>Header Files\entities</Filter>
     </ClInclude>
     <ClInclude Include="CTRAIN.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CObstacle.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="CBeast.h">
       <Filter>Header Files\entities</Filter>
     </ClInclude>
   </ItemGroup>
