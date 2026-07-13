@@ -163,5 +163,23 @@
     <Image Include="Character\Sky_Character.png">
       <Filter>Resource Files\Charater</Filter>
     </Image>
+    <Image Include="Character\Luffy_Charater.png">
+      <Filter>Resource Files\Charater</Filter>
+    </Image>
+    <Image Include="Obstacles\Beast.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Bird.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Dinosaur.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Fish.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Light.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
   </ItemGroup>
 </Project>
