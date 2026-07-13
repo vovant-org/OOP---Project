@@ -184,5 +184,11 @@
     <Image Include="Obstacles\Light_Ancient.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
+    <Image Include="Map\City_map.png">
+      <Filter>Resource Files\Map</Filter>
+    </Image>
+    <Image Include="Obstacles\City_light.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
   </ItemGroup>
 </Project>
