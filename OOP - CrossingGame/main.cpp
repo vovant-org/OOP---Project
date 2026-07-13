@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Crossing Game");
+    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Crossing Game");
     window.setFramerateLimit(60);
 
     sf::Texture tex;
@@ -12,10 +12,10 @@ int main() {
     sf::Sprite sprite(tex);
 
     // Scale vừa phải để thấy toàn bộ sprite sheet
-    sprite.setScale(2.f, 2.f);
+    sprite.setScale(3.f, 3.f);
 
     // Đặt vị trí giữa màn hình
-    sprite.setPosition(100.f, 100.f);
+    sprite.setPosition(105.f, 25.f);
 
     while (window.isOpen()) {
         sf::Event e;
