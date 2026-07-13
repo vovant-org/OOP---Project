@@ -178,9 +178,9 @@
     <Image Include="..\..\..\..\Downloads\Dinosaur.png" />
     <Image Include="..\..\..\..\Downloads\Fish.png" />
     <Image Include="..\..\..\..\Downloads\Light.png" />
-    <Image Include="..\..\..\..\Downloads\Luffy_Charater.png" />
     <Image Include="Character\Chicken_character.png" />
     <Image Include="Character\Kight_Character.png" />
+    <Image Include="Character\Luffy_Charater.png" />
     <Image Include="Character\Sky_Character.png" />
     <Image Include="Obstacles\Bike_Obstacle.png" />
     <Image Include="Obstacles\Bird_Obstacle.png" />
