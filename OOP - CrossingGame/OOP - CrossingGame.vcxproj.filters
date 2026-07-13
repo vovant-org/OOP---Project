@@ -178,10 +178,10 @@
     <Image Include="Obstacles\Fish.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
-    <Image Include="Obstacles\Light.png">
+    <Image Include="Obstacles\HellGiant_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
-    <Image Include="Obstacles\HellGiant_Obstacle.png">
+    <Image Include="Obstacles\Light_Ancient.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
   </ItemGroup>

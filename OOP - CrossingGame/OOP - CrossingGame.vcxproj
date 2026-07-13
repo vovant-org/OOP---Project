@@ -189,7 +189,7 @@
     <Image Include="Obstacles\HellGiant_Obstacle.png" />
     <Image Include="Obstacles\HellMotor_Obstacle.png" />
     <Image Include="Obstacles\HellTrain_Obstacle.png" />
-    <Image Include="Obstacles\Light.png" />
+    <Image Include="Obstacles\Light_Ancient.png" />
     <Image Include="Obstacles\Motor_Obstacle.png" />
     <Image Include="Obstacles\Piglin_Obstacle.png" />
     <Image Include="Obstacles\Plane_Obstacle.png" />
