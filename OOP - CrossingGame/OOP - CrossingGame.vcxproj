@@ -177,20 +177,23 @@
     <ClInclude Include="TrafficLight.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\Downloads\Beast.png" />
-    <Image Include="..\..\..\..\Downloads\Bird.png" />
-    <Image Include="..\..\..\..\Downloads\Dinosaur.png" />
-    <Image Include="..\..\..\..\Downloads\Fish.png" />
-    <Image Include="..\..\..\..\Downloads\Light.png" />
-    <Image Include="..\..\..\..\Downloads\Luffy_Charater.png" />
     <Image Include="Character\Chicken_character.png" />
     <Image Include="Character\Kight_Character.png" />
+    <Image Include="Character\Luffy_Charater.png" />
     <Image Include="Character\Sky_Character.png" />
+    <Image Include="Map\City_map.png" />
+    <Image Include="Obstacles\Beast.png" />
     <Image Include="Obstacles\Bike_Obstacle.png" />
+    <Image Include="Obstacles\Bird.png" />
     <Image Include="Obstacles\Bird_Obstacle.png" />
+    <Image Include="Obstacles\City_light.png" />
     <Image Include="Obstacles\Cloud_Obstacle.png" />
+    <Image Include="Obstacles\Dinosaur.png" />
+    <Image Include="Obstacles\Fish.png" />
+    <Image Include="Obstacles\HellGiant_Obstacle.png" />
     <Image Include="Obstacles\HellMotor_Obstacle.png" />
     <Image Include="Obstacles\HellTrain_Obstacle.png" />
+    <Image Include="Obstacles\Light_Ancient.png" />
     <Image Include="Obstacles\Motor_Obstacle.png" />
     <Image Include="Obstacles\Piglin_Obstacle.png" />
     <Image Include="Obstacles\Plane_Obstacle.png" />

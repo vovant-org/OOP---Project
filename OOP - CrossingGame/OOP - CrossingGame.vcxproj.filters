@@ -175,22 +175,31 @@
     <Image Include="Character\Sky_Character.png">
       <Filter>Resource Files\Charater</Filter>
     </Image>
-    <Image Include="..\..\..\..\Downloads\Luffy_Charater.png">
+    <Image Include="Character\Luffy_Charater.png">
       <Filter>Resource Files\Charater</Filter>
     </Image>
-    <Image Include="..\..\..\..\Downloads\Beast.png">
+    <Image Include="Obstacles\Beast.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
-    <Image Include="..\..\..\..\Downloads\Bird.png">
+    <Image Include="Obstacles\Bird.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
-    <Image Include="..\..\..\..\Downloads\Dinosaur.png">
+    <Image Include="Obstacles\Dinosaur.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
-    <Image Include="..\..\..\..\Downloads\Fish.png">
+    <Image Include="Obstacles\Fish.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
-    <Image Include="..\..\..\..\Downloads\Light.png">
+    <Image Include="Obstacles\HellGiant_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Light_Ancient.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Map\City_map.png">
+      <Filter>Resource Files\Map</Filter>
+    </Image>
+    <Image Include="Obstacles\City_light.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
   </ItemGroup>
