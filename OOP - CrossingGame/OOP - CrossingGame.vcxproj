@@ -177,10 +177,12 @@
     <Image Include="Character\Kight_Character.png" />
     <Image Include="Character\Luffy_Charater.png" />
     <Image Include="Character\Sky_Character.png" />
+    <Image Include="Map\City_map.png" />
     <Image Include="Obstacles\Beast.png" />
     <Image Include="Obstacles\Bike_Obstacle.png" />
     <Image Include="Obstacles\Bird.png" />
     <Image Include="Obstacles\Bird_Obstacle.png" />
+    <Image Include="Obstacles\City_light.png" />
     <Image Include="Obstacles\Cloud_Obstacle.png" />
     <Image Include="Obstacles\Dinosaur.png" />
     <Image Include="Obstacles\Fish.png" />
