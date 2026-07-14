@@ -151,26 +151,8 @@
     <Image Include="Obstacles\Piglin_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
-    <Image Include="Obstacles\Bike_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Motor_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Truck_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
     <Image Include="Character\Chicken_character.png">
       <Filter>Resource Files\Charater</Filter>
-    </Image>
-    <Image Include="Obstacles\Bird_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Cloud_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Plane_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
     </Image>
     <Image Include="Character\Sky_Character.png">
       <Filter>Resource Files\Charater</Filter>
@@ -201,6 +183,12 @@
     </Image>
     <Image Include="Obstacles\City_light.png">
       <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Map\Hell_map.png">
+      <Filter>Resource Files\Map</Filter>
+    </Image>
+    <Image Include="Map\Sky_map.png">
+      <Filter>Resource Files\Map</Filter>
     </Image>
   </ItemGroup>
 </Project>

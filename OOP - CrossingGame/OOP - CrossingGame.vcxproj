@@ -77,12 +77,12 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)SFML\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\SFML\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)SFML\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\SFML\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics-d.lib
 ;sfml-window-d.lib
 ;sfml-system-d.lib</AdditionalDependencies>
@@ -100,12 +100,12 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)SFML\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\OOP_Project\SFML\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)SFML\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\SFML\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics.lib;
 sfml-window.lib
 ;sfml-system.lib</AdditionalDependencies>
@@ -121,12 +121,12 @@ sfml-window.lib
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)SFML\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\SFML\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)SFML\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\SFML\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics-d.lib
 ;sfml-window-d.lib
 ;sfml-system-d.lib</AdditionalDependencies>
@@ -144,12 +144,12 @@ sfml-window.lib
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)SFML\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\OOP_Project\SFML\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)SFML\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\SFML\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics.lib;
 sfml-window.lib
 ;sfml-system.lib</AdditionalDependencies>
@@ -196,22 +196,18 @@ sfml-window.lib
     <Image Include="Character\Luffy_Charater.png" />
     <Image Include="Character\Sky_Character.png" />
     <Image Include="Map\City_map.png" />
+    <Image Include="Map\Hell_map.png" />
+    <Image Include="Map\Sky_map.png" />
     <Image Include="Obstacles\Beast.png" />
-    <Image Include="Obstacles\Bike_Obstacle.png" />
     <Image Include="Obstacles\Bird.png" />
-    <Image Include="Obstacles\Bird_Obstacle.png" />
     <Image Include="Obstacles\City_light.png" />
-    <Image Include="Obstacles\Cloud_Obstacle.png" />
     <Image Include="Obstacles\Dinosaur.png" />
     <Image Include="Obstacles\Fish.png" />
     <Image Include="Obstacles\HellGiant_Obstacle.png" />
     <Image Include="Obstacles\HellMotor_Obstacle.png" />
     <Image Include="Obstacles\HellTrain_Obstacle.png" />
     <Image Include="Obstacles\Light_Ancient.png" />
-    <Image Include="Obstacles\Motor_Obstacle.png" />
     <Image Include="Obstacles\Piglin_Obstacle.png" />
-    <Image Include="Obstacles\Plane_Obstacle.png" />
-    <Image Include="Obstacles\Truck_Obstacle.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
