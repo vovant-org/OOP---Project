@@ -190,5 +190,47 @@
     <Image Include="Map\Sky_map.png">
       <Filter>Resource Files\Map</Filter>
     </Image>
+    <Image Include="Obstacles\Bike_Obstacle_left.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Bike_Obstacle_right.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Bird_Obstacle_left.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Bird_Obstacle_right.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Cloud_Obstacle_left.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Cloud_Obstacle_right.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Hell_light.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Motor_Obstacle_left.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Motor_Obstacle_right.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Plane_Obstacle_left.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Plane_Obstacle_right.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Sky_light.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Truck_Obstacle_left.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Truck_Obstacle_right.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
   </ItemGroup>
 </Project>
