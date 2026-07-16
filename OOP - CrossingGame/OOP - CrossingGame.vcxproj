@@ -195,6 +195,7 @@ sfml-window.lib
     <Image Include="Character\Kight_Character.png" />
     <Image Include="Character\Luffy_Charater.png" />
     <Image Include="Character\Sky_Character.png" />
+    <Image Include="Map\Ancient_map.png" />
     <Image Include="Map\City_map.png" />
     <Image Include="Map\Hell_map.png" />
     <Image Include="Map\Sky_map.png" />

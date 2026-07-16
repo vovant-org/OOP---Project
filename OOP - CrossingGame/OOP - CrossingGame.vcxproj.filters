@@ -232,5 +232,8 @@
     <Image Include="Obstacles\Truck_Obstacle_right.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
+    <Image Include="Map\Ancient_map.png">
+      <Filter>Resource Files\Map</Filter>
+    </Image>
   </ItemGroup>
 </Project>
