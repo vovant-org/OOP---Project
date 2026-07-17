@@ -38,7 +38,7 @@ int main()
     // nguyen nhan gay ra vet do lem duoi chan ga trong anh ban gui.
     Texture chickenTexture;
 
-    if (!chickenTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/Sky_character.png"))
+    if (!chickenTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/chicken_character.png"))
     {
         cout << "Khong load duoc chicken\n";
         return -1;
@@ -73,7 +73,7 @@ int main()
     // = tam o se luon trung voi tam nhan vat, khong bi lech nua.
     chicken.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
 
-    chicken.setScale(0.5f, 0.5f);
+    chicken.setScale(0.4f, 0.4f);
 
     //----------------------------------
     // TINH VI TRI PHAN DAT TRONG (CO) TREN MAP

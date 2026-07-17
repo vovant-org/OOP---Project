@@ -160,6 +160,7 @@ sfml-window.lib
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CANIMAL.cpp" />
+    <ClCompile Include="CBIKE.cpp" />
     <ClCompile Include="CBIRD.cpp" />
     <ClCompile Include="CDINOSAUR.cpp" />
     <ClCompile Include="CFISH.cpp" />
@@ -177,6 +178,7 @@ sfml-window.lib
   <ItemGroup>
     <ClInclude Include="CANIMAL.h" />
     <ClInclude Include="CBeast.h" />
+    <ClInclude Include="CBIKE.h" />
     <ClInclude Include="CBIRD.h" />
     <ClInclude Include="CDINASOUR.h" />
     <ClInclude Include="CGAME.h" />
@@ -200,8 +202,7 @@ sfml-window.lib
     <Image Include="Map\Hell_map.png" />
     <Image Include="Map\Sky_map.png" />
     <Image Include="Obstacles\Beast.png" />
-    <Image Include="Obstacles\Bike_Obstacle_left.png" />
-    <Image Include="Obstacles\Bike_Obstacle_right.png" />
+    <Image Include="Obstacles\Bike_Obstacle.png" />
     <Image Include="Obstacles\Bird.png" />
     <Image Include="Obstacles\Bird_Obstacle_left.png" />
     <Image Include="Obstacles\Bird_Obstacle_right.png" />
@@ -215,14 +216,12 @@ sfml-window.lib
     <Image Include="Obstacles\HellTrain_Obstacle.png" />
     <Image Include="Obstacles\Hell_light.png" />
     <Image Include="Obstacles\Light_Ancient.png" />
-    <Image Include="Obstacles\Motor_Obstacle_left.png" />
-    <Image Include="Obstacles\Motor_Obstacle_right.png" />
+    <Image Include="Obstacles\Motor_Obstacle.png" />
     <Image Include="Obstacles\Piglin_Obstacle.png" />
     <Image Include="Obstacles\Plane_Obstacle_left.png" />
     <Image Include="Obstacles\Plane_Obstacle_right.png" />
     <Image Include="Obstacles\Sky_light.png" />
-    <Image Include="Obstacles\Truck_Obstacle_left.png" />
-    <Image Include="Obstacles\Truck_Obstacle_right.png" />
+    <Image Include="Obstacles\Truck_Obstacle.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

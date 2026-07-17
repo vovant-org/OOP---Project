@@ -1,23 +1,23 @@
-// CTRUCK.cpp
-#include "CTRUCK.h"
+// CBIKE.cpp
+#include "CBIKE.h"
 
-CTRUCK::CTRUCK(float startX, float startY, float spd, bool moveRight)
+CBIKE::CBIKE(float startX, float startY, float spd, bool moveRight)
     : CVEHICLE(startX, startY, spd, moveRight)
 {
-    frameWidth = 108;
-    frameHeight = 72;
-    frameTime = 0.15f;     // Xe tải to, animation chậm hơn (ít khi cần đổi frame)
+    frameWidth = 112;
+    frameHeight = 112;
+    frameTime = 0.1f;      // Xe đạp đảo chân khá nhanh
     elapsedTime = 0.f;
     currentFrame = 0;
 
-    texture.loadFromFile("assets/Truck_Obstacle.png"); // sheet 432x72, 4 frame 108x72
+    texture.loadFromFile("assets/Bke_Obstacle.png"); // sheet 448x112, 4 frame 112x112
     sprite.setTexture(texture);
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
-    sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
+    sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f); // tâm sprite để lật hình không lệch vị trí
     sprite.setPosition(x, y);
 }
 
-void CTRUCK::Update(float deltaTime)
+void CBIKE::Update(float deltaTime)
 {
     // Di chuyển: moveRight = true -> từ trái sang phải, ngược lại -> từ phải sang trái
     if (isMovingRight)
@@ -27,13 +27,13 @@ void CTRUCK::Update(float deltaTime)
 
     sprite.setPosition(x, y);
 
-    // Lật hình theo hướng di chuyển
+    // Lật hình theo hướng di chuyển (giả sử sprite gốc quay mặt phải)
     sprite.setScale(isMovingRight ? 1.f : -1.f, 1.f);
 
-    // Cập nhật animation
+    // Cập nhật animation (chạy bánh xe)
     elapsedTime += deltaTime;
     if (elapsedTime >= frameTime) {
-        currentFrame = (currentFrame + 1) % 4;
+        currentFrame = (currentFrame + 1) % 4; // dải 4 frame
         sprite.setTextureRect(sf::IntRect(currentFrame * frameWidth, 0, frameWidth, frameHeight));
         elapsedTime = 0.f;
     }
