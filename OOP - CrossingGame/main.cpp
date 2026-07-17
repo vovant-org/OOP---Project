@@ -1,63 +1,100 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
+
+using namespace sf;
+using namespace std;
 
 int main()
 {
-    // Tạo cửa sổ
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Crossing Game");
+    RenderWindow window(VideoMode(1920, 1080), "Crossing Game");
     window.setFramerateLimit(60);
 
-    //======================
-    // Load Map
-    //======================
-    sf::Texture mapTexture;
+    //----------------------------------
+    // MAP
+    //----------------------------------
+    Texture mapTexture;
+
     if (!mapTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Map/City_map.png"))
+    {
+        cout << "Khong load duoc map\n";
         return -1;
+    }
 
     Sprite map(mapTexture);
 
     map.setScale(
-        1920.f / mapSize.x,
-        1080.f / mapSize.y
+        1920.f / mapTexture.getSize().x,
+        1080.f / mapTexture.getSize().y
     );
 
-    map.setPosition(0.f, 0.f);
+    //----------------------------------
+    // CHICKEN
+    //----------------------------------
+    // QUAN TRONG: dung ban Chicken_character.png da CHUAN HOA (1040 x 1100),
+    // luoi 4 cot x 5 hang DEU NHAU (moi o 260 x 220px), khong con dung
+    // bang toa do rieng nua. Neu ban dang dung file Chicken_character.png
+    // BAN GOC (1254x1254, chua chuan hoa) thi PHAI dung lai bang chickenFrames
+    // cua lan truoc, KHONG duoc tron lan 2 kieu voi nhau - do chinh la
+    // nguyen nhan gay ra vet do lem duoi chan ga trong anh ban gui.
+    Texture chickenTexture;
 
-    if (!chickenTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/Chicken_character.png"))
+    if (!chickenTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/Sky_character.png"))
+    {
+        cout << "Khong load duoc chicken\n";
         return -1;
+    }
 
-    sf::Sprite chicken(chickenTexture);
+    chickenTexture.setSmooth(false);
 
-    // Sprite sheet có 4 cột × 5 hàng
-    int frameWidth = chickenTexture.getSize().x / 4;
-    int frameHeight = chickenTexture.getSize().y / 5;
+    cout << "Texture = "
+        << chickenTexture.getSize().x
+        << " x "
+        << chickenTexture.getSize().y
+        << endl;
 
-    // Lấy frame đầu tiên của hàng DOWN
-    chicken.setTextureRect(sf::IntRect(
-        0,
-        frameHeight,
+    // Anh chuan hoa co luoi DEU: 4 cot x 5 hang
+    // -> chia deu la chinh xac, khong bi lech o nhu ban goc truoc day
+    int frameWidth = chickenTexture.getSize().x / 4;   // = 260
+    int frameHeight = chickenTexture.getSize().y / 5;  // = 220
+
+    Sprite chicken(chickenTexture);
+
+    int frame = 0;
+    int direction = 1; // 0=UP, 1=DOWN, 2=LEFT, 3=RIGHT, 4=DIE/DIZZY
+
+    chicken.setTextureRect(IntRect(
+        frame * frameWidth,
+        direction * frameHeight,
         frameWidth,
         frameHeight
     ));
 
-    // Phóng to nhân vật
-    chicken.setScale(3.f, 3.f);
+    // Anh da duoc can giua nhan vat trong tung o san, nen origin
+    // = tam o se luon trung voi tam nhan vat, khong bi lech nua.
+    chicken.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
 
-    // Đặt giữa màn hình
-    chicken.setPosition(
-        1920 / 2.f - frameWidth * 1.5f,
-        1080 - 180.f
-    );
+    chicken.setScale(0.5f, 0.5f);
 
-    //======================
-    // Game Loop
-    //======================
+    //----------------------------------
+    // TINH VI TRI PHAN DAT TRONG (CO) TREN MAP
+    //----------------------------------
+    float grassStartYOriginal = 855.f;
+    float grassStartOnScreen = grassStartYOriginal * map.getScale().y;
+    float windowBottom = 1080.f;
+
+    float chickenY = (grassStartOnScreen + windowBottom) / 2.f;
+    float chickenX = 960.f;
+
+    chicken.setPosition(chickenX, chickenY);
+
+    //----------------------------------
     while (window.isOpen())
     {
-        sf::Event event;
+        Event event;
 
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            if (event.type == Event::Closed)
                 window.close();
         }
 

@@ -139,9 +139,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Character\Kight_Character.png">
-      <Filter>Resource Files\Charater</Filter>
-    </Image>
     <Image Include="Obstacles\HellMotor_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
@@ -151,13 +148,7 @@
     <Image Include="Obstacles\Piglin_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
-    <Image Include="Character\Chicken_character.png">
-      <Filter>Resource Files\Charater</Filter>
-    </Image>
     <Image Include="Character\Sky_Character.png">
-      <Filter>Resource Files\Charater</Filter>
-    </Image>
-    <Image Include="Character\Luffy_Charater.png">
       <Filter>Resource Files\Charater</Filter>
     </Image>
     <Image Include="Obstacles\Beast.png">
@@ -234,6 +225,15 @@
     </Image>
     <Image Include="Map\Ancient_map.png">
       <Filter>Resource Files\Map</Filter>
+    </Image>
+    <Image Include="Character\Chicken_character.png">
+      <Filter>Resource Files\Charater</Filter>
+    </Image>
+    <Image Include="Character\Knight_character.png">
+      <Filter>Resource Files\Charater</Filter>
+    </Image>
+    <Image Include="Character\Ancient_character.png">
+      <Filter>Resource Files\Charater</Filter>
     </Image>
   </ItemGroup>
 </Project>
