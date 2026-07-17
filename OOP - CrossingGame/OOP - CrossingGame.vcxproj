@@ -201,14 +201,13 @@ sfml-window.lib
     <Image Include="Map\City_map.png" />
     <Image Include="Map\Hell_map.png" />
     <Image Include="Map\Sky_map.png" />
+    <Image Include="Obstacles\Angle_Obstacle.png" />
     <Image Include="Obstacles\Beast.png" />
     <Image Include="Obstacles\Bike_Obstacle.png" />
     <Image Include="Obstacles\Bird.png" />
-    <Image Include="Obstacles\Bird_Obstacle_left.png" />
-    <Image Include="Obstacles\Bird_Obstacle_right.png" />
+    <Image Include="Obstacles\Bird_Obstacle.png" />
     <Image Include="Obstacles\City_light.png" />
-    <Image Include="Obstacles\Cloud_Obstacle_left.png" />
-    <Image Include="Obstacles\Cloud_Obstacle_right.png" />
+    <Image Include="Obstacles\Cloud_Obstacle.png" />
     <Image Include="Obstacles\Dinosaur.png" />
     <Image Include="Obstacles\Fish.png" />
     <Image Include="Obstacles\HellGiant_Obstacle.png" />
@@ -218,8 +217,6 @@ sfml-window.lib
     <Image Include="Obstacles\Light_Ancient.png" />
     <Image Include="Obstacles\Motor_Obstacle.png" />
     <Image Include="Obstacles\Piglin_Obstacle.png" />
-    <Image Include="Obstacles\Plane_Obstacle_left.png" />
-    <Image Include="Obstacles\Plane_Obstacle_right.png" />
     <Image Include="Obstacles\Sky_light.png" />
     <Image Include="Obstacles\Truck_Obstacle.png" />
   </ItemGroup>

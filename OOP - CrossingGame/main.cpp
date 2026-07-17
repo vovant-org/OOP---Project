@@ -14,7 +14,7 @@ int main()
     //----------------------------------
     Texture mapTexture;
 
-    if (!mapTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Map/City_map.png"))
+    if (!mapTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Map/Sky_map.png"))
     {
         cout << "Khong load duoc map\n";
         return -1;
@@ -38,7 +38,7 @@ int main()
     // nguyen nhan gay ra vet do lem duoi chan ga trong anh ban gui.
     Texture chickenTexture;
 
-    if (!chickenTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/chicken_character.png"))
+    if (!chickenTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/Sky_character.png"))
     {
         cout << "Khong load duoc chicken\n";
         return -1;

@@ -187,25 +187,7 @@
     <Image Include="Map\Sky_map.png">
       <Filter>Resource Files\Map</Filter>
     </Image>
-    <Image Include="Obstacles\Bird_Obstacle_left.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Bird_Obstacle_right.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Cloud_Obstacle_left.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Cloud_Obstacle_right.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
     <Image Include="Obstacles\Hell_light.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Plane_Obstacle_left.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Plane_Obstacle_right.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
     <Image Include="Obstacles\Sky_light.png">
@@ -230,6 +212,15 @@
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
     <Image Include="Obstacles\Truck_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Angle_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Bird_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Cloud_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
   </ItemGroup>
