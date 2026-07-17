@@ -13,10 +13,7 @@ int main()
     if (!mapTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Map/City_map.png"))
         return -1;
 
-    sf::Sprite map(mapTexture);
-
-    // Scale map full màn hình
-    sf::Vector2u mapSize = mapTexture.getSize();
+    Sprite map(mapTexture);
 
     map.setScale(
         1920.f / mapSize.x,
@@ -25,10 +22,6 @@ int main()
 
     map.setPosition(0.f, 0.f);
 
-    //======================
-    // Load Chicken
-    //======================
-    sf::Texture chickenTexture;
     if (!chickenTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/Chicken_character.png"))
         return -1;
 
