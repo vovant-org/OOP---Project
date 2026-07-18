@@ -145,15 +145,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Obstacles\HellMotor_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\HellTrain_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Piglin_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
     <Image Include="Character\Sky_Character.png">
       <Filter>Resource Files\Charater</Filter>
     </Image>
@@ -167,9 +158,6 @@
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
     <Image Include="Obstacles\Fish.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\HellGiant_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
     <Image Include="Obstacles\Light_Ancient.png">
@@ -221,6 +209,18 @@
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
     <Image Include="Obstacles\Cloud_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Hellbrute_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Hellmotor_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Helltrain_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Hellpiglin_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
   </ItemGroup>
