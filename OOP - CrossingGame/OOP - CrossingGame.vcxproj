@@ -163,10 +163,10 @@ sfml-window.lib
     <ClCompile Include="CBIKE.cpp" />
     <ClCompile Include="CBIRD.cpp" />
     <ClCompile Include="CDINOSAUR.cpp" />
-    <ClCompile Include="CFISH.cpp" />
+    <ClCompile Include="CCROCODILE.h" />
     <ClCompile Include="CGAME.cpp" />
     <ClCompile Include="CMOTOR.cpp" />
-    <ClCompile Include="COldBird.cpp" />
+    <ClCompile Include="COLDBIRD.h" />
     <ClCompile Include="CPEOPLE.cpp" />
     <ClCompile Include="CTRAIN.cpp" />
     <ClCompile Include="CTRUCK.cpp" />
@@ -177,7 +177,7 @@ sfml-window.lib
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CANIMAL.h" />
-    <ClInclude Include="CBeast.h" />
+    <ClInclude Include="CBEAST.h" />
     <ClInclude Include="CBIKE.h" />
     <ClInclude Include="CBIRD.h" />
     <ClInclude Include="CDINASOUR.h" />
@@ -193,30 +193,30 @@ sfml-window.lib
     <ClInclude Include="TrafficLight.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Character\Ancient_character.png" />
     <Image Include="Character\Chicken_character.png" />
+    <Image Include="Character\Dog_character.png" />
     <Image Include="Character\Knight_character.png" />
-    <Image Include="Character\Sky_Character.png" />
+    <Image Include="Character\Luffy_character.png" />
     <Image Include="Map\Ancient_map.png" />
     <Image Include="Map\City_map.png" />
     <Image Include="Map\Hell_map.png" />
     <Image Include="Map\Sky_map.png" />
+    <Image Include="Obstacles\Ancient_light.png" />
     <Image Include="Obstacles\Angle_Obstacle.png" />
-    <Image Include="Obstacles\Beast.png" />
+    <Image Include="Obstacles\Beast_Obstacle.png" />
     <Image Include="Obstacles\Bike_Obstacle.png" />
-    <Image Include="Obstacles\Bird.png" />
     <Image Include="Obstacles\Bird_Obstacle.png" />
     <Image Include="Obstacles\City_light.png" />
     <Image Include="Obstacles\Cloud_Obstacle.png" />
-    <Image Include="Obstacles\Dinosaur.png" />
-    <Image Include="Obstacles\Fish.png" />
+    <Image Include="Obstacles\Crocodile_Obstacle.png" />
+    <Image Include="Obstacles\Dinasour_Obstacle.png" />
     <Image Include="Obstacles\Hellbrute_Obstacle.png" />
     <Image Include="Obstacles\Hellmotor_Obstacle.png" />
     <Image Include="Obstacles\Hellpiglin_Obstacle.png" />
     <Image Include="Obstacles\Helltrain_Obstacle.png" />
     <Image Include="Obstacles\Hell_light.png" />
-    <Image Include="Obstacles\Light_Ancient.png" />
     <Image Include="Obstacles\Motor_Obstacle.png" />
+    <Image Include="Obstacles\Oldbird_Obstacle.png" />
     <Image Include="Obstacles\Sky_light.png" />
     <Image Include="Obstacles\Truck_Obstacle.png" />
   </ItemGroup>

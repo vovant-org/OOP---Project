@@ -87,10 +87,10 @@
     <ClCompile Include="CBIRD.cpp">
       <Filter>Source Files\entities</Filter>
     </ClCompile>
-    <ClCompile Include="COldBird.cpp">
+    <ClCompile Include="COLDBIRD.h">
       <Filter>Header Files\entities</Filter>
     </ClCompile>
-    <ClCompile Include="CFISH.cpp">
+    <ClCompile Include="CCROCODILE.h">
       <Filter>Header Files\entities</Filter>
     </ClCompile>
     <ClCompile Include="CBIKE.cpp">
@@ -137,7 +137,7 @@
     <ClInclude Include="CObstacle.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="CBeast.h">
+    <ClInclude Include="CBEAST.h">
       <Filter>Header Files\entities</Filter>
     </ClInclude>
     <ClInclude Include="CBIKE.h">
@@ -145,24 +145,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Character\Sky_Character.png">
-      <Filter>Resource Files\Charater</Filter>
-    </Image>
-    <Image Include="Obstacles\Beast.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Bird.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Dinosaur.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Fish.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Light_Ancient.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
     <Image Include="Map\City_map.png">
       <Filter>Resource Files\Map</Filter>
     </Image>
@@ -188,9 +170,6 @@
       <Filter>Resource Files\Charater</Filter>
     </Image>
     <Image Include="Character\Knight_character.png">
-      <Filter>Resource Files\Charater</Filter>
-    </Image>
-    <Image Include="Character\Ancient_character.png">
       <Filter>Resource Files\Charater</Filter>
     </Image>
     <Image Include="Obstacles\Motor_Obstacle.png">
@@ -221,6 +200,27 @@
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
     <Image Include="Obstacles\Hellpiglin_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Character\Dog_character.png">
+      <Filter>Resource Files\Charater</Filter>
+    </Image>
+    <Image Include="Character\Luffy_character.png">
+      <Filter>Resource Files\Charater</Filter>
+    </Image>
+    <Image Include="Obstacles\Beast_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Crocodile_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Dinasour_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Oldbird_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Ancient_light.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
   </ItemGroup>
