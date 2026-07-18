@@ -172,24 +172,6 @@
     <Image Include="Character\Knight_character.png">
       <Filter>Resource Files\Charater</Filter>
     </Image>
-    <Image Include="Obstacles\Motor_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Bike_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Truck_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Angle_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Bird_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Cloud_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
     <Image Include="Obstacles\Hellbrute_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
@@ -208,19 +190,37 @@
     <Image Include="Character\Luffy_character.png">
       <Filter>Resource Files\Charater</Filter>
     </Image>
-    <Image Include="Obstacles\Beast_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Crocodile_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Dinasour_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
-    <Image Include="Obstacles\Oldbird_Obstacle.png">
-      <Filter>Resource Files\Obstacles</Filter>
-    </Image>
     <Image Include="Obstacles\Ancient_light.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Citybike_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Citymotor_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Citytruck_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Skyangle_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Skybird_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Skycloud_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Ancientbeast_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Ancientbird_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Ancientcrocodile_Obstacle.png">
+      <Filter>Resource Files\Obstacles</Filter>
+    </Image>
+    <Image Include="Obstacles\Ancientdinasour_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
   </ItemGroup>
