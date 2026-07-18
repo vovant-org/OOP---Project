@@ -1,10 +1,10 @@
 #pragma once
-// CMOTOR.h
+// CHELLMOTOR.h
 #include "CVEHICLE.h"
 
-class CMOTOR : public CVEHICLE {
+class CHELLMOTOR : public CVEHICLE {
 public:
-    CMOTOR(float startX, float startY, float spd, bool moveRight);
+    CHELLMOTOR(float startX, float startY, float spd, bool moveRight);
 
     void Update(float deltaTime) override;
     // Tùy chỉnh kích thước frameWidth, frameHeight cho phù hợp sprite xe máy

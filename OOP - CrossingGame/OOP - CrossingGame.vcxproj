@@ -176,16 +176,21 @@ sfml-window.lib
     <ClCompile Include="Map.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CANGLE.h" />
     <ClInclude Include="CANIMAL.h" />
     <ClInclude Include="CBEAST.h" />
     <ClInclude Include="CBIKE.h" />
     <ClInclude Include="CBIRD.h" />
+    <ClInclude Include="CBRUTE.h" />
+    <ClInclude Include="CCLOUD.h" />
     <ClInclude Include="CDINASOUR.h" />
     <ClInclude Include="CGAME.h" />
+    <ClInclude Include="CHELLMOTOR.h" />
     <ClInclude Include="CMOTOR.h" />
     <ClInclude Include="CObstacle.h" />
     <ClInclude Include="ConsoleHandle.h" />
     <ClInclude Include="CPEOPLE.h" />
+    <ClInclude Include="CPIGLIN.h" />
     <ClInclude Include="CTRAIN.h" />
     <ClInclude Include="CTRUCK.h" />
     <ClInclude Include="CVEHICLE.h" />

@@ -143,6 +143,21 @@
     <ClInclude Include="CBIKE.h">
       <Filter>Header Files\entities</Filter>
     </ClInclude>
+    <ClInclude Include="CBRUTE.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CPIGLIN.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CHELLMOTOR.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CCLOUD.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CANGLE.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Map\City_map.png">

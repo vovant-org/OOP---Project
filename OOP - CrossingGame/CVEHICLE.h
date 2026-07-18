@@ -1,6 +1,5 @@
 #pragma once
 // CVEHICLE.h
-#pragma once
 #include "CObstacle.h"
 
 class CVEHICLE : public CObstacle {

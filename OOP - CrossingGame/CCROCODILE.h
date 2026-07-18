@@ -1,9 +1,9 @@
 #pragma once
 #include "CANIMAL.h"
 
-class CFISH : public CANIMAL {
+class CCROCODILE : public CANIMAL {
 public:
-    CFISH(float startX, float startY, float spd, bool moveRight);
+    CCROCODILE(float startX, float startY, float spd, bool moveRight);
 
     void Update(float deltaTime) override;
 };
