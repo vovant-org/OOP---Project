@@ -117,6 +117,9 @@
     <ClCompile Include="TrafficLight.cpp">
       <Filter>Source Files\entities</Filter>
     </ClCompile>
+    <ClCompile Include="Sound-BackGround.mp3">
+      <Filter>Resource Files\Sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -277,8 +280,5 @@
     <Image Include="Obstacles\Ancientdinasour_Obstacle.png">
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="SoundBackGround.mp3" />
   </ItemGroup>
 </Project>
