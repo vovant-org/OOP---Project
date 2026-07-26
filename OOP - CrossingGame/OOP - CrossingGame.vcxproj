@@ -178,12 +178,12 @@ sfml-window.lib
     <ClCompile Include="CTRAIN.cpp" />
     <ClCompile Include="CTRUCK.cpp" />
     <ClCompile Include="CVEHICLE.cpp" />
-    <ClCompile Include="HUD.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="TrafficLight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="CANGLE.h" />
     <ClInclude Include="CANIMAL.h" />
     <ClInclude Include="CBEAST.h" />
@@ -193,6 +193,7 @@ sfml-window.lib
     <ClInclude Include="CCLOUD.h" />
     <ClInclude Include="CDINASOUR.h" />
     <ClInclude Include="CGAME.h" />
+    <ClInclude Include="CharacterSelection.h" />
     <ClInclude Include="CHELLMOTOR.h" />
     <ClInclude Include="CMOTOR.h" />
     <ClInclude Include="CObstacle.h" />
@@ -201,8 +202,12 @@ sfml-window.lib
     <ClInclude Include="CTRAIN.h" />
     <ClInclude Include="CTRUCK.h" />
     <ClInclude Include="CVEHICLE.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MenuBackground.h" />
     <ClInclude Include="ObstacleHelper.h" />
+    <ClInclude Include="PauseMenu.h" />
+    <ClInclude Include="SettingMenu.h" />
     <ClInclude Include="TrafficLight.h" />
   </ItemGroup>
   <ItemGroup>
