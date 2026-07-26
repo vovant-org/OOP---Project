@@ -159,13 +159,20 @@ sfml-window.lib
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CANGLE.cpp" />
     <ClCompile Include="CANIMAL.cpp" />
+    <ClCompile Include="CBEAST.cpp" />
     <ClCompile Include="CBIKE.cpp" />
     <ClCompile Include="CBIRD.cpp" />
+    <ClCompile Include="CCLOUD.cpp" />
+    <ClCompile Include="CCROCODILE.cpp" />
     <ClCompile Include="CDINOSAUR.cpp" />
     <ClCompile Include="CCROCODILE.h" />
     <ClCompile Include="CGAME.cpp" />
+    <ClCompile Include="CHELLMOTOR.cpp" />
     <ClCompile Include="CMOTOR.cpp" />
+    <ClCompile Include="CObstacle.cpp" />
+    <ClCompile Include="COLDBIRD.cpp" />
     <ClCompile Include="COLDBIRD.h" />
     <ClCompile Include="CPEOPLE.cpp" />
     <ClCompile Include="CTRAIN.cpp" />
@@ -174,6 +181,7 @@ sfml-window.lib
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="TrafficLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CANGLE.h" />
@@ -188,13 +196,13 @@ sfml-window.lib
     <ClInclude Include="CHELLMOTOR.h" />
     <ClInclude Include="CMOTOR.h" />
     <ClInclude Include="CObstacle.h" />
-    <ClInclude Include="ConsoleHandle.h" />
     <ClInclude Include="CPEOPLE.h" />
     <ClInclude Include="CPIGLIN.h" />
     <ClInclude Include="CTRAIN.h" />
     <ClInclude Include="CTRUCK.h" />
     <ClInclude Include="CVEHICLE.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="ObstacleHelper.h" />
     <ClInclude Include="TrafficLight.h" />
   </ItemGroup>
   <ItemGroup>

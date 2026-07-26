@@ -1,25 +1,23 @@
-// CBIKE.cpp — City map
-// Sprite: Citybike_Obstacle.png
-#include "CBIKE.h"
+// CCROCODILE.cpp — Ancient map
+// Sprite: Ancientcrocodile_Obstacle.png
+#include "CCROCODILE.h"
 #include "ObstacleHelper.h"
 
-CBIKE::CBIKE(float startX, float startY, float spd, bool moveRight)
-    : CVEHICLE(startX, startY, spd, moveRight)
+CCROCODILE::CCROCODILE(float startX, float startY, float spd, bool moveRight)
+    : CANIMAL(startX, startY, spd, moveRight)
 {
-    if (!texture.loadFromFile("Obstacles/Citybike_Obstacle.png")) return;
+    if (!texture.loadFromFile("Obstacles/Ancientcrocodile_Obstacle.png")) return;
 
     sprite.setTexture(texture);
 
-    // Sprite sheet ngang: N frame cùng hàng
     int totalFrames = 4;
     frameWidth = texture.getSize().x / totalFrames;
     frameHeight = texture.getSize().y;
-    frameTime = 0.10f;  // Xe đạp: animation vừa phải
+    frameTime = 0.15f;  // Cá sấu: di chuyển chậm, nguy hiểm
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
     sprite.setScale(0.18f, 0.18f);
 
-    // Lật ảnh nếu đi sang trái
     if (!isMovingRight) {
         sprite.setScale(-0.18f, 0.18f);
         sprite.setOrigin((float)frameWidth, 0.f);
@@ -28,7 +26,7 @@ CBIKE::CBIKE(float startX, float startY, float spd, bool moveRight)
     sprite.setPosition(x, y);
 }
 
-void CBIKE::Update(float deltaTime)
+void CCROCODILE::Update(float deltaTime)
 {
     OBSTACLE_UPDATE(4)
 }

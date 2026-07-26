@@ -1,32 +1,32 @@
-// CTRUCK.cpp — City map
-// Sprite: Citytruck_Obstacle.png
-#include "CTRUCK.h"
+// CHELLMOTOR.cpp — Hell map
+// Sprite: HellMotor_Obstacle.png
+#include "CHELLMOTOR.h"
 #include "ObstacleHelper.h"
 
-CTRUCK::CTRUCK(float startX, float startY, float spd, bool moveRight)
+CHELLMOTOR::CHELLMOTOR(float startX, float startY, float spd, bool moveRight)
     : CVEHICLE(startX, startY, spd, moveRight)
 {
-    if (!texture.loadFromFile("Obstacles/Citytruck_Obstacle.png")) return;
+    if (!texture.loadFromFile("Obstacles/HellMotor_Obstacle.png")) return;
 
     sprite.setTexture(texture);
 
     int totalFrames = 4;
     frameWidth = texture.getSize().x / totalFrames;
     frameHeight = texture.getSize().y;
-    frameTime = 0.12f;  // Xe tải: animation chậm hơn, xe nặng
+    frameTime = 0.06f;  // Hell motor: nhanh và hung hãn nhất
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
-    sprite.setScale(0.22f, 0.22f);  // Xe tải to hơn motor/bike
+    sprite.setScale(0.17f, 0.17f);
 
     if (!isMovingRight) {
-        sprite.setScale(-0.22f, 0.22f);
+        sprite.setScale(-0.17f, 0.17f);
         sprite.setOrigin((float)frameWidth, 0.f);
     }
 
     sprite.setPosition(x, y);
 }
 
-void CTRUCK::Update(float deltaTime)
+void CHELLMOTOR::Update(float deltaTime)
 {
     OBSTACLE_UPDATE(4)
 }
