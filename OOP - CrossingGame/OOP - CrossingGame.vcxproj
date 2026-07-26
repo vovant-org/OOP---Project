@@ -238,6 +238,9 @@ sfml-window.lib
     <Image Include="Obstacles\Skycloud_Obstacle.png" />
     <Image Include="Obstacles\Sky_light.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="SoundBackGround.mp3" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

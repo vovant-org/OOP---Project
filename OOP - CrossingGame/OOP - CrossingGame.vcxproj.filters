@@ -278,4 +278,7 @@
       <Filter>Resource Files\Obstacles</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="SoundBackGround.mp3" />
+  </ItemGroup>
 </Project>
