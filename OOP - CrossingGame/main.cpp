@@ -38,7 +38,7 @@ int main()
     // nguyen nhan gay ra vet do lem duoi chan ga trong anh ban gui.
     Texture chickenTexture;
 
-    if (!chickenTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/Knight_character.png"))
+    if (!chickenTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/Dog_character.png"))
     {
         cout << "Khong load duoc chicken\n";
         return -1;
