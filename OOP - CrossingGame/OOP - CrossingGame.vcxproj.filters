@@ -282,10 +282,10 @@
     <Media Include="Sound\Sound-BackGround.mp3">
       <Filter>Resource Files\Sound</Filter>
     </Media>
-    <Media Include="Sound\Ancient_map_backgroundmusic.mp3">
+    <Media Include="Sound\Ancientmap_backgroundmusic.mp3">
       <Filter>Resource Files\Sound</Filter>
     </Media>
-    <Media Include="Sound\Hell_map_backgroundmusic.mp3">
+    <Media Include="Sound\Hellmap_backgroundmusic.mp3">
       <Filter>Resource Files\Sound</Filter>
     </Media>
   </ItemGroup>
