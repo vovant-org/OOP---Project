@@ -288,5 +288,11 @@
     <Media Include="Sound\Hellmap_backgroundmusic.mp3">
       <Filter>Resource Files\Sound</Filter>
     </Media>
+    <Media Include="Sound\Citymap_backgroundmusic.mp3">
+      <Filter>Resource Files\Sound</Filter>
+    </Media>
+    <Media Include="Sound\Skymap_backgroundmusic.mp3">
+      <Filter>Resource Files\Sound</Filter>
+    </Media>
   </ItemGroup>
 </Project>

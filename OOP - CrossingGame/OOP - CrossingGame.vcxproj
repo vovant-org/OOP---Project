@@ -240,7 +240,9 @@ sfml-window.lib
   </ItemGroup>
   <ItemGroup>
     <Media Include="Sound\Ancientmap_backgroundmusic.mp3" />
+    <Media Include="Sound\Citymap_backgroundmusic.mp3" />
     <Media Include="Sound\Hellmap_backgroundmusic.mp3" />
+    <Media Include="Sound\Skymap_backgroundmusic.mp3" />
     <Media Include="Sound\Sound-BackGround.mp3" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
