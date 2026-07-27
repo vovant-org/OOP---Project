@@ -1,6 +1,7 @@
 // TrafficLight.h
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <string>
 
 // Enum để phân biệt trạng thái đèn cho dễ nhìn code
 enum LightState {
@@ -26,6 +27,9 @@ private:
 public:
     // Khởi tạo đèn ở một tọa độ cụ thể
     TrafficLight(float startX, float startY);
+
+    // Nạp texture (sprite sheet 2 frame: xanh + đỏ)
+    bool loadTexture(const std::string& path);
 
     void Update(float deltaTime); // Hàm này đếm thời gian và chuyển trạng thái
     void Draw(sf::RenderWindow& window);
