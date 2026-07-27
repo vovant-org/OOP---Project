@@ -180,7 +180,6 @@ sfml-window.lib
     <ClCompile Include="CVEHICLE.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="Sound-BackGround.mp3" />
     <ClCompile Include="TrafficLight.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +237,9 @@ sfml-window.lib
     <Image Include="Obstacles\Skybird_Obstacle.png" />
     <Image Include="Obstacles\Skycloud_Obstacle.png" />
     <Image Include="Obstacles\Sky_light.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Sound\Sound-BackGround.mp3" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
