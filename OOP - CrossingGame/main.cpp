@@ -126,6 +126,7 @@ int main()
     play.setCharacterSize(28);
     play.setScale(scaleX, scaleY);
     play.setPosition(buttonX, startY);
+    play.setFocused(false);
 
     //--------------------------------------------------
     // CONTINUE
@@ -140,6 +141,7 @@ int main()
     cont.setCharacterSize(28);
     cont.setScale(scaleX, scaleY);
     cont.setPosition(buttonX, startY + spacing);
+    cont.setFocused(false);
 
     //--------------------------------------------------
     // SETTINGS
@@ -154,6 +156,7 @@ int main()
     settings.setCharacterSize(28);
     settings.setScale(scaleX, scaleY);
     settings.setPosition(buttonX, startY + spacing * 2);
+    settings.setFocused(false);
 
     //--------------------------------------------------
     // LEADERBOARD
@@ -168,6 +171,7 @@ int main()
     leaderboard.setCharacterSize(28);
     leaderboard.setScale(scaleX, scaleY);
     leaderboard.setPosition(buttonX, startY + spacing * 3);
+    leaderboard.setFocused(false);
 
     //--------------------------------------------------
     // ABOUT
@@ -182,6 +186,7 @@ int main()
     about.setCharacterSize(28);
     about.setScale(scaleX, scaleY);
     about.setPosition(buttonX, startY + spacing * 4);
+    about.setFocused(false);
 
     //--------------------------------------------------
     // EXIT
@@ -196,6 +201,7 @@ int main()
     exit.setCharacterSize(28);
     exit.setScale(scaleX, scaleY);
     exit.setPosition(buttonX, startY + spacing * 5);
+    exit.setFocused(false);
 
     //--------------------------------------------------
     // Game Loop
@@ -214,6 +220,43 @@ int main()
         }
 
         menu.update();
+
+        switch (menu.getResult())
+        {
+        case MainMenuResult::Play:
+            std::cout << "PLAY\n";
+            menu.clearResult();
+            break;
+
+        case MainMenuResult::Continue:
+            std::cout << "CONTINUE\n";
+            menu.clearResult();
+            break;
+
+        case MainMenuResult::Settings:
+            std::cout << "SETTINGS\n";
+            menu.clearResult();
+            break;
+
+        case MainMenuResult::Leaderboard:
+            std::cout << "LEADERBOARD\n";
+            menu.clearResult();
+            break;
+
+        case MainMenuResult::About:
+            std::cout << "ABOUT\n";
+            menu.clearResult();
+            break;
+
+        case MainMenuResult::Exit:
+            std::cout << "EXIT\n";
+            menu.clearResult();
+            window.close();
+            break;
+
+        default:
+            break;
+        }
 
         window.clear();
 

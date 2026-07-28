@@ -46,7 +46,10 @@ void Button::setPosition(float x, float y)
 
 void Button::setScale(float scaleX, float scaleY)
 {
+    normalScale = { scaleX, scaleY };
+
     sprite.setScale(scaleX, scaleY);
+
     centerText();
 }
 
@@ -105,6 +108,16 @@ bool Button::isEnabled() const
     return enabled;
 }
 
+void Button::setFocused(bool focus)
+{
+    focused = focus;
+}
+
+bool Button::isFocused() const
+{
+    return focused;
+}
+
 bool Button::contains(sf::Vector2f mousePos) const
 {
     return sprite.getGlobalBounds().contains(mousePos);
@@ -113,6 +126,16 @@ bool Button::contains(sf::Vector2f mousePos) const
 bool Button::isPressed() const
 {
     return pressed;
+}
+
+void Button::press()
+{
+    if (!enabled)
+        return;
+
+    pressed = true;
+    pressAnimating = true;
+    pressClock.restart();
 }
 
 //==================================================
@@ -124,6 +147,15 @@ void Button::processEvent(const sf::Event& event,
 {
     if (!enabled)
         return;
+
+    if (pressAnimating)
+    {
+        if (pressClock.getElapsedTime() >= pressDuration)
+        {
+            pressed = false;
+            pressAnimating = false;
+        }
+    }
 
     sf::Vector2f mousePos =
         window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -147,16 +179,50 @@ void Button::update()
 {
     if (!enabled)
     {
+        sprite.setColor(sf::Color(180, 180, 180));
+
+        sprite.setScale(
+            normalScale.x,
+            normalScale.y);
+
         text.setFillColor(sf::Color(150, 150, 150));
+
+        centerText();
         return;
     }
 
     if (pressed)
+    {
+        sprite.setColor(pressedColor);
+
+        sprite.setScale(
+            normalScale.x * 0.97f,
+            normalScale.y * 0.97f);
+
         text.setFillColor(pressedColor);
-    else if (hovered)
+    }
+    else if (hovered || focused)
+    {
+        sprite.setColor(hoverColor);
+
+        sprite.setScale(
+            normalScale.x * hoverScale,
+            normalScale.y * hoverScale);
+
         text.setFillColor(hoverColor);
+    }
     else
+    {
+        sprite.setColor(normalColor);
+
+        sprite.setScale(
+            normalScale.x,
+            normalScale.y);
+
         text.setFillColor(normalColor);
+    }
+
+    centerText();
 }
 
 //==================================================

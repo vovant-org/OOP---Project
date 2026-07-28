@@ -7,6 +7,8 @@
 MainMenu::MainMenu()
 {
     buttons.resize(6);
+
+    updateFocus();
 }
 
 //==================================================
@@ -60,6 +62,63 @@ std::size_t MainMenu::getButtonCount() const
     return buttons.size();
 }
 
+void MainMenu::updateFocus()
+{
+    for (size_t i = 0; i < buttons.size(); i++)
+    {
+        buttons[i].setFocused(false);
+    }
+
+    if (!buttons.empty())
+    {
+        buttons[selectedIndex].setFocused(true);
+    }
+}
+
+//==================================================
+// Keyboard Navigation
+//==================================================
+
+void MainMenu::moveSelectionUp()
+{
+    if (buttons.empty())
+        return;
+
+    selectedIndex--;
+
+    if (selectedIndex < 0)
+        selectedIndex = static_cast<int>(buttons.size()) - 1;
+
+    updateFocus();
+}
+
+void MainMenu::moveSelectionDown()
+{
+    if (buttons.empty())
+        return;
+
+    selectedIndex++;
+
+    if (selectedIndex >= static_cast<int>(buttons.size()))
+        selectedIndex = 0;
+
+    updateFocus();
+}
+
+//==================================================
+// Result
+//==================================================
+
+MainMenuResult MainMenu::getResult() const
+{
+    return result;
+}
+
+void MainMenu::clearResult()
+{
+    result = MainMenuResult::None;
+}
+
 //==================================================
 // Menu
 //==================================================
@@ -67,6 +126,66 @@ std::size_t MainMenu::getButtonCount() const
 void MainMenu::processEvent(const sf::Event& event,
     const sf::RenderWindow& window)
 {
+    //------------------------------------------
+    // Keyboard
+    //------------------------------------------
+
+    if (event.type == sf::Event::KeyPressed)
+    {
+        switch (event.key.code)
+        {
+        case sf::Keyboard::Up:
+            moveSelectionUp();
+            break;
+
+        case sf::Keyboard::Down:
+            moveSelectionDown();
+            break;
+
+        case sf::Keyboard::Enter:
+
+            // Chạy animation nhấn button
+            buttons[selectedIndex].press();
+
+            // Trả về kết quả
+            switch (selectedIndex)
+            {
+            case 0:
+                result = MainMenuResult::Play;
+                break;
+
+            case 1:
+                result = MainMenuResult::Continue;
+                break;
+
+            case 2:
+                result = MainMenuResult::Settings;
+                break;
+
+            case 3:
+                result = MainMenuResult::Leaderboard;
+                break;
+
+            case 4:
+                result = MainMenuResult::About;
+                break;
+
+            case 5:
+                result = MainMenuResult::Exit;
+                break;
+            }
+
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    //------------------------------------------
+    // Mouse
+    //------------------------------------------
+
     for (auto& button : buttons)
     {
         button.processEvent(event, window);

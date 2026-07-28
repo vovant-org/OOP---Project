@@ -16,10 +16,22 @@ private:
 
     bool hovered = false;
     bool pressed = false;
+    bool focused = false;
     bool enabled = true;
 
     // Luôn căn giữa chữ trên button
     void centerText();
+
+    // Scale animation
+    sf::Vector2f normalScale;
+
+    float hoverScale = 1.05f;
+    float pressedScale = 0.97f;
+
+    // Press animation
+    sf::Clock pressClock;
+    bool pressAnimating = false;
+    sf::Time pressDuration = sf::milliseconds(50);
 
 public:
 
@@ -46,8 +58,13 @@ public:
     void setEnabled(bool enable);
     bool isEnabled() const;
 
+    void setFocused(bool focus);
+    bool isFocused() const;
+
     bool contains(sf::Vector2f mousePos) const;
     bool isPressed() const;
+
+    void press();
 
     // Update
     void processEvent(const sf::Event& event,
