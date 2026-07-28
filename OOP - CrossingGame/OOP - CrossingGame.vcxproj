@@ -183,6 +183,7 @@ sfml-window.lib
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MenuBackground.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="TrafficLight.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -207,6 +208,7 @@ sfml-window.lib
     <ClInclude Include="CTRUCK.h" />
     <ClInclude Include="CVEHICLE.h" />
     <ClInclude Include="GameOverMenu.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="LeaderboardMenu.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Map.h" />
@@ -214,6 +216,7 @@ sfml-window.lib
     <ClInclude Include="MenuBackground.h" />
     <ClInclude Include="ObstacleHelper.h" />
     <ClInclude Include="PauseMenu.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="SettingMenu.h" />
     <ClInclude Include="TrafficLight.h" />
     <ClInclude Include="WinMenu.h" />

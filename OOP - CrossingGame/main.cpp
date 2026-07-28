@@ -2,62 +2,52 @@
 #include <iostream>
 
 #include "MainMenu.h"
+#include "ResourceManager.h"
 
 int main()
 {
+    //--------------------------------------------------
+    // Window
+    //--------------------------------------------------
+
     sf::RenderWindow window(
         sf::VideoMode(1280, 720),
-        "Main Menu Test"
-    );
+        "Main Menu Test");
 
     window.setFramerateLimit(60);
 
     //--------------------------------------------------
-    // Load Background
+    // Resource Manager
     //--------------------------------------------------
 
-    sf::Texture backgroundTexture;
+    ResourceManager resources;
 
-    if (!backgroundTexture.loadFromFile(
+    if (!resources.loadTexture(
+        "ui/background",
         "ui/Background/CrossingGame_background.png"))
     {
         std::cout << "Cannot load background!\n";
         return -1;
     }
 
-    //--------------------------------------------------
-    // Load Logo
-    //--------------------------------------------------
-
-    sf::Texture logoTexture;
-
-    if (!logoTexture.loadFromFile(
+    if (!resources.loadTexture(
+        "ui/logo",
         "ui/Logo/CrossingGame_Logo.png"))
     {
         std::cout << "Cannot load logo!\n";
         return -1;
     }
 
-    //--------------------------------------------------
-    // Load Button Texture
-    //--------------------------------------------------
-
-    sf::Texture buttonTexture;
-
-    if (!buttonTexture.loadFromFile(
+    if (!resources.loadTexture(
+        "ui/button",
         "ui/Button/button_normal.png"))
     {
-        std::cout << "Cannot load button texture!\n";
+        std::cout << "Cannot load button!\n";
         return -1;
     }
 
-    //--------------------------------------------------
-    // Load Font
-    //--------------------------------------------------
-
-    sf::Font font;
-
-    if (!font.loadFromFile(
+    if (!resources.loadFont(
+        "font/pixel",
         "Font/PixelOperator.ttf"))
     {
         std::cout << "Cannot load font!\n";
@@ -65,143 +55,106 @@ int main()
     }
 
     //--------------------------------------------------
-    // Create Main Menu
+    // Main Menu
     //--------------------------------------------------
 
     MainMenu menu;
 
-    //-------------------------
+    //--------------------------------------------------
     // Background
-    //-------------------------
+    //--------------------------------------------------
 
-    menu.setBackgroundTexture(backgroundTexture);
+    menu.setBackgroundTexture(
+        resources.getTexture("ui/background"));
+
+    const sf::Texture& background =
+        resources.getTexture("ui/background");
 
     float bgScaleX =
         static_cast<float>(window.getSize().x) /
-        backgroundTexture.getSize().x;
+        background.getSize().x;
 
     float bgScaleY =
         static_cast<float>(window.getSize().y) /
-        backgroundTexture.getSize().y;
+        background.getSize().y;
 
     menu.setBackgroundScale(bgScaleX, bgScaleY);
 
-    //-------------------------
+    //--------------------------------------------------
     // Logo
-    //-------------------------
+    //--------------------------------------------------
 
-    menu.setLogoTexture(logoTexture);
+    menu.setLogoTexture(
+        resources.getTexture("ui/logo"));
 
     menu.setLogoScale(0.40f, 0.40f);
 
     menu.setLogoPosition(330.f, -50.f);
 
-    //-------------------------
-    // Button Common Size
-    //-------------------------
+    //--------------------------------------------------
+    // Button Common Settings
+    //--------------------------------------------------
 
-    float buttonWidth = 240.f;
-    float buttonHeight = 100.f;
+    const sf::Texture& buttonTexture =
+        resources.getTexture("ui/button");
+
+    const sf::Font& font =
+        resources.getFont("font/pixel");
+
+    constexpr float buttonWidth = 240.f;
+    constexpr float buttonHeight = 100.f;
 
     float scaleX =
-        buttonWidth / buttonTexture.getSize().x;
+        buttonWidth /
+        buttonTexture.getSize().x;
 
     float scaleY =
-        buttonHeight / buttonTexture.getSize().y;
+        buttonHeight /
+        buttonTexture.getSize().y;
 
-    float buttonX = 515.f;
-    float startY = 250.f;   // vị trí button đầu tiên, đẩy xuống 1 chút để không đụng logo
-    float spacing = 55.f;
-
-    //--------------------------------------------------
-    // PLAY
-    //--------------------------------------------------
-
-    Button& play =
-        menu.getButton(MainMenuButton::Play);
-
-    play.setTexture(buttonTexture);
-    play.setFont(font);
-    play.setText("PLAY");
-    play.setCharacterSize(28);
-    play.setScale(scaleX, scaleY);
-    play.setPosition(buttonX, startY);
-    play.setFocused(false);
+    constexpr float buttonX = 515.f;
+    constexpr float startY = 250.f;
+    constexpr float spacing = 55.f;
 
     //--------------------------------------------------
-    // CONTINUE
+    // Button Data
     //--------------------------------------------------
 
-    Button& cont =
-        menu.getButton(MainMenuButton::Continue);
-
-    cont.setTexture(buttonTexture);
-    cont.setFont(font);
-    cont.setText("CONTINUE");
-    cont.setCharacterSize(28);
-    cont.setScale(scaleX, scaleY);
-    cont.setPosition(buttonX, startY + spacing);
-    cont.setFocused(false);
-
-    //--------------------------------------------------
-    // SETTINGS
-    //--------------------------------------------------
-
-    Button& settings =
-        menu.getButton(MainMenuButton::Settings);
-
-    settings.setTexture(buttonTexture);
-    settings.setFont(font);
-    settings.setText("SETTINGS");
-    settings.setCharacterSize(28);
-    settings.setScale(scaleX, scaleY);
-    settings.setPosition(buttonX, startY + spacing * 2);
-    settings.setFocused(false);
+    const std::string buttonNames[] =
+    {
+        "PLAY",
+        "CONTINUE",
+        "SETTINGS",
+        "LEADERBOARD",
+        "ABOUT",
+        "EXIT"
+    };
 
     //--------------------------------------------------
-    // LEADERBOARD
+    // Create Buttons
     //--------------------------------------------------
 
-    Button& leaderboard =
-        menu.getButton(MainMenuButton::Leaderboard);
+    for (std::size_t i = 0; i < menu.getButtonCount(); i++)
+    {
+        Button& button =
+            menu.getButton(static_cast<MainMenuButton>(i));
 
-    leaderboard.setTexture(buttonTexture);
-    leaderboard.setFont(font);
-    leaderboard.setText("LEADERBOARD");
-    leaderboard.setCharacterSize(28);
-    leaderboard.setScale(scaleX, scaleY);
-    leaderboard.setPosition(buttonX, startY + spacing * 3);
-    leaderboard.setFocused(false);
+        button.setTexture(buttonTexture);
 
-    //--------------------------------------------------
-    // ABOUT
-    //--------------------------------------------------
+        button.setFont(font);
 
-    Button& about =
-        menu.getButton(MainMenuButton::About);
+        button.setText(buttonNames[i]);
 
-    about.setTexture(buttonTexture);
-    about.setFont(font);
-    about.setText("ABOUT");
-    about.setCharacterSize(28);
-    about.setScale(scaleX, scaleY);
-    about.setPosition(buttonX, startY + spacing * 4);
-    about.setFocused(false);
+        button.setCharacterSize(28);
 
-    //--------------------------------------------------
-    // EXIT
-    //--------------------------------------------------
+        button.setScale(scaleX, scaleY);
 
-    Button& exit =
-        menu.getButton(MainMenuButton::Exit);
+        button.setPosition(
+            buttonX,
+            startY + spacing * static_cast<float>(i));
 
-    exit.setTexture(buttonTexture);
-    exit.setFont(font);
-    exit.setText("EXIT");
-    exit.setCharacterSize(28);
-    exit.setScale(scaleX, scaleY);
-    exit.setPosition(buttonX, startY + spacing * 5);
-    exit.setFocused(false);
+        button.setFocused(false);
+    }
 
     //--------------------------------------------------
     // Game Loop
@@ -250,7 +203,6 @@ int main()
 
         case MainMenuResult::Exit:
             std::cout << "EXIT\n";
-            menu.clearResult();
             window.close();
             break;
 
