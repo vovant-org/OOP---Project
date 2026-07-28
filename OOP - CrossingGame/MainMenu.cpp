@@ -190,7 +190,31 @@ void MainMenu::processEvent(const sf::Event& event,
     {
         button.processEvent(event, window);
     }
+    if (event.type == sf::Event::MouseButtonReleased &&
+        event.mouseButton.button == sf::Mouse::Left)
+    {
+        for (size_t i = 0; i < buttons.size(); i++)
+        {
+            if (buttons[i].contains(
+                window.mapPixelToCoords(
+                    { event.mouseButton.x, event.mouseButton.y })))
+            {
+                buttons[i].press();
+
+                switch (i)
+                {
+                case 0: result = MainMenuResult::Play; break;
+                case 1: result = MainMenuResult::Continue; break;
+                case 2: result = MainMenuResult::Settings; break;
+                case 3: result = MainMenuResult::Leaderboard; break;
+                case 4: result = MainMenuResult::About; break;
+                case 5: result = MainMenuResult::Exit; break;
+                }
+            }
+        }
+    }
 }
+
 
 void MainMenu::update()
 {
