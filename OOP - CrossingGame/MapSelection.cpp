@@ -54,15 +54,28 @@ bool MapSelection::loadMapThumbnail(int index, const std::string& path)
     return true;
 }
 
+bool MapSelection::loadArrowTexture(const std::string& path)
+{
+    if (!leftArrowTexture.loadFromFile(path))
+    {
+        std::cout << "[MapSelection] Cannot load arrow: "
+            << path << "\n";
+        return false;
+    }
+
+    leftArrowTexture.setSmooth(true);
+    return true;
+}
+
 void MapSelection::setupButtons(const sf::Texture& buttonTex,
     float btnW, float btnH,
     float scaleX, float scaleY)
 {
-    prevButton.setTexture(buttonTex);
-    prevButton.setScale(scaleX * 0.5f, scaleY * 0.5f);
+    prevButton.setTexture(leftArrowTexture);
+    prevButton.setScale(0.18f, 0.18f);
 
-    nextButton.setTexture(buttonTex);
-    nextButton.setScale(scaleX * 0.5f, scaleY * 0.5f);
+    nextButton.setTexture(leftArrowTexture);
+    nextButton.setScale(-0.18f, 0.18f);
 
     playButton.setTexture(buttonTex);
     playButton.setScale(scaleX, scaleY);
@@ -78,8 +91,8 @@ void MapSelection::setupLayout()
     //--------------------------------------------------
     // Preview box (thumbnail map — chiếm phần lớn màn hình)
     //--------------------------------------------------
-    float pvW = W * 0.55f;
-    float pvH = H * 0.55f;
+    float pvW = W * 0.60f;
+    float pvH = H * 0.58f;
     float pvX = cx - pvW / 2.f;
     float pvY = H * 0.15f;
 
@@ -97,7 +110,7 @@ void MapSelection::setupLayout()
     // Title
     //--------------------------------------------------
     titleText.setString("SELECT MAP");
-    titleText.setCharacterSize(38);
+    titleText.setCharacterSize(44);
     titleText.setFillColor(sf::Color(255, 220, 80));
     titleText.setStyle(sf::Text::Bold);
     centerText(titleText, cx, H * 0.04f);
@@ -111,21 +124,17 @@ void MapSelection::setupLayout()
     //--------------------------------------------------
     // Map description
     //--------------------------------------------------
-    mapDescText.setCharacterSize(18);
+    mapDescText.setCharacterSize(20);
     mapDescText.setFillColor(sf::Color(180, 190, 210));
 
     //--------------------------------------------------
     // Nút < >
     //--------------------------------------------------
-    prevButton.setText("<");
-    prevButton.setFont(font);
-    prevButton.setCharacterSize(28);
-    prevButton.setPosition(pvX - 90.f, pvY + pvH / 2.f - 25.f);
+    prevButton.setText("");
+    prevButton.setPosition(pvX - 110.f, pvY + pvH / 2.f - 25.f);
 
-    nextButton.setText(">");
-    nextButton.setFont(font);
-    nextButton.setCharacterSize(28);
-    nextButton.setPosition(pvX + pvW + 20.f, pvY + pvH / 2.f - 25.f);
+    nextButton.setText("");
+    nextButton.setPosition(pvX + pvW + 50.f, pvY + pvH / 2.f - 25.f);
 
     //--------------------------------------------------
     // Nút PLAY
@@ -133,7 +142,7 @@ void MapSelection::setupLayout()
     playButton.setText("PLAY");
     playButton.setFont(font);
     playButton.setCharacterSize(26);
-    playButton.setPosition(cx - 150.f, H * 0.88f);
+    playButton.setPosition(cx - 170.f, H * 0.88f);
 
     //--------------------------------------------------
     // Nút BACK
@@ -141,7 +150,7 @@ void MapSelection::setupLayout()
     backButton.setText("BACK");
     backButton.setFont(font);
     backButton.setCharacterSize(26);
-    backButton.setPosition(cx + 20.f, H * 0.88f);
+    backButton.setPosition(cx + 50.f, H * 0.88f);
 
     //--------------------------------------------------
     // Dot indicators
@@ -161,7 +170,7 @@ void MapSelection::setupLayout()
     // Hint
     //--------------------------------------------------
     hintText.setString("LEFT / RIGHT  |  ENTER = Play  |  ESC = Back");
-    hintText.setCharacterSize(16);
+    hintText.setCharacterSize(18);
     hintText.setFillColor(sf::Color(120, 120, 140, 200));
     centerText(hintText, cx, H * 0.955f);
 

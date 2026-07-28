@@ -62,16 +62,37 @@ bool CharacterSelection::loadCharacterTexture(int index, const std::string& path
     return true;
 }
 
+bool CharacterSelection::loadUITextures(
+    const std::string& arrow,
+    const std::string& heart,
+    const std::string& lightning)
+{
+    bool ok = true;
+
+    ok &= leftArrowTexture.loadFromFile(arrow);
+    ok &= heartTexture.loadFromFile(heart);
+    ok &= lightningTexture.loadFromFile(lightning);
+
+    leftArrowTexture.setSmooth(true);
+    heartTexture.setSmooth(true);
+    lightningTexture.setSmooth(true);
+
+    return ok;
+}
+
 void CharacterSelection::setupButtons(const sf::Texture& buttonTex,
     float btnW, float btnH,
     float scaleX, float scaleY)
 {
     // Nút < >  đặt 2 bên preview
-    prevButton.setTexture(buttonTex);
-    prevButton.setScale(scaleX * 0.5f, scaleY * 0.5f);
+    prevButton.setTexture(leftArrowTexture);
+    prevButton.setScale(0.18f, 0.18f);
 
-    nextButton.setTexture(buttonTex);
-    nextButton.setScale(scaleX * 0.5f, scaleY * 0.5f);
+    nextButton.setTexture(leftArrowTexture);
+    nextButton.setScale(-0.18f, 0.18f);
+
+    selectButton.setTexture(buttonTex);
+    backButton.setTexture(buttonTex);
 
     // Nút SELECT
     selectButton.setTexture(buttonTex);
@@ -89,7 +110,7 @@ void CharacterSelection::setupLayout()
     //--------------------------------------------------
     // Preview box (giữa màn hình, chiếm ~30% chiều rộng)
     //--------------------------------------------------
-    float pvW = W * 0.28f;
+    float pvW = W * 0.40f;
     float pvH = H * 0.52f;
     float pvX = cx - pvW / 2.f;
     float pvY = H * 0.16f;
@@ -119,7 +140,7 @@ void CharacterSelection::setupLayout()
     // Title
     //--------------------------------------------------
     titleText.setString("SELECT CHARACTER");
-    titleText.setCharacterSize(36);
+    titleText.setCharacterSize(44);
     titleText.setFillColor(sf::Color(255, 220, 80));
     titleText.setStyle(sf::Text::Bold);
     centerText(titleText, cx, H * 0.04f);
@@ -127,18 +148,14 @@ void CharacterSelection::setupLayout()
     //--------------------------------------------------
     // Nút < prev — bên trái preview
     //--------------------------------------------------
-    prevButton.setText("<");
-    prevButton.setFont(font);
-    prevButton.setCharacterSize(26);
-    prevButton.setPosition(pvX - 80.f, pvY + pvH / 2.f - 25.f);
+    prevButton.setText("");
+    prevButton.setPosition(pvX - 120.f, pvY + pvH / 2.f - 25.f);
 
     //--------------------------------------------------
     // Nút > next — bên phải preview
     //--------------------------------------------------
-    nextButton.setText(">");
-    nextButton.setFont(font);
-    nextButton.setCharacterSize(26);
-    nextButton.setPosition(pvX + pvW + 10.f, pvY + pvH / 2.f - 25.f);
+    nextButton.setText("");
+    nextButton.setPosition(pvX + pvW + 50.f, pvY + pvH / 2.f - 25.f);
 
     //--------------------------------------------------
     // Nút SELECT
@@ -146,7 +163,7 @@ void CharacterSelection::setupLayout()
     selectButton.setText("SELECT");
     selectButton.setFont(font);
     selectButton.setCharacterSize(24);
-    selectButton.setPosition(cx - 140.f, H * 0.88f);
+    selectButton.setPosition(cx - 170.f, H * 0.88f);
 
     //--------------------------------------------------
     // Nút BACK
@@ -154,7 +171,7 @@ void CharacterSelection::setupLayout()
     backButton.setText("BACK");
     backButton.setFont(font);
     backButton.setCharacterSize(24);
-    backButton.setPosition(cx + 20.f, H * 0.88f);
+    backButton.setPosition(cx + 50.f, H * 0.88f);
 
     //--------------------------------------------------
     // Dot indicators
@@ -174,7 +191,7 @@ void CharacterSelection::setupLayout()
     // Hint
     //--------------------------------------------------
     hintText.setString("LEFT / RIGHT  |  ENTER = Select  |  ESC = Back");
-    hintText.setCharacterSize(16);
+    hintText.setCharacterSize(18);
     hintText.setFillColor(sf::Color(120, 120, 140, 200));
     centerText(hintText, cx, H * 0.95f);
 
@@ -298,25 +315,25 @@ void CharacterSelection::updateStatsText()
 
     // Tên nhân vật (chỉ tên thôi — theo yêu cầu)
     charNameText.setString(c.name);
-    charNameText.setCharacterSize(26);
+    charNameText.setCharacterSize(32);
     charNameText.setFillColor(sf::Color(255, 220, 80));
     charNameText.setStyle(sf::Text::Bold);
     centerText(charNameText,
         infoBox.getPosition().x + infoBox.getSize().x / 2.f,
         infoBox.getPosition().y + 10.f);
 
-    statSpeedText.setString("Speed : " + makeStars(c.speed));
+    statSpeedText.setString("Speed");
     statSpeedText.setCharacterSize(18);
     statSpeedText.setFillColor(sf::Color(200, 220, 255));
     statSpeedText.setPosition(lx, ty + dy * 1.f);
 
-    statHPText.setString("HP    : " + makeStars(c.hp));
+    statHPText.setString("HP");
     statHPText.setCharacterSize(18);
     statHPText.setFillColor(sf::Color(200, 220, 255));
     statHPText.setPosition(lx, ty + dy * 2.f);
 
     statSkillText.setString("Skill : " + c.skill);
-    statSkillText.setCharacterSize(18);
+    statSkillText.setCharacterSize(20);
     statSkillText.setFillColor(sf::Color(200, 220, 255));
     statSkillText.setPosition(lx, ty + dy * 3.f);
 }
@@ -417,6 +434,32 @@ void CharacterSelection::update(float deltaTime)
 // draw
 //==================================================
 
+void CharacterSelection::drawIcons(sf::RenderWindow& window) const
+{
+    sf::Sprite heart(heartTexture);
+    sf::Sprite lightning(lightningTexture);
+
+    heart.setScale(0.06f, 0.06f);
+    lightning.setScale(0.06f, 0.06f);
+
+    float startX = infoBox.getPosition().x + 130.f;
+
+    float speedY = infoBox.getPosition().y + 50.f;
+    float hpY = infoBox.getPosition().y + 86.f;
+
+    for (int i = 0;i < charInfos[selectedIndex].speed;i++)
+    {
+        lightning.setPosition(startX + i * 28.f, speedY);
+        window.draw(lightning);
+    }
+
+    for (int i = 0;i < charInfos[selectedIndex].hp;i++)
+    {
+        heart.setPosition(startX + i * 28.f, hpY);
+        window.draw(heart);
+    }
+}
+
 void CharacterSelection::draw(sf::RenderWindow& window) const
 {
     // Background
@@ -445,6 +488,9 @@ void CharacterSelection::draw(sf::RenderWindow& window) const
     window.draw(charNameText);
     window.draw(statSpeedText);
     window.draw(statHPText);
+
+    drawIcons(window);
+
     window.draw(statSkillText);
 
     // Buttons
@@ -464,15 +510,6 @@ void CharacterSelection::draw(sf::RenderWindow& window) const
 //==================================================
 // Private helpers
 //==================================================
-
-std::string CharacterSelection::makeStars(int val) const
-{
-    // Dùng ASCII thay Unicode để tránh encoding issue
-    std::string s;
-    for (int i = 0; i < 5; i++)
-        s += (i < val) ? "* " : ". ";
-    return s;
-}
 
 void CharacterSelection::centerText(sf::Text& t, float cx, float y)
 {

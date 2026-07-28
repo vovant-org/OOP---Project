@@ -50,6 +50,9 @@ private:
     std::array<sf::Texture, MAP_COUNT> mapTextures;
     std::array<sf::Sprite, MAP_COUNT> mapSprites;
 
+    // UI
+    sf::Texture leftArrowTexture;
+
     int selectedIndex = 0;
 
     // Buttons
@@ -94,6 +97,7 @@ public:
     void setBackgroundTexture(const sf::Texture& tex, float sx, float sy);
     bool loadFont(const std::string& path);
     bool loadMapThumbnail(int index, const std::string& path);
+    bool loadArrowTexture(const std::string& path);
     void setupButtons(const sf::Texture& buttonTex,
         float btnW, float btnH,
         float scaleX, float scaleY);

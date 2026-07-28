@@ -119,6 +119,12 @@ int main()
     charSelect.loadCharacterTexture(1, "Character/Knight_character.png");
     charSelect.loadCharacterTexture(2, "Character/Dog_character.png");
     charSelect.loadCharacterTexture(3, "Character/Luffy_character.png");
+    
+    charSelect.loadUITextures(
+        "ui/Icon/LeftArrow.png",
+        "ui/Icon/Heart.png",
+        "ui/Icon/Lightning.png");
+
     charSelect.setupButtons(buttonTexture, btnW, btnH, btnScaleX, btnScaleY);
     charSelect.setupLayout();
 
@@ -133,6 +139,10 @@ int main()
     mapSelect.loadMapThumbnail(1, "Map/Ancient_map.png");
     mapSelect.loadMapThumbnail(2, "Map/Hell_map.png");
     mapSelect.loadMapThumbnail(3, "Map/Sky_map.png");
+
+    mapSelect.loadArrowTexture(
+        "ui/Icon/LeftArrow.png");
+
     mapSelect.setupButtons(buttonTexture, btnW, btnH, btnScaleX, btnScaleY);
     mapSelect.setupLayout();
 

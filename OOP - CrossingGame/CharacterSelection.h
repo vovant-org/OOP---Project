@@ -20,8 +20,8 @@ enum class CharacterSelectionResult
 struct CharacterInfo
 {
     std::string name;
-    int         speed;
-    int         hp;
+    int speed;
+    int hp;
     std::string skill;
 };
 
@@ -41,22 +41,51 @@ private:
         { "Luffy",   4, 4, "Gear"  }
     } };
 
-    std::array<sf::Texture, CHARACTER_COUNT> charTextures;
-    std::array<sf::Sprite,  CHARACTER_COUNT> charSprites;
+    //--------------------------------------------------
+    // Character Preview
+    //--------------------------------------------------
 
-    int selectedIndex   = 0;
-    int previewFrame    = 0;
-    float frameTimer    = 0.f;
+    std::array<sf::Texture, CHARACTER_COUNT> charTextures;
+    std::array<sf::Sprite, CHARACTER_COUNT> charSprites;
+
+    //--------------------------------------------------
+    // UI Textures
+    //--------------------------------------------------
+
+    sf::Texture leftArrowTexture;
+    sf::Texture heartTexture;
+    sf::Texture lightningTexture;
+
+    //--------------------------------------------------
+    // UI Sprites
+    //--------------------------------------------------
+
+    sf::Sprite heartIcon;
+    sf::Sprite lightningIcon;
+
+    int selectedIndex = 0;
+    int previewFrame = 0;
+    float frameTimer = 0.f;
     float frameDuration = 0.12f;
-    int   frameW        = 0;
-    int   frameH        = 0;
+
+    int frameW = 0;
+    int frameH = 0;
+
+    //--------------------------------------------------
+    // Buttons
+    //--------------------------------------------------
 
     Button prevButton;
     Button nextButton;
     Button selectButton;
     Button backButton;
 
+    //--------------------------------------------------
+    // Text
+    //--------------------------------------------------
+
     sf::Font font;
+
     sf::Text titleText;
     sf::Text charNameText;
     sf::Text statSpeedText;
@@ -64,10 +93,22 @@ private:
     sf::Text statSkillText;
     sf::Text hintText;
 
+    //--------------------------------------------------
+    // Bottom Indicators
+    //--------------------------------------------------
+
     std::array<sf::CircleShape, CHARACTER_COUNT> dots;
+
+    //--------------------------------------------------
+    // Window
+    //--------------------------------------------------
 
     float W = 1280.f;
     float H = 720.f;
+
+    //--------------------------------------------------
+    // Boxes
+    //--------------------------------------------------
 
     sf::RectangleShape previewBox;
     sf::RectangleShape infoBox;
@@ -75,35 +116,60 @@ private:
 
     CharacterSelectionResult result = CharacterSelectionResult::None;
 
-    // helpers
-    std::string makeStars(int val) const;
-    void        updatePreview();
-    void        updateDots();
-    void        updateStatsText();
-    void        selectPrev();
-    void        selectNext();
-    void        centerText(sf::Text& t, float cx, float y);
+    //--------------------------------------------------
+    // Helpers
+    //--------------------------------------------------
+
+    void updatePreview();
+    void updateDots();
+    void updateStatsText();
+
+    void selectPrev();
+    void selectNext();
+
+    void centerText(sf::Text& t, float cx, float y);
+
+    // Draw Heart / Lightning icons
+    void drawIcons(sf::RenderWindow& window) const;
 
 public:
 
     CharacterSelection();
 
     void setWindowSize(float w, float h);
-    void setBackgroundTexture(const sf::Texture& tex, float sx, float sy);
+
+    void setBackgroundTexture(const sf::Texture& tex,
+        float sx,
+        float sy);
+
     bool loadFont(const std::string& path);
-    bool loadCharacterTexture(int index, const std::string& path);
+
+    bool loadCharacterTexture(int index,
+        const std::string& path);
+
+    // Load UI Icons
+    bool loadUITextures(const std::string& arrow,
+        const std::string& heart,
+        const std::string& lightning);
+
     void setupButtons(const sf::Texture& buttonTex,
-                      float btnW, float btnH,
-                      float scaleX, float scaleY);
+        float btnW,
+        float btnH,
+        float scaleX,
+        float scaleY);
+
     void setupLayout();
 
     CharacterSelectionResult getResult() const;
     void clearResult();
-    int  getSelectedIndex() const;
+
+    int getSelectedIndex() const;
 
     void processEvent(const sf::Event& event,
-                      const sf::RenderWindow& window) override;
+        const sf::RenderWindow& window) override;
+
     void update() override;
     void update(float deltaTime);
+
     void draw(sf::RenderWindow& window) const override;
 };
