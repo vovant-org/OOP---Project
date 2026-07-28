@@ -67,6 +67,9 @@
     <Filter Include="Resource Files\Font">
       <UniqueIdentifier>{e5bf829a-5346-4f3c-a0be-6798e431242c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\ui\Menu_Map">
+      <UniqueIdentifier>{1ffd3faa-0802-48d2-a76d-c07e26e93bf2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CANIMAL.cpp">
@@ -322,9 +325,6 @@
     <Image Include="ui\Button\button_normal.png">
       <Filter>Resource Files\ui\Button</Filter>
     </Image>
-    <Image Include="ui\Background\CrossingGame_background.png">
-      <Filter>Resource Files\ui\Background</Filter>
-    </Image>
     <Image Include="ui\Logo\CrossingGame_Logo.png">
       <Filter>Resource Files\ui\Logo</Filter>
     </Image>
@@ -333,6 +333,9 @@
     </Image>
     <Image Include="ui\Hint\CrossingGame_Select_Button.png">
       <Filter>Resource Files\ui\Hint</Filter>
+    </Image>
+    <Image Include="ui\Background\CrossingGame_background.png">
+      <Filter>Resource Files\ui\Background</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
