@@ -19,7 +19,7 @@ int main()
     sf::Texture backgroundTexture;
 
     if (!backgroundTexture.loadFromFile(
-        "Resource Files/ui/Background/CrossingGame_background.png"))
+        "ui/Background/CrossingGame_background.png"))
     {
         std::cout << "Cannot load background!\n";
         return -1;
@@ -32,7 +32,7 @@ int main()
     sf::Texture logoTexture;
 
     if (!logoTexture.loadFromFile(
-        "Resource Files/ui/Logo/CrossingGame_Logo.png"))
+        "ui/Logo/CrossingGame_Logo.png"))
     {
         std::cout << "Cannot load logo!\n";
         return -1;
@@ -45,7 +45,7 @@ int main()
     sf::Texture buttonTexture;
 
     if (!buttonTexture.loadFromFile(
-        "Resource Files/ui/Button/button_normal.png"))
+        "ui/Button/button_normal.png"))
     {
         std::cout << "Cannot load button texture!\n";
         return -1;
@@ -58,7 +58,7 @@ int main()
     sf::Font font;
 
     if (!font.loadFromFile(
-        "Resource Files/Font/PixelOperator.ttf"))
+        "Font/PixelOperator.ttf"))
     {
         std::cout << "Cannot load font!\n";
         return -1;
