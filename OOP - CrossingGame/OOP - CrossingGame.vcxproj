@@ -250,6 +250,7 @@ sfml-window.lib
     <Image Include="ui\Hint\CrossingGame_Exit_Button.png" />
     <Image Include="ui\Hint\CrossingGame_Select_Button.png" />
     <Image Include="ui\Logo\CrossingGame_Logo.png" />
+    <Image Include="ui\Menu_Map\MenuMap.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Sound\Ancientmap_backgroundmusic.mp3" />
