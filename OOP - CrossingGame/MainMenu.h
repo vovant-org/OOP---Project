@@ -18,6 +18,18 @@ enum class MainMenuButton
     Exit
 };
 
+enum class MainMenuResult
+{
+    None = 0,
+
+    Play,
+    Continue,
+    Settings,
+    Leaderboard,
+    About,
+    Exit
+};
+
 class MainMenu : public Menu
 {
 private:
@@ -30,6 +42,15 @@ private:
 
     // Buttons
     std::vector<Button> buttons;
+
+    int selectedIndex = 0;
+
+    MainMenuResult result = MainMenuResult::None;
+
+    void updateFocus();
+
+    void moveSelectionUp();
+    void moveSelectionDown();
 
 public:
 
@@ -63,6 +84,13 @@ public:
         const sf::RenderWindow& window) override;
 
     void update() override;
+
+    //==============================
+    // Result
+    //==============================
+    MainMenuResult getResult() const;
+
+    void clearResult();
 
     void draw(sf::RenderWindow& window) const override;
 };
