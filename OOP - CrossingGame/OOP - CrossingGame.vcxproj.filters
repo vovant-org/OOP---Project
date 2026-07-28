@@ -49,6 +49,21 @@
     <Filter Include="Resource Files\Sound">
       <UniqueIdentifier>{e805996b-2a38-44fd-b712-dcae2166b118}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\ui">
+      <UniqueIdentifier>{392e4fe5-6b2c-47a8-9cc5-6724c8d32ecf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\ui\Button">
+      <UniqueIdentifier>{bad03b66-ec47-460f-84e3-873b4a027d1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\ui\Background">
+      <UniqueIdentifier>{a79c5fb6-b7c9-4bd6-ab4c-43e52a6f293e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\ui\Logo">
+      <UniqueIdentifier>{a6ad434c-9a84-41e2-ae1c-9f99adb0973d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\ui\Hint">
+      <UniqueIdentifier>{c88a4bcc-58ab-4931-91fb-32fba19c39d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CANIMAL.cpp">
@@ -195,6 +210,21 @@
       <Filter>Header Files\ui</Filter>
     </ClInclude>
     <ClInclude Include="PauseMenu.h">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.h">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="AboutMenu.h">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="LeaderboardMenu.h">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOverMenu.h">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="WinMenu.h">
       <Filter>Header Files\ui</Filter>
     </ClInclude>
   </ItemGroup>

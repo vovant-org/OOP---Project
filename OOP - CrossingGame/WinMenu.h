@@ -3,18 +3,16 @@
 #include "Menu.h"
 #include "Button.h"
 
-class PauseMenu : public Menu
+class WinMenu : public Menu
 {
 private:
 
-    Button resumeButton;
-    Button restartButton;
-    Button settingButton;
+    Button nextLevelButton;
     Button mainMenuButton;
 
 public:
 
-    PauseMenu();
+    WinMenu();
 
     void processEvent(const sf::Event& event) override;
 
