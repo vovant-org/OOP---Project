@@ -1,0 +1,482 @@
+// CharacterSelection.cpp
+#include "CharacterSelection.h"
+#include <iostream>
+
+//==================================================
+// Constructor
+//==================================================
+
+CharacterSelection::CharacterSelection()
+{
+    // Sẽ được setup đầy đủ sau khi gọi setupLayout()
+}
+
+//==================================================
+// Setup
+//==================================================
+
+void CharacterSelection::setWindowSize(float w, float h)
+{
+    W = w;
+    H = h;
+}
+
+void CharacterSelection::setBackgroundTexture(const sf::Texture& tex,
+    float sx, float sy)
+{
+    background.setTexture(tex);
+    background.setScale(sx, sy);
+}
+
+bool CharacterSelection::loadFont(const std::string& path)
+{
+    if (!font.loadFromFile(path))
+    {
+        std::cout << "[CharacterSelection] Cannot load font: " << path << "\n";
+        return false;
+    }
+
+    titleText.setFont(font);
+    charNameText.setFont(font);
+    statSpeedText.setFont(font);
+    statHPText.setFont(font);
+    statSkillText.setFont(font);
+    hintText.setFont(font);
+
+    return true;
+}
+
+bool CharacterSelection::loadCharacterTexture(int index, const std::string& path)
+{
+    if (index < 0 || index >= CHARACTER_COUNT) return false;
+
+    if (!charTextures[index].loadFromFile(path))
+    {
+        std::cout << "[CharacterSelection] Cannot load character " << index
+            << ": " << path << "\n";
+        return false;
+    }
+
+    charTextures[index].setSmooth(false);
+    charSprites[index].setTexture(charTextures[index]);
+    return true;
+}
+
+void CharacterSelection::setupButtons(const sf::Texture& buttonTex,
+    float btnW, float btnH,
+    float scaleX, float scaleY)
+{
+    // Nút < >  đặt 2 bên preview
+    prevButton.setTexture(buttonTex);
+    prevButton.setScale(scaleX * 0.5f, scaleY * 0.5f);
+
+    nextButton.setTexture(buttonTex);
+    nextButton.setScale(scaleX * 0.5f, scaleY * 0.5f);
+
+    // Nút SELECT
+    selectButton.setTexture(buttonTex);
+    selectButton.setScale(scaleX, scaleY);
+
+    // Nút BACK
+    backButton.setTexture(buttonTex);
+    backButton.setScale(scaleX, scaleY);
+}
+
+void CharacterSelection::setupLayout()
+{
+    float cx = W / 2.f;
+
+    //--------------------------------------------------
+    // Preview box (giữa màn hình, chiếm ~30% chiều rộng)
+    //--------------------------------------------------
+    float pvW = W * 0.28f;
+    float pvH = H * 0.52f;
+    float pvX = cx - pvW / 2.f;
+    float pvY = H * 0.16f;
+
+    previewBox.setSize({ pvW, pvH });
+    previewBox.setPosition(pvX, pvY);
+    previewBox.setFillColor(sf::Color(10, 15, 30, 200));
+
+    previewBorder.setSize({ pvW + 6.f, pvH + 6.f });
+    previewBorder.setPosition(pvX - 3.f, pvY - 3.f);
+    previewBorder.setFillColor(sf::Color::Transparent);
+    previewBorder.setOutlineColor(sf::Color(255, 220, 80, 200));
+    previewBorder.setOutlineThickness(3.f);
+
+    //--------------------------------------------------
+    // Info box (bên dưới preview)
+    //--------------------------------------------------
+    float infoH = H * 0.22f;
+    infoBox.setSize({ pvW, infoH });
+    infoBox.setPosition(pvX, pvY + pvH + 10.f);
+    infoBox.setFillColor(sf::Color(10, 15, 30, 180));
+    // outline nhẹ
+    infoBox.setOutlineColor(sf::Color(100, 100, 120, 150));
+    infoBox.setOutlineThickness(1.f);
+
+    //--------------------------------------------------
+    // Title
+    //--------------------------------------------------
+    titleText.setString("SELECT CHARACTER");
+    titleText.setCharacterSize(36);
+    titleText.setFillColor(sf::Color(255, 220, 80));
+    titleText.setStyle(sf::Text::Bold);
+    centerText(titleText, cx, H * 0.04f);
+
+    //--------------------------------------------------
+    // Nút < prev — bên trái preview
+    //--------------------------------------------------
+    prevButton.setText("<");
+    prevButton.setFont(font);
+    prevButton.setCharacterSize(26);
+    prevButton.setPosition(pvX - 80.f, pvY + pvH / 2.f - 25.f);
+
+    //--------------------------------------------------
+    // Nút > next — bên phải preview
+    //--------------------------------------------------
+    nextButton.setText(">");
+    nextButton.setFont(font);
+    nextButton.setCharacterSize(26);
+    nextButton.setPosition(pvX + pvW + 10.f, pvY + pvH / 2.f - 25.f);
+
+    //--------------------------------------------------
+    // Nút SELECT
+    //--------------------------------------------------
+    selectButton.setText("SELECT");
+    selectButton.setFont(font);
+    selectButton.setCharacterSize(24);
+    selectButton.setPosition(cx - 140.f, H * 0.88f);
+
+    //--------------------------------------------------
+    // Nút BACK
+    //--------------------------------------------------
+    backButton.setText("BACK");
+    backButton.setFont(font);
+    backButton.setCharacterSize(24);
+    backButton.setPosition(cx + 20.f, H * 0.88f);
+
+    //--------------------------------------------------
+    // Dot indicators
+    //--------------------------------------------------
+    float dotY = pvY + pvH + infoH + 20.f;
+    float dotSpacing = 28.f;
+    float dotStartX = cx - (CHARACTER_COUNT - 1) * dotSpacing / 2.f;
+
+    for (int i = 0; i < CHARACTER_COUNT; i++)
+    {
+        dots[i].setRadius(7.f);
+        dots[i].setOrigin(7.f, 7.f);
+        dots[i].setPosition(dotStartX + i * dotSpacing, dotY);
+    }
+
+    //--------------------------------------------------
+    // Hint
+    //--------------------------------------------------
+    hintText.setString("LEFT / RIGHT  |  ENTER = Select  |  ESC = Back");
+    hintText.setCharacterSize(16);
+    hintText.setFillColor(sf::Color(120, 120, 140, 200));
+    centerText(hintText, cx, H * 0.95f);
+
+    //--------------------------------------------------
+    // Cập nhật nội dung lần đầu
+    //--------------------------------------------------
+    updatePreview();
+    updateDots();
+    updateStatsText();
+}
+
+//==================================================
+// Result
+//==================================================
+
+CharacterSelectionResult CharacterSelection::getResult() const
+{
+    return result;
+}
+
+void CharacterSelection::clearResult()
+{
+    result = CharacterSelectionResult::None;
+}
+
+int CharacterSelection::getSelectedIndex() const
+{
+    return selectedIndex;
+}
+
+//==================================================
+// Navigation
+//==================================================
+
+void CharacterSelection::selectPrev()
+{
+    selectedIndex = (selectedIndex - 1 + CHARACTER_COUNT) % CHARACTER_COUNT;
+    updatePreview();
+    updateDots();
+    updateStatsText();
+}
+
+void CharacterSelection::selectNext()
+{
+    selectedIndex = (selectedIndex + 1) % CHARACTER_COUNT;
+    updatePreview();
+    updateDots();
+    updateStatsText();
+}
+
+//==================================================
+// Update preview sprite
+//==================================================
+
+void CharacterSelection::updatePreview()
+{
+    previewFrame = 0;
+    frameTimer = 0.f;
+
+    auto& tex = charTextures[selectedIndex];
+    auto& sp = charSprites[selectedIndex];
+
+    if (tex.getSize().x == 0) return;
+
+    // Sprite sheet: 4 cols x 5 rows
+    // Row 0=down(front), 1=left, 2=right, 3=up(back), 4=die
+    // Dùng row 0 để preview (nhìn thẳng vào người chơi)
+    frameW = tex.getSize().x / 4;
+    frameH = tex.getSize().y / 5;
+
+    sp.setTextureRect(sf::IntRect(0, 0, frameW, frameH));
+    sp.setOrigin((float)frameW / 2.f, (float)frameH / 2.f);
+
+    // Scale vừa 60% preview box
+    float pvW = previewBox.getSize().x;
+    float pvH = previewBox.getSize().y;
+    float maxW = pvW * 0.60f;
+    float maxH = pvH * 0.70f;
+    float scale = std::min(maxW / frameW, maxH / frameH);
+    sp.setScale(scale, scale);
+
+    // Căn giữa preview box
+    sf::FloatRect pb = previewBox.getGlobalBounds();
+    sp.setPosition(pb.left + pb.width / 2.f,
+        pb.top + pb.height / 2.f);
+}
+
+//==================================================
+// Update dot indicators
+//==================================================
+
+void CharacterSelection::updateDots()
+{
+    for (int i = 0; i < CHARACTER_COUNT; i++)
+    {
+        if (i == selectedIndex)
+        {
+            dots[i].setRadius(9.f);
+            dots[i].setOrigin(9.f, 9.f);
+            dots[i].setFillColor(sf::Color(255, 220, 80));
+        }
+        else
+        {
+            dots[i].setRadius(6.f);
+            dots[i].setOrigin(6.f, 6.f);
+            dots[i].setFillColor(sf::Color(80, 80, 100));
+        }
+    }
+}
+
+//==================================================
+// Update stat texts
+//==================================================
+
+void CharacterSelection::updateStatsText()
+{
+    const auto& c = charInfos[selectedIndex];
+    float       lx = infoBox.getPosition().x + 20.f;
+    float       ty = infoBox.getPosition().y + 14.f;
+    float       dy = 36.f;
+
+    // Tên nhân vật (chỉ tên thôi — theo yêu cầu)
+    charNameText.setString(c.name);
+    charNameText.setCharacterSize(26);
+    charNameText.setFillColor(sf::Color(255, 220, 80));
+    charNameText.setStyle(sf::Text::Bold);
+    centerText(charNameText,
+        infoBox.getPosition().x + infoBox.getSize().x / 2.f,
+        infoBox.getPosition().y + 10.f);
+
+    statSpeedText.setString("Speed : " + makeStars(c.speed));
+    statSpeedText.setCharacterSize(18);
+    statSpeedText.setFillColor(sf::Color(200, 220, 255));
+    statSpeedText.setPosition(lx, ty + dy * 1.f);
+
+    statHPText.setString("HP    : " + makeStars(c.hp));
+    statHPText.setCharacterSize(18);
+    statHPText.setFillColor(sf::Color(200, 220, 255));
+    statHPText.setPosition(lx, ty + dy * 2.f);
+
+    statSkillText.setString("Skill : " + c.skill);
+    statSkillText.setCharacterSize(18);
+    statSkillText.setFillColor(sf::Color(200, 220, 255));
+    statSkillText.setPosition(lx, ty + dy * 3.f);
+}
+
+//==================================================
+// processEvent
+//==================================================
+
+void CharacterSelection::processEvent(const sf::Event& event,
+    const sf::RenderWindow& window)
+{
+    // ── Keyboard ──────────────────────────────────
+    if (event.type == sf::Event::KeyPressed)
+    {
+        switch (event.key.code)
+        {
+        case sf::Keyboard::Left:
+        case sf::Keyboard::A:
+            selectPrev();
+            break;
+
+        case sf::Keyboard::Right:
+        case sf::Keyboard::D:
+            selectNext();
+            break;
+
+        case sf::Keyboard::Return:
+            selectButton.press();
+            result = CharacterSelectionResult::Selected;
+            break;
+
+        case sf::Keyboard::Escape:
+            backButton.press();
+            result = CharacterSelectionResult::Back;
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    // ── Mouse ─────────────────────────────────────
+    prevButton.processEvent(event, window);
+    nextButton.processEvent(event, window);
+    selectButton.processEvent(event, window);
+    backButton.processEvent(event, window);
+
+    if (event.type == sf::Event::MouseButtonReleased &&
+        event.mouseButton.button == sf::Mouse::Left)
+    {
+        sf::Vector2f mp = window.mapPixelToCoords(
+            sf::Mouse::getPosition(window));
+
+        if (prevButton.contains(mp))   selectPrev();
+        if (nextButton.contains(mp))   selectNext();
+        if (selectButton.contains(mp)) result = CharacterSelectionResult::Selected;
+        if (backButton.contains(mp))   result = CharacterSelectionResult::Back;
+    }
+}
+
+//==================================================
+// update (no deltaTime — required by Menu interface)
+//==================================================
+
+void CharacterSelection::update()
+{
+    prevButton.update();
+    nextButton.update();
+    selectButton.update();
+    backButton.update();
+}
+
+//==================================================
+// update (with deltaTime — for animation)
+//==================================================
+
+void CharacterSelection::update(float deltaTime)
+{
+    update();   // base update
+
+    // Animate preview
+    if (frameW <= 0) return;
+
+    frameTimer += deltaTime;
+    if (frameTimer >= frameDuration)
+    {
+        frameTimer = 0.f;
+        previewFrame = (previewFrame + 1) % 4;
+
+        auto& sp = charSprites[selectedIndex];
+        sp.setTextureRect(sf::IntRect(
+            previewFrame * frameW, 0,   // row 0 = walk down/front
+            frameW, frameH));
+    }
+}
+
+//==================================================
+// draw
+//==================================================
+
+void CharacterSelection::draw(sf::RenderWindow& window) const
+{
+    // Background
+    background.draw(window);
+
+    // Overlay tối nhẹ
+    sf::RectangleShape overlay;
+    overlay.setSize({ W, H });
+    overlay.setFillColor(sf::Color(0, 0, 0, 100));
+    window.draw(overlay);
+
+    // Title
+    window.draw(titleText);
+
+    // Preview frame
+    window.draw(previewBorder);
+    window.draw(previewBox);
+
+    // Character sprite
+    const auto& sp = charSprites[selectedIndex];
+    if (charTextures[selectedIndex].getSize().x > 0)
+        window.draw(sp);
+
+    // Info box
+    window.draw(infoBox);
+    window.draw(charNameText);
+    window.draw(statSpeedText);
+    window.draw(statHPText);
+    window.draw(statSkillText);
+
+    // Buttons
+    prevButton.draw(window);
+    nextButton.draw(window);
+    selectButton.draw(window);
+    backButton.draw(window);
+
+    // Dot indicators
+    for (const auto& dot : dots)
+        window.draw(dot);
+
+    // Hint
+    window.draw(hintText);
+}
+
+//==================================================
+// Private helpers
+//==================================================
+
+std::string CharacterSelection::makeStars(int val) const
+{
+    // Dùng ASCII thay Unicode để tránh encoding issue
+    std::string s;
+    for (int i = 0; i < 5; i++)
+        s += (i < val) ? "* " : ". ";
+    return s;
+}
+
+void CharacterSelection::centerText(sf::Text& t, float cx, float y)
+{
+    sf::FloatRect b = t.getLocalBounds();
+    t.setOrigin(b.left + b.width / 2.f, b.top);
+    t.setPosition(cx, y);
+}
