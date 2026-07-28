@@ -147,6 +147,12 @@
     <ClCompile Include="MainMenu.cpp">
       <Filter>Source Files\ui</Filter>
     </ClCompile>
+    <ClCompile Include="CharacterSelection.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="MapSelection.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -240,6 +246,9 @@
       <Filter>Header Files\ui</Filter>
     </ClInclude>
     <ClInclude Include="WinMenu.h">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="MapSelection.h">
       <Filter>Header Files\ui</Filter>
     </ClInclude>
   </ItemGroup>

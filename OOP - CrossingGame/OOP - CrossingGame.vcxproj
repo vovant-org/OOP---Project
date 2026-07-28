@@ -170,6 +170,7 @@ sfml-window.lib
     <ClCompile Include="CDINOSAUR.cpp" />
     <ClCompile Include="CCROCODILE.h" />
     <ClCompile Include="CGAME.cpp" />
+    <ClCompile Include="CharacterSelection.cpp" />
     <ClCompile Include="CHELLMOTOR.cpp" />
     <ClCompile Include="CMOTOR.cpp" />
     <ClCompile Include="CObstacle.cpp" />
@@ -182,6 +183,7 @@ sfml-window.lib
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MapSelection.cpp" />
     <ClCompile Include="MenuBackground.cpp" />
     <ClCompile Include="TrafficLight.cpp" />
   </ItemGroup>
@@ -210,6 +212,7 @@ sfml-window.lib
     <ClInclude Include="LeaderboardMenu.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MapSelection.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="MenuBackground.h" />
     <ClInclude Include="ObstacleHelper.h" />

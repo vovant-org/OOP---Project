@@ -1,267 +1,277 @@
+// main.cpp — Crossing Game
+// Luồng: MainMenu → CharacterSelection → MapSelection → Game
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
 #include "MainMenu.h"
+#include "CharacterSelection.h"
+#include "MapSelection.h"
+// #include "CGAME.h"   ← bật khi implement xong
 
+//==================================================
+// Hằng số
+//==================================================
+const unsigned int WIN_W = 1280;
+const unsigned int WIN_H = 720;
+
+const std::string FONT_PATH = "Font/PixelOperator.ttf";
+const std::string BG_PATH = "ui/Background/CrossingGame_background.png";
+const std::string LOGO_PATH = "ui/Logo/CrossingGame_Logo.png";
+const std::string BUTTON_PATH = "ui/Button/button_normal.png";
+
+//==================================================
+// Helper: load chung tài nguyên
+//==================================================
+static bool loadTexture(sf::Texture& tex, const std::string& path)
+{
+    if (!tex.loadFromFile(path))
+    {
+        std::cout << "[ERROR] Cannot load: " << path << "\n";
+        return false;
+    }
+    return true;
+}
+
+//==================================================
+// main
+//==================================================
 int main()
 {
     sf::RenderWindow window(
-        sf::VideoMode(1280, 720),
-        "Main Menu Test"
+        sf::VideoMode(WIN_W, WIN_H),
+        "Crossing Game",
+        sf::Style::Close
     );
-
     window.setFramerateLimit(60);
 
     //--------------------------------------------------
-    // Load Background
+    // Load shared assets
     //--------------------------------------------------
+    sf::Texture bgTexture, logoTexture, buttonTexture;
+    if (!loadTexture(bgTexture, BG_PATH))     return -1;
+    if (!loadTexture(logoTexture, LOGO_PATH))   return -1;
+    if (!loadTexture(buttonTexture, BUTTON_PATH)) return -1;
 
-    sf::Texture backgroundTexture;
+    float bgScaleX = (float)WIN_W / bgTexture.getSize().x;
+    float bgScaleY = (float)WIN_H / bgTexture.getSize().y;
 
-    if (!backgroundTexture.loadFromFile(
-        "ui/Background/CrossingGame_background.png"))
-    {
-        std::cout << "Cannot load background!\n";
-        return -1;
-    }
-
-    //--------------------------------------------------
-    // Load Logo
-    //--------------------------------------------------
-
-    sf::Texture logoTexture;
-
-    if (!logoTexture.loadFromFile(
-        "ui/Logo/CrossingGame_Logo.png"))
-    {
-        std::cout << "Cannot load logo!\n";
-        return -1;
-    }
-
-    //--------------------------------------------------
-    // Load Button Texture
-    //--------------------------------------------------
-
-    sf::Texture buttonTexture;
-
-    if (!buttonTexture.loadFromFile(
-        "ui/Button/button_normal.png"))
-    {
-        std::cout << "Cannot load button texture!\n";
-        return -1;
-    }
-
-    //--------------------------------------------------
-    // Load Font
-    //--------------------------------------------------
+    float btnW = 240.f, btnH = 100.f;
+    float btnScaleX = btnW / buttonTexture.getSize().x;
+    float btnScaleY = btnH / buttonTexture.getSize().y;
 
     sf::Font font;
-
-    if (!font.loadFromFile(
-        "Font/PixelOperator.ttf"))
+    if (!font.loadFromFile(FONT_PATH))
     {
-        std::cout << "Cannot load font!\n";
+        std::cout << "[ERROR] Cannot load font\n";
         return -1;
     }
 
     //--------------------------------------------------
-    // Create Main Menu
+    // State machine
     //--------------------------------------------------
+    enum class AppState { MainMenu, CharSelect, MapSelect, Playing, Exit };
+    AppState state = AppState::MainMenu;
 
-    MainMenu menu;
-
-    //-------------------------
-    // Background
-    //-------------------------
-
-    menu.setBackgroundTexture(backgroundTexture);
-
-    float bgScaleX =
-        static_cast<float>(window.getSize().x) /
-        backgroundTexture.getSize().x;
-
-    float bgScaleY =
-        static_cast<float>(window.getSize().y) /
-        backgroundTexture.getSize().y;
-
-    menu.setBackgroundScale(bgScaleX, bgScaleY);
-
-    //-------------------------
-    // Logo
-    //-------------------------
-
-    menu.setLogoTexture(logoTexture);
-
-    menu.setLogoScale(0.40f, 0.40f);
-
-    menu.setLogoPosition(330.f, -50.f);
-
-    //-------------------------
-    // Button Common Size
-    //-------------------------
-
-    float buttonWidth = 240.f;
-    float buttonHeight = 100.f;
-
-    float scaleX =
-        buttonWidth / buttonTexture.getSize().x;
-
-    float scaleY =
-        buttonHeight / buttonTexture.getSize().y;
-
-    float buttonX = 515.f;
-    float startY = 250.f;   // vị trí button đầu tiên, đẩy xuống 1 chút để không đụng logo
-    float spacing = 55.f;
+    int selectedCharIndex = 0;
+    int selectedMapIndex = 0;
 
     //--------------------------------------------------
-    // PLAY
+    // Build MainMenu
     //--------------------------------------------------
+    MainMenu mainMenu;
+    mainMenu.setBackgroundTexture(bgTexture);
+    mainMenu.setBackgroundScale(bgScaleX, bgScaleY);
+    mainMenu.setLogoTexture(logoTexture);
+    mainMenu.setLogoScale(0.40f, 0.40f);
+    mainMenu.setLogoPosition(330.f, -50.f);
 
-    Button& play =
-        menu.getButton(MainMenuButton::Play);
-
-    play.setTexture(buttonTexture);
-    play.setFont(font);
-    play.setText("PLAY");
-    play.setCharacterSize(28);
-    play.setScale(scaleX, scaleY);
-    play.setPosition(buttonX, startY);
-    play.setFocused(false);
-
-    //--------------------------------------------------
-    // CONTINUE
-    //--------------------------------------------------
-
-    Button& cont =
-        menu.getButton(MainMenuButton::Continue);
-
-    cont.setTexture(buttonTexture);
-    cont.setFont(font);
-    cont.setText("CONTINUE");
-    cont.setCharacterSize(28);
-    cont.setScale(scaleX, scaleY);
-    cont.setPosition(buttonX, startY + spacing);
-    cont.setFocused(false);
-
-    //--------------------------------------------------
-    // SETTINGS
-    //--------------------------------------------------
-
-    Button& settings =
-        menu.getButton(MainMenuButton::Settings);
-
-    settings.setTexture(buttonTexture);
-    settings.setFont(font);
-    settings.setText("SETTINGS");
-    settings.setCharacterSize(28);
-    settings.setScale(scaleX, scaleY);
-    settings.setPosition(buttonX, startY + spacing * 2);
-    settings.setFocused(false);
+    {
+        float bx = 515.f, startY = 250.f, spacing = 55.f;
+        auto setupBtn = [&](Button& btn, const std::string& text, float y) {
+            btn.setTexture(buttonTexture);
+            btn.setFont(font);
+            btn.setText(text);
+            btn.setCharacterSize(28);
+            btn.setScale(btnScaleX, btnScaleY);
+            btn.setPosition(bx, y);
+            btn.setFocused(false);
+            };
+        setupBtn(mainMenu.getButton(MainMenuButton::Play), "PLAY", startY);
+        setupBtn(mainMenu.getButton(MainMenuButton::Continue), "CONTINUE", startY + spacing);
+        setupBtn(mainMenu.getButton(MainMenuButton::Settings), "SETTINGS", startY + spacing * 2);
+        setupBtn(mainMenu.getButton(MainMenuButton::Leaderboard), "LEADERBOARD", startY + spacing * 3);
+        setupBtn(mainMenu.getButton(MainMenuButton::About), "ABOUT", startY + spacing * 4);
+        setupBtn(mainMenu.getButton(MainMenuButton::Exit), "EXIT", startY + spacing * 5);
+    }
 
     //--------------------------------------------------
-    // LEADERBOARD
+    // Build CharacterSelection
     //--------------------------------------------------
-
-    Button& leaderboard =
-        menu.getButton(MainMenuButton::Leaderboard);
-
-    leaderboard.setTexture(buttonTexture);
-    leaderboard.setFont(font);
-    leaderboard.setText("LEADERBOARD");
-    leaderboard.setCharacterSize(28);
-    leaderboard.setScale(scaleX, scaleY);
-    leaderboard.setPosition(buttonX, startY + spacing * 3);
-    leaderboard.setFocused(false);
-
-    //--------------------------------------------------
-    // ABOUT
-    //--------------------------------------------------
-
-    Button& about =
-        menu.getButton(MainMenuButton::About);
-
-    about.setTexture(buttonTexture);
-    about.setFont(font);
-    about.setText("ABOUT");
-    about.setCharacterSize(28);
-    about.setScale(scaleX, scaleY);
-    about.setPosition(buttonX, startY + spacing * 4);
-    about.setFocused(false);
+    CharacterSelection charSelect;
+    charSelect.setWindowSize((float)WIN_W, (float)WIN_H);
+    charSelect.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
+    charSelect.loadFont(FONT_PATH);
+    charSelect.loadCharacterTexture(0, "Character/Chicken_character.png");
+    charSelect.loadCharacterTexture(1, "Character/Knight_character.png");
+    charSelect.loadCharacterTexture(2, "Character/Dog_character.png");
+    charSelect.loadCharacterTexture(3, "Character/Luffy_character.png");
+    charSelect.setupButtons(buttonTexture, btnW, btnH, btnScaleX, btnScaleY);
+    charSelect.setupLayout();
 
     //--------------------------------------------------
-    // EXIT
+    // Build MapSelection
     //--------------------------------------------------
-
-    Button& exit =
-        menu.getButton(MainMenuButton::Exit);
-
-    exit.setTexture(buttonTexture);
-    exit.setFont(font);
-    exit.setText("EXIT");
-    exit.setCharacterSize(28);
-    exit.setScale(scaleX, scaleY);
-    exit.setPosition(buttonX, startY + spacing * 5);
-    exit.setFocused(false);
+    MapSelection mapSelect;
+    mapSelect.setWindowSize((float)WIN_W, (float)WIN_H);
+    mapSelect.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
+    mapSelect.loadFont(FONT_PATH);
+    mapSelect.loadMapThumbnail(0, "Map/City_map.png");
+    mapSelect.loadMapThumbnail(1, "Map/Ancient_map.png");
+    mapSelect.loadMapThumbnail(2, "Map/Hell_map.png");
+    mapSelect.loadMapThumbnail(3, "Map/Sky_map.png");
+    mapSelect.setupButtons(buttonTexture, btnW, btnH, btnScaleX, btnScaleY);
+    mapSelect.setupLayout();
 
     //--------------------------------------------------
-    // Game Loop
+    // Game loop
     //--------------------------------------------------
+    sf::Clock clock;
 
     while (window.isOpen())
     {
-        sf::Event event;
+        float dt = clock.restart().asSeconds();
 
+        sf::Event event;
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
+                break;
+            }
 
-            menu.processEvent(event, window);
+            switch (state)
+            {
+            case AppState::MainMenu:
+                mainMenu.processEvent(event, window);
+                break;
+
+            case AppState::CharSelect:
+                charSelect.processEvent(event, window);
+                break;
+
+            case AppState::MapSelect:
+                mapSelect.processEvent(event, window);
+                break;
+
+            default: break;
+            }
         }
 
-        menu.update();
-
-        switch (menu.getResult())
+        //----------------------------------------------
+        // Update + check transitions
+        //----------------------------------------------
+        switch (state)
         {
-        case MainMenuResult::Play:
-            std::cout << "PLAY\n";
-            menu.clearResult();
+            //========================
+        case AppState::MainMenu:
+            //========================
+            mainMenu.update();
+
+            switch (mainMenu.getResult())
+            {
+            case MainMenuResult::Play:
+                mainMenu.clearResult();
+                charSelect.clearResult();
+                state = AppState::CharSelect;
+                break;
+
+            case MainMenuResult::Continue:
+                std::cout << "[INFO] Continue — chưa implement\n";
+                mainMenu.clearResult();
+                break;
+
+            case MainMenuResult::Settings:
+                std::cout << "[INFO] Settings — chưa implement\n";
+                mainMenu.clearResult();
+                break;
+
+            case MainMenuResult::Exit:
+                window.close();
+                break;
+
+            default: break;
+            }
             break;
 
-        case MainMenuResult::Continue:
-            std::cout << "CONTINUE\n";
-            menu.clearResult();
+            //========================
+        case AppState::CharSelect:
+            //========================
+            charSelect.update(dt);
+
+            switch (charSelect.getResult())
+            {
+            case CharacterSelectionResult::Selected:
+                selectedCharIndex = charSelect.getSelectedIndex();
+                std::cout << "[INFO] Character selected: "
+                    << selectedCharIndex << "\n";
+                charSelect.clearResult();
+                mapSelect.clearResult();
+                state = AppState::MapSelect;
+                break;
+
+            case CharacterSelectionResult::Back:
+                charSelect.clearResult();
+                state = AppState::MainMenu;
+                break;
+
+            default: break;
+            }
             break;
 
-        case MainMenuResult::Settings:
-            std::cout << "SETTINGS\n";
-            menu.clearResult();
+            //========================
+        case AppState::MapSelect:
+            //========================
+            mapSelect.update();
+
+            switch (mapSelect.getResult())
+            {
+            case MapSelectionResult::Selected:
+                selectedMapIndex = mapSelect.getSelectedIndex();
+                std::cout << "[INFO] Map selected: "
+                    << selectedMapIndex << "\n";
+                mapSelect.clearResult();
+
+                // TODO: khởi tạo CGAME với selectedCharIndex + selectedMapIndex
+                // CGAME game(window, selectedCharIndex, selectedMapIndex);
+                // game.run();
+                // Sau khi game kết thúc → về MainMenu
+                state = AppState::MainMenu;
+                break;
+
+            case MapSelectionResult::Back:
+                mapSelect.clearResult();
+                state = AppState::CharSelect;
+                break;
+            default: break;
+            }
             break;
 
-        case MainMenuResult::Leaderboard:
-            std::cout << "LEADERBOARD\n";
-            menu.clearResult();
-            break;
-
-        case MainMenuResult::About:
-            std::cout << "ABOUT\n";
-            menu.clearResult();
-            break;
-
-        case MainMenuResult::Exit:
-            std::cout << "EXIT\n";
-            menu.clearResult();
-            window.close();
-            break;
-
-        default:
-            break;
+        default: break;
         }
 
+        //----------------------------------------------
+        // Draw
+        //----------------------------------------------
         window.clear();
 
-        menu.draw(window);
-
+        switch (state)
+        {
+        case AppState::MainMenu:  mainMenu.draw(window);   break;
+        case AppState::CharSelect: charSelect.draw(window); break;
+        case AppState::MapSelect:  mapSelect.draw(window);  break;
+        default: break;
+        }
         window.display();
     }
 
