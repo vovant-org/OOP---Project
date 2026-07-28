@@ -138,6 +138,12 @@
     <ClCompile Include="Button.cpp">
       <Filter>Source Files\ui</Filter>
     </ClCompile>
+    <ClCompile Include="MenuBackground.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">

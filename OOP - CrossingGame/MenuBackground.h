@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <string>
 
 class MenuBackground
 {
@@ -13,9 +12,13 @@ public:
 
     MenuBackground();
 
-    bool load(const std::string& filename);
+    void setTexture(const sf::Texture& texture);
 
     void setPosition(float x, float y);
 
-    void draw(sf::RenderWindow& window);
+    void setScale(float scaleX, float scaleY);
+
+    sf::FloatRect getGlobalBounds() const;
+
+    void draw(sf::RenderWindow& window) const;
 };

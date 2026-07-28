@@ -180,7 +180,9 @@ sfml-window.lib
     <ClCompile Include="CTRUCK.cpp" />
     <ClCompile Include="CVEHICLE.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MenuBackground.cpp" />
     <ClCompile Include="TrafficLight.cpp" />
   </ItemGroup>
   <ItemGroup>
