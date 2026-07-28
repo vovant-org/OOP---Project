@@ -1,107 +1,87 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-using namespace sf;
-using namespace std;
+#include "Button.h"
 
 int main()
 {
-    RenderWindow window(VideoMode(1920, 1080), "Crossing Game");
+    sf::RenderWindow window(
+        sf::VideoMode(1280, 720),
+        "Button Test");
+
     window.setFramerateLimit(60);
 
-    //----------------------------------
-    // MAP
-    //----------------------------------
-    Texture mapTexture;
+    //--------------------------------------------------
+    // Load Texture
+    //--------------------------------------------------
 
-    if (!mapTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Map/Hell_map.png"))
+    sf::Texture buttonTexture;
+
+    if (!buttonTexture.loadFromFile(
+        "D:/OOP_Project/OOP - CrossingGame/ui/Button/button_normal.png"))
     {
-        cout << "Khong load duoc map\n";
+        std::cout << "Cannot load button texture!\n";
         return -1;
     }
 
-    Sprite map(mapTexture);
+    //--------------------------------------------------
+    // Load Font
+    //--------------------------------------------------
 
-    map.setScale(
-        1920.f / mapTexture.getSize().x,
-        1080.f / mapTexture.getSize().y
+    sf::Font font;
+
+    if (!font.loadFromFile(
+        "D:/OOP_Project/OOP - CrossingGame/Font/PixelOperator.ttf"))
+    {
+        std::cout << "Cannot load font!\n";
+        return -1;
+    }
+
+    //--------------------------------------------------
+    // Create Button
+    //--------------------------------------------------
+
+    Button playButton;
+
+    playButton.setFont(font);
+
+    playButton.setText("PLAY");
+
+    playButton.setCharacterSize(24);
+
+    // Kích thước button mong muốn, ví dụ 240 x 70 px
+    float targetWidth = 240.f;
+    float targetHeight = 70.f;
+
+    playButton.setTexture(buttonTexture);
+    playButton.setScale(
+        targetWidth / buttonTexture.getSize().x,   // 240 / 1536
+        targetHeight / buttonTexture.getSize().y    // 70 / 1024
     );
 
-    //----------------------------------
-    // CHICKEN
-    //----------------------------------
-    // QUAN TRONG: dung ban Chicken_character.png da CHUAN HOA (1040 x 1100),
-    // luoi 4 cot x 5 hang DEU NHAU (moi o 260 x 220px), khong con dung
-    // bang toa do rieng nua. Neu ban dang dung file Chicken_character.png
-    // BAN GOC (1254x1254, chua chuan hoa) thi PHAI dung lai bang chickenFrames
-    // cua lan truoc, KHONG duoc tron lan 2 kieu voi nhau - do chinh la
-    // nguyen nhan gay ra vet do lem duoi chan ga trong anh ban gui.
-    Texture chickenTexture;
+    playButton.setPosition(440.f, 250.f);
 
-    if (!chickenTexture.loadFromFile("D:/OOP_Project/OOP - CrossingGame/Character/Dog_character.png"))
-    {
-        cout << "Khong load duoc chicken\n";
-        return -1;
-    }
+    //--------------------------------------------------
+    // Game Loop
+    //--------------------------------------------------
 
-    chickenTexture.setSmooth(false);
-
-    cout << "Texture = "
-        << chickenTexture.getSize().x
-        << " x "
-        << chickenTexture.getSize().y
-        << endl;
-
-    // Anh chuan hoa co luoi DEU: 4 cot x 5 hang
-    // -> chia deu la chinh xac, khong bi lech o nhu ban goc truoc day
-    int frameWidth = chickenTexture.getSize().x / 4;   // = 260
-    int frameHeight = chickenTexture.getSize().y / 5;  // = 220
-
-    Sprite chicken(chickenTexture);
-
-    int frame = 0;
-    int direction = 1; // 0=UP, 1=DOWN, 2=LEFT, 3=RIGHT, 4=DIE/DIZZY
-
-    chicken.setTextureRect(IntRect(
-        frame * frameWidth,
-        direction * frameHeight,
-        frameWidth,
-        frameHeight
-    ));
-
-    // Anh da duoc can giua nhan vat trong tung o san, nen origin
-    // = tam o se luon trung voi tam nhan vat, khong bi lech nua.
-    chicken.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-
-    chicken.setScale(0.4f, 0.4f);
-
-    //----------------------------------
-    // TINH VI TRI PHAN DAT TRONG (CO) TREN MAP
-    //----------------------------------
-    float grassStartYOriginal = 855.f;
-    float grassStartOnScreen = grassStartYOriginal * map.getScale().y;
-    float windowBottom = 1080.f;
-
-    float chickenY = (grassStartOnScreen + windowBottom) / 2.f;
-    float chickenX = 960.f;
-
-    chicken.setPosition(chickenX, chickenY);
-
-    //----------------------------------
     while (window.isOpen())
     {
-        Event event;
+        sf::Event event;
 
         while (window.pollEvent(event))
         {
-            if (event.type == Event::Closed)
+            if (event.type == sf::Event::Closed)
                 window.close();
+
+            playButton.processEvent(event, window);
         }
 
-        window.clear();
+        playButton.update();
 
-        window.draw(map);
-        window.draw(chicken);
+        window.clear(sf::Color(30, 30, 30));
+
+        playButton.draw(window);
 
         window.display();
     }

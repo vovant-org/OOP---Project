@@ -159,6 +159,7 @@ sfml-window.lib
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="CANGLE.cpp" />
     <ClCompile Include="CANIMAL.cpp" />
     <ClCompile Include="CBEAST.cpp" />
@@ -242,6 +243,11 @@ sfml-window.lib
     <Image Include="Obstacles\Skybird_Obstacle.png" />
     <Image Include="Obstacles\Skycloud_Obstacle.png" />
     <Image Include="Obstacles\Sky_light.png" />
+    <Image Include="ui\Background\CrossingGame_background.png" />
+    <Image Include="ui\Button\button_normal.png" />
+    <Image Include="ui\Hint\CrossingGame_Exit_Button.png" />
+    <Image Include="ui\Hint\CrossingGame_Select_Button.png" />
+    <Image Include="ui\Logo\CrossingGame_Logo.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Sound\Ancientmap_backgroundmusic.mp3" />
@@ -249,6 +255,9 @@ sfml-window.lib
     <Media Include="Sound\Hellmap_backgroundmusic.mp3" />
     <Media Include="Sound\Skymap_backgroundmusic.mp3" />
     <Media Include="Sound\Sound-BackGround.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Font\PixelOperator.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
