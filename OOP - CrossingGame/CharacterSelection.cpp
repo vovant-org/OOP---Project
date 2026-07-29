@@ -3,6 +3,20 @@
 #include <iostream>
 
 //==================================================
+// Helper: scale sprite theo kích thước mong muốn (px) thay vì
+// dùng hệ số scale cố định — tránh icon bị to/lệch khi đổi ảnh
+//==================================================
+static void fitSpriteToSize(sf::Sprite& sp, float targetW, float targetH, bool flipX = false)
+{
+    sf::Vector2u sz = sp.getTexture()->getSize();
+    if (sz.x == 0 || sz.y == 0) return;
+
+    float sx = targetW / (float)sz.x;
+    float sy = targetH / (float)sz.y;
+    sp.setScale(flipX ? -sx : sx, sy);
+}
+
+//==================================================
 // Constructor
 //==================================================
 
@@ -85,11 +99,23 @@ void CharacterSelection::setupButtons(const sf::Texture& buttonTex,
     float scaleX, float scaleY)
 {
     // Nút < >  đặt 2 bên preview
-    prevButton.setTexture(leftArrowTexture);
-    prevButton.setScale(0.18f, 0.18f);
+    // Scale theo kích thước px mong muốn (56x56) thay vì hệ số cố định,
+    // để không phụ thuộc độ phân giải ảnh mũi tên gốc
+    const float ARROW_SIZE = 56.f;
+    {
+        sf::Vector2u arrSz = leftArrowTexture.getSize();
+        if (arrSz.x > 0 && arrSz.y > 0)
+        {
+            float asx = ARROW_SIZE / (float)arrSz.x;
+            float asy = ARROW_SIZE / (float)arrSz.y;
 
-    nextButton.setTexture(leftArrowTexture);
-    nextButton.setScale(-0.18f, 0.18f);
+            prevButton.setTexture(leftArrowTexture);
+            prevButton.setScale(asx, asy);
+
+            nextButton.setTexture(leftArrowTexture);
+            nextButton.setScale(-asx, asy);
+        }
+    }
 
     selectButton.setTexture(buttonTex);
     backButton.setTexture(buttonTex);
@@ -111,9 +137,9 @@ void CharacterSelection::setupLayout()
     // Preview box (giữa màn hình, chiếm ~30% chiều rộng)
     //--------------------------------------------------
     float pvW = W * 0.40f;
-    float pvH = H * 0.52f;
+    float pvH = H * 0.42f;      // giảm bớt để chừa chỗ cho info box + nút bên dưới
     float pvX = cx - pvW / 2.f;
-    float pvY = H * 0.16f;
+    float pvY = H * 0.13f;
 
     previewBox.setSize({ pvW, pvH });
     previewBox.setPosition(pvX, pvY);
@@ -128,7 +154,7 @@ void CharacterSelection::setupLayout()
     //--------------------------------------------------
     // Info box (bên dưới preview)
     //--------------------------------------------------
-    float infoH = H * 0.22f;
+    float infoH = H * 0.17f;
     infoBox.setSize({ pvW, infoH });
     infoBox.setPosition(pvX, pvY + pvH + 10.f);
     infoBox.setFillColor(sf::Color(10, 15, 30, 180));
@@ -146,37 +172,23 @@ void CharacterSelection::setupLayout()
     centerText(titleText, cx, H * 0.04f);
 
     //--------------------------------------------------
-    // Nút < prev — bên trái preview
+    // Nút < prev — bên trái preview (canh giữa theo chiều cao preview)
     //--------------------------------------------------
+    const float arrowHalf = 28.f; // ARROW_SIZE / 2
     prevButton.setText("");
-    prevButton.setPosition(pvX - 120.f, pvY + pvH / 2.f - 25.f);
+    prevButton.setPosition(pvX - 50.f, pvY + pvH / 2.f - arrowHalf);
 
     //--------------------------------------------------
     // Nút > next — bên phải preview
     //--------------------------------------------------
     nextButton.setText("");
-    nextButton.setPosition(pvX + pvW + 50.f, pvY + pvH / 2.f - 25.f);
+    nextButton.setPosition(pvX + pvW + 50.f, pvY + pvH / 2.f - arrowHalf);
 
     //--------------------------------------------------
-    // Nút SELECT
+    // Dot indicators — ngay dưới info box
     //--------------------------------------------------
-    selectButton.setText("SELECT");
-    selectButton.setFont(font);
-    selectButton.setCharacterSize(24);
-    selectButton.setPosition(cx - 170.f, H * 0.88f);
-
-    //--------------------------------------------------
-    // Nút BACK
-    //--------------------------------------------------
-    backButton.setText("BACK");
-    backButton.setFont(font);
-    backButton.setCharacterSize(24);
-    backButton.setPosition(cx + 50.f, H * 0.88f);
-
-    //--------------------------------------------------
-    // Dot indicators
-    //--------------------------------------------------
-    float dotY = pvY + pvH + infoH + 20.f;
+    float infoBottom = pvY + pvH + 10.f + infoH;
+    float dotY = infoBottom + 18.f;
     float dotSpacing = 28.f;
     float dotStartX = cx - (CHARACTER_COUNT - 1) * dotSpacing / 2.f;
 
@@ -188,12 +200,27 @@ void CharacterSelection::setupLayout()
     }
 
     //--------------------------------------------------
+    // Nút SELECT / BACK — đặt dưới dots, đủ chỗ trước hint
+    //--------------------------------------------------
+    float buttonY = H * 0.80f;
+
+    selectButton.setText("SELECT");
+    selectButton.setFont(font);
+    selectButton.setCharacterSize(24);
+    selectButton.setPosition(cx - 250.f, buttonY);
+
+    backButton.setText("BACK");
+    backButton.setFont(font);
+    backButton.setCharacterSize(24);
+    backButton.setPosition(cx + 10.f, buttonY);
+
+    //--------------------------------------------------
     // Hint
     //--------------------------------------------------
     hintText.setString("LEFT / RIGHT  |  ENTER = Select  |  ESC = Back");
     hintText.setCharacterSize(18);
     hintText.setFillColor(sf::Color(120, 120, 140, 200));
-    centerText(hintText, cx, H * 0.95f);
+    centerText(hintText, cx, H * 0.955f);
 
     //--------------------------------------------------
     // Cập nhật nội dung lần đầu
@@ -309,7 +336,9 @@ void CharacterSelection::updateDots()
 void CharacterSelection::updateStatsText()
 {
     const auto& c = charInfos[selectedIndex];
-    float       lx = infoBox.getPosition().x + 20.f;
+    float       boxX = infoBox.getPosition().x;
+    float       boxW = infoBox.getSize().x;
+    float       lx = boxX + 20.f;
     float       ty = infoBox.getPosition().y + 14.f;
     float       dy = 36.f;
 
@@ -319,7 +348,7 @@ void CharacterSelection::updateStatsText()
     charNameText.setFillColor(sf::Color(255, 220, 80));
     charNameText.setStyle(sf::Text::Bold);
     centerText(charNameText,
-        infoBox.getPosition().x + infoBox.getSize().x / 2.f,
+        boxX + boxW / 2.f,
         infoBox.getPosition().y + 10.f);
 
     statSpeedText.setString("Speed");
@@ -332,10 +361,14 @@ void CharacterSelection::updateStatsText()
     statHPText.setFillColor(sf::Color(200, 220, 255));
     statHPText.setPosition(lx, ty + dy * 2.f);
 
+    // Skill — đưa sang cột bên phải của box, canh giữa theo chiều dọc
+    // với hàng Speed/HP thay vì xếp thêm 1 hàng bên dưới (dễ tràn box)
     statSkillText.setString("Skill : " + c.skill);
     statSkillText.setCharacterSize(20);
     statSkillText.setFillColor(sf::Color(200, 220, 255));
-    statSkillText.setPosition(lx, ty + dy * 3.f);
+    float skillX = boxX + boxW * 0.58f;
+    float skillY = ty + dy * 1.5f;
+    statSkillText.setPosition(skillX, skillY);
 }
 
 //==================================================
@@ -439,8 +472,12 @@ void CharacterSelection::drawIcons(sf::RenderWindow& window) const
     sf::Sprite heart(heartTexture);
     sf::Sprite lightning(lightningTexture);
 
-    heart.setScale(0.06f, 0.06f);
-    lightning.setScale(0.06f, 0.06f);
+    // Kích thước icon cố định theo px, không phụ thuộc ảnh gốc
+    const float ICON_SIZE = 22.f;
+    const float ICON_SPACING = ICON_SIZE + 6.f;
+
+    fitSpriteToSize(heart, ICON_SIZE, ICON_SIZE);
+    fitSpriteToSize(lightning, ICON_SIZE, ICON_SIZE);
 
     float startX = infoBox.getPosition().x + 130.f;
 
@@ -449,13 +486,13 @@ void CharacterSelection::drawIcons(sf::RenderWindow& window) const
 
     for (int i = 0;i < charInfos[selectedIndex].speed;i++)
     {
-        lightning.setPosition(startX + i * 28.f, speedY);
+        lightning.setPosition(startX + i * ICON_SPACING, speedY);
         window.draw(lightning);
     }
 
     for (int i = 0;i < charInfos[selectedIndex].hp;i++)
     {
-        heart.setPosition(startX + i * 28.f, hpY);
+        heart.setPosition(startX + i * ICON_SPACING, hpY);
         window.draw(heart);
     }
 }

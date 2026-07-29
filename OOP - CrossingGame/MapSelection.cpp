@@ -2,6 +2,20 @@
 #include "MapSelection.h"
 #include <iostream>
 using namespace std;
+
+//==================================================
+// Helper: scale sprite theo kích thước mong muốn (px) thay vì
+// dùng hệ số scale cố định — tránh icon bị to/lệch khi đổi ảnh
+//==================================================
+static void fitSpriteToSize(sf::Sprite& sp, float targetW, float targetH, bool flipX = false)
+{
+    sf::Vector2u sz = sp.getTexture()->getSize();
+    if (sz.x == 0 || sz.y == 0) return;
+
+    float sx = targetW / (float)sz.x;
+    float sy = targetH / (float)sz.y;
+    sp.setScale(flipX ? -sx : sx, sy);
+}
 //==================================================
 // Constructor
 //==================================================
@@ -71,11 +85,21 @@ void MapSelection::setupButtons(const sf::Texture& buttonTex,
     float btnW, float btnH,
     float scaleX, float scaleY)
 {
-    prevButton.setTexture(leftArrowTexture);
-    prevButton.setScale(0.18f, 0.18f);
+    // Scale mũi tên theo kích thước px mong muốn (56x56), không phụ
+    // thuộc độ phân giải ảnh gốc — tránh bị to/lệch tỉ lệ
+    const float ARROW_SIZE = 56.f;
+    sf::Vector2u arrSz = leftArrowTexture.getSize();
+    if (arrSz.x > 0 && arrSz.y > 0)
+    {
+        float asx = ARROW_SIZE / (float)arrSz.x;
+        float asy = ARROW_SIZE / (float)arrSz.y;
 
-    nextButton.setTexture(leftArrowTexture);
-    nextButton.setScale(-0.18f, 0.18f);
+        prevButton.setTexture(leftArrowTexture);
+        prevButton.setScale(asx, asy);
+
+        nextButton.setTexture(leftArrowTexture);
+        nextButton.setScale(-asx, asy);
+    }
 
     playButton.setTexture(buttonTex);
     playButton.setScale(scaleX, scaleY);
@@ -92,9 +116,9 @@ void MapSelection::setupLayout()
     // Preview box (thumbnail map — chiếm phần lớn màn hình)
     //--------------------------------------------------
     float pvW = W * 0.60f;
-    float pvH = H * 0.58f;
+    float pvH = H * 0.42f;      // giảm bớt để chừa chỗ cho tên map, mô tả, dots, nút
     float pvX = cx - pvW / 2.f;
-    float pvY = H * 0.15f;
+    float pvY = H * 0.13f;
 
     previewBox.setSize({ pvW, pvH });
     previewBox.setPosition(pvX, pvY);
@@ -130,32 +154,17 @@ void MapSelection::setupLayout()
     //--------------------------------------------------
     // Nút < >
     //--------------------------------------------------
+    const float arrowHalf = 28.f; // ARROW_SIZE / 2
     prevButton.setText("");
-    prevButton.setPosition(pvX - 110.f, pvY + pvH / 2.f - 25.f);
+    prevButton.setPosition(pvX - 50.f, pvY + pvH / 2.f - arrowHalf);
 
     nextButton.setText("");
-    nextButton.setPosition(pvX + pvW + 50.f, pvY + pvH / 2.f - 25.f);
+    nextButton.setPosition(pvX + pvW + 50.f, pvY + pvH / 2.f - arrowHalf);
 
     //--------------------------------------------------
-    // Nút PLAY
+    // Dot indicators — ngay dưới mô tả map (được đặt lại trong updateTexts())
     //--------------------------------------------------
-    playButton.setText("PLAY");
-    playButton.setFont(font);
-    playButton.setCharacterSize(26);
-    playButton.setPosition(cx - 170.f, H * 0.88f);
-
-    //--------------------------------------------------
-    // Nút BACK
-    //--------------------------------------------------
-    backButton.setText("BACK");
-    backButton.setFont(font);
-    backButton.setCharacterSize(26);
-    backButton.setPosition(cx + 50.f, H * 0.88f);
-
-    //--------------------------------------------------
-    // Dot indicators
-    //--------------------------------------------------
-    float dotY = pvY + pvH + 14.f;
+    float dotY = pvY + pvH + 116.f;  // chừa chỗ cho mapNameText + mapDescText
     float dotSpc = 32.f;
     float dotStartX = cx - (MAP_COUNT - 1) * dotSpc / 2.f;
 
@@ -165,6 +174,21 @@ void MapSelection::setupLayout()
         dots[i].setOrigin(7.f, 7.f);
         dots[i].setPosition(dotStartX + i * dotSpc, dotY);
     }
+
+    //--------------------------------------------------
+    // Nút PLAY / BACK — đặt dưới dots, đủ chỗ trước hint
+    //--------------------------------------------------
+    float buttonY = H * 0.80f;
+
+    playButton.setText("PLAY");
+    playButton.setFont(font);
+    playButton.setCharacterSize(26);
+    playButton.setPosition(cx - 250.f, buttonY);
+
+    backButton.setText("BACK");
+    backButton.setFont(font);
+    backButton.setCharacterSize(26);
+    backButton.setPosition(cx + 10.f, buttonY);
 
     //--------------------------------------------------
     // Hint

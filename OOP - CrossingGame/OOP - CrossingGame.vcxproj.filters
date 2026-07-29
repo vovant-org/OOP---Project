@@ -70,6 +70,9 @@
     <Filter Include="Resource Files\ui\Menu_Map">
       <UniqueIdentifier>{1ffd3faa-0802-48d2-a76d-c07e26e93bf2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\ui\Icon">
+      <UniqueIdentifier>{7b4360c3-4f7b-4fe2-ada5-97c6551dc295}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CANIMAL.cpp">
@@ -348,6 +351,15 @@
     </Image>
     <Image Include="ui\Menu_Map\MenuMap.png">
       <Filter>Resource Files\ui\Menu_Map</Filter>
+    </Image>
+    <Image Include="ui\Icon\Heart.png">
+      <Filter>Resource Files\ui\Icon</Filter>
+    </Image>
+    <Image Include="ui\Icon\LeftArrow.png">
+      <Filter>Resource Files\ui\Icon</Filter>
+    </Image>
+    <Image Include="ui\Icon\Lightning.png">
+      <Filter>Resource Files\ui\Icon</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

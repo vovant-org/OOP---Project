@@ -33,6 +33,39 @@ static bool loadTexture(sf::Texture& tex, const std::string& path)
 }
 
 //==================================================
+// Helper: letterbox — giữ đúng tỉ lệ WIN_W x WIN_H (canvas logic)
+// dù cửa sổ/màn hình thực tế có kích thước hay tỉ lệ khác (fullscreen, v.v.)
+// Nhờ vậy toàn bộ toạ độ UI (vốn tính theo pixel cố định 1280x720)
+// không bị vỡ layout khi bật fullscreen.
+//==================================================
+static void applyLetterboxView(sf::RenderWindow& window, sf::View& view)
+{
+    sf::Vector2u wsize = window.getSize();
+    if (wsize.x == 0 || wsize.y == 0) return;
+
+    float windowRatio = (float)wsize.x / (float)wsize.y;
+    float viewRatio = (float)WIN_W / (float)WIN_H;
+
+    float sizeX = 1.f, sizeY = 1.f, posX = 0.f, posY = 0.f;
+
+    if (windowRatio > viewRatio)
+    {
+        // Cửa sổ rộng hơn tỉ lệ 16:9 → viền đen 2 bên trái/phải
+        sizeX = viewRatio / windowRatio;
+        posX = (1.f - sizeX) / 2.f;
+    }
+    else
+    {
+        // Cửa sổ cao hơn tỉ lệ 16:9 → viền đen trên/dưới
+        sizeY = windowRatio / viewRatio;
+        posY = (1.f - sizeY) / 2.f;
+    }
+
+    view.setViewport(sf::FloatRect(posX, posY, sizeX, sizeY));
+    window.setView(view);
+}
+
+//==================================================
 // main
 //==================================================
 int main()
@@ -47,6 +80,13 @@ int main()
         sf::Style::Close
     );
     window.setFramerateLimit(60);
+
+    // View logic cố định 1280x720 — mọi toạ độ UI trong game đều tính
+    // theo view này, nên khi đổi kích thước cửa sổ / bật fullscreen,
+    // ta chỉ cần letterbox view chứ không cần sửa toạ độ UI ở đâu khác.
+    bool isFullscreen = false;
+    sf::View gameView(sf::FloatRect(0.f, 0.f, (float)WIN_W, (float)WIN_H));
+    applyLetterboxView(window, gameView);
 
     //--------------------------------------------------
     // Load shared assets
@@ -69,6 +109,8 @@ int main()
         std::cout << "[ERROR] Cannot load font\n";
         return -1;
     }
+
+    std::cout << "[INFO] Nhan F11 de bat/tat toan man hinh\n";
 
     //--------------------------------------------------
     // State machine
@@ -119,7 +161,7 @@ int main()
     charSelect.loadCharacterTexture(1, "Character/Knight_character.png");
     charSelect.loadCharacterTexture(2, "Character/Dog_character.png");
     charSelect.loadCharacterTexture(3, "Character/Luffy_character.png");
-    
+
     charSelect.loadUITextures(
         "ui/Icon/LeftArrow.png",
         "ui/Icon/Heart.png",
@@ -162,6 +204,33 @@ int main()
             {
                 window.close();
                 break;
+            }
+
+            // F11 — bật/tắt toàn màn hình
+            if (event.type == sf::Event::KeyPressed &&
+                event.key.code == sf::Keyboard::F11)
+            {
+                isFullscreen = !isFullscreen;
+
+                if (isFullscreen)
+                {
+                    window.create(sf::VideoMode::getDesktopMode(),
+                        "Crossing Game", sf::Style::Fullscreen);
+                }
+                else
+                {
+                    window.create(sf::VideoMode(WIN_W, WIN_H),
+                        "Crossing Game", sf::Style::Close);
+                }
+                window.setFramerateLimit(60);
+                applyLetterboxView(window, gameView);
+                continue; // window vừa được tạo lại, event cũ không còn hợp lệ
+            }
+
+            // Cửa sổ đổi kích thước (kể cả khi chuyển sang fullscreen)
+            if (event.type == sf::Event::Resized)
+            {
+                applyLetterboxView(window, gameView);
             }
 
             switch (state)
