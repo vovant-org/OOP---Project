@@ -388,6 +388,12 @@
     <Image Include="ui\Icon\Times.png">
       <Filter>Resource Files\ui\Icon</Filter>
     </Image>
+    <Image Include="ui\Logo\BACK.png">
+      <Filter>Resource Files\ui\Logo</Filter>
+    </Image>
+    <Image Include="ui\Logo\SETTING.png">
+      <Filter>Resource Files\ui\Logo</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="Sound\Sound-BackGround.mp3">

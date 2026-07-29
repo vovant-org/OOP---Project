@@ -29,8 +29,8 @@ namespace
     constexpr float PANEL_TEX_SIZE = 1254.f;
 
     // ===== CHANGED: mở rộng panel theo chiều ngang, giữ nguyên chiều cao =====
-    constexpr float PANEL_WIDTH = 1100.f;
-    constexpr float PANEL_HEIGHT = 860.f;
+    constexpr float PANEL_WIDTH = 950.f;
+    constexpr float PANEL_HEIGHT = 950.f;
 
     constexpr float PANEL_SCALE_X = PANEL_WIDTH / PANEL_TEX_SIZE;
     constexpr float PANEL_SCALE_Y = PANEL_HEIGHT / PANEL_TEX_SIZE;
@@ -53,9 +53,9 @@ namespace
     constexpr float TITLE_TEX_WIDTH = 1827.f;
     constexpr float TITLE_TEX_HEIGHT = 861.f;
 
-    constexpr float TITLE_Y = 165.f;   // ===== CHANGED: đưa title lên xíu (190 -> 165) =====
+    constexpr float TITLE_Y = 225.f;  
 
-    constexpr float TITLE_WIDTH = 300.f;
+    constexpr float TITLE_WIDTH = 330.f;
     constexpr float TITLE_HEIGHT =
         TITLE_WIDTH * (TITLE_TEX_HEIGHT / TITLE_TEX_WIDTH);
 
@@ -68,13 +68,13 @@ namespace
     // Rows
     //----------------------------------
 
-    constexpr unsigned int LABEL_CHAR_SIZE = 28;
+    constexpr unsigned int LABEL_CHAR_SIZE = 35;
 
-    constexpr float MUSIC_ROW_Y = 380.f;
-    constexpr float SOUND_ROW_Y = 470.f;
-    constexpr float FULLSCREEN_ROW_Y = 560.f;
-    constexpr float FPS_ROW_Y = 650.f;
-    constexpr float RESOLUTION_ROW_Y = 740.f;
+    constexpr float MUSIC_ROW_Y = 310.f;
+    constexpr float SOUND_ROW_Y = 420.f;
+    constexpr float FULLSCREEN_ROW_Y = 530.f;
+    constexpr float FPS_ROW_Y = 640.f;
+    constexpr float RESOLUTION_ROW_Y = 750.f;
 
     //----------------------------------
     // Plus / Minus Icons (1254 x 1254)
@@ -82,10 +82,10 @@ namespace
 
     constexpr float ICON_TEX_SIZE = 1254.f;
 
-    constexpr float ICON_SIZE = 40.f;
+    constexpr float ICON_SIZE = 50.f;
     constexpr float ICON_SCALE = ICON_SIZE / ICON_TEX_SIZE;
 
-    constexpr float ICON_GAP = 16.f;
+    constexpr float ICON_GAP = -2.f;
 
     //----------------------------------
     // Value Boxes (SliverBox.png, 1537 x 1023)
@@ -95,16 +95,19 @@ namespace
     constexpr float BOX_TEX_WIDTH = 1537.f;
     constexpr float BOX_TEX_HEIGHT = 1023.f;
 
-    constexpr float BOX_WIDTH = 96.f;
-    constexpr float BOX_HEIGHT = 64.f;
+    constexpr float BOX_WIDTH = 180.f;
+    constexpr float BOX_HEIGHT = 160.f;
 
     constexpr float BOX_SCALE_X = BOX_WIDTH / BOX_TEX_WIDTH;
     constexpr float BOX_SCALE_Y = BOX_HEIGHT / BOX_TEX_HEIGHT;
 
     constexpr float BOX_X = CONTENT_RIGHT - ICON_SIZE - ICON_GAP - BOX_WIDTH;
 
-    constexpr float RES_BOX_WIDTH = 280.f;
-    constexpr float RES_BOX_HEIGHT = 64.f;
+    // ===== ADDED: lệch icon xuống để trùng trục ngang (vertical center) với box =====
+    constexpr float ICON_Y_OFFSET = (BOX_HEIGHT - ICON_SIZE) / 2.f;
+
+    constexpr float RES_BOX_WIDTH = 255.f;
+    constexpr float RES_BOX_HEIGHT = 160.f;
 
     constexpr float RES_BOX_SCALE_X = RES_BOX_WIDTH / BOX_TEX_WIDTH;
     constexpr float RES_BOX_SCALE_Y = RES_BOX_HEIGHT / BOX_TEX_HEIGHT;
@@ -123,7 +126,7 @@ namespace
     // 2 đầu box không còn bị méo (kỹ thuật 3-slice / 9-slice).
     //----------------------------------
 
-    constexpr float LABEL_BOX_WIDTH = 300.f;
+    constexpr float LABEL_BOX_WIDTH = 310.f;
     constexpr float LABEL_BOX_HEIGHT = BOX_HEIGHT;
 
     constexpr float LABEL_BOX_X = CONTENT_LEFT;
@@ -151,13 +154,16 @@ namespace
         LABEL_BOX_MID_SCREEN_WIDTH / LABEL_BOX_MID_TEX_WIDTH;
 
     // Chỉnh nếu chữ label bị lệch tâm so với box do texture có padding ẩn
-    constexpr float LABEL_TEXT_Y_OFFSET = 0.f;
+    constexpr float LABEL_TEXT_Y_OFFSET = -30.f;
+
+    // ===== ADDED: bù lệch ngang do font có padding không đều 2 bên =====
+    constexpr float LABEL_TEXT_X_OFFSET = -30.f; // âm = dịch trái, dương = dịch phải
 
     //----------------------------------
     // Value Text
     //----------------------------------
 
-    constexpr unsigned int VALUE_CHAR_SIZE = 24;
+    constexpr unsigned int VALUE_CHAR_SIZE = 40;
 
     //----------------------------------
     // Switch (1254 x 1254)
@@ -165,7 +171,7 @@ namespace
 
     constexpr float SWITCH_TEX_SIZE = 1254.f;
 
-    constexpr float SWITCH_SIZE = 90.f;
+    constexpr float SWITCH_SIZE = 130.f;
     constexpr float SWITCH_SCALE = SWITCH_SIZE / SWITCH_TEX_SIZE;
 
     //----------------------------------
@@ -174,7 +180,7 @@ namespace
 
     constexpr float TIMES_TEX_SIZE = 1254.f;
 
-    constexpr float TIMES_SIZE = 32.f;
+    constexpr float TIMES_SIZE = 40.f;
     constexpr float TIMES_SCALE = TIMES_SIZE / TIMES_TEX_SIZE;
 
     //----------------------------------
@@ -182,9 +188,9 @@ namespace
     //----------------------------------
 
     constexpr float BACK_TEX_WIDTH = 1736.f;
-    constexpr float BACK_TEX_HEIGHT = 906.f;
+    constexpr float BACK_TEX_HEIGHT = 860.f;
 
-    constexpr float BACK_BUTTON_WIDTH = 170.f;   // ===== CHANGED: nhỏ lại (200 -> 170) =====
+    constexpr float BACK_BUTTON_WIDTH = 130.f;   // ===== CHANGED: nhỏ lại (200 -> 170) =====
     constexpr float BACK_BUTTON_HEIGHT =
         BACK_BUTTON_WIDTH * (BACK_TEX_HEIGHT / BACK_TEX_WIDTH);
 
@@ -192,7 +198,7 @@ namespace
         BACK_BUTTON_WIDTH / BACK_TEX_WIDTH;
 
     constexpr float BACK_BUTTON_X = CENTER_X - BACK_BUTTON_WIDTH / 2.f;
-    constexpr float BACK_BUTTON_Y = 860.f;
+    constexpr float BACK_BUTTON_Y = 930.f;
 
     //----------------------------------
     // FPS Steps
@@ -427,19 +433,19 @@ void SettingMenu::initializeObjects()
     // Labels
     //----------------------------------
 
-    musicLabel.setString("Music");
+    musicLabel.setString("MUSIC");
     musicLabel.setCharacterSize(LABEL_CHAR_SIZE);
 
-    soundLabel.setString("Sound");
+    soundLabel.setString("SOUND");
     soundLabel.setCharacterSize(LABEL_CHAR_SIZE);
 
-    fullscreenLabel.setString("Fullscreen");
+    fullscreenLabel.setString("F.S");
     fullscreenLabel.setCharacterSize(LABEL_CHAR_SIZE);
 
     fpsLabel.setString("FPS");
     fpsLabel.setCharacterSize(LABEL_CHAR_SIZE);
 
-    resolutionLabel.setString("Resolution");
+    resolutionLabel.setString("RES");
     resolutionLabel.setCharacterSize(LABEL_CHAR_SIZE);
 
     //----------------------------------
@@ -463,23 +469,23 @@ void SettingMenu::initializeObjects()
     // Vì nội dung label không đổi sau khi khởi tạo, không cần
     // tính lại trong updateTexts().
     centerTextOnPoint(musicLabel,
-        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f,
+        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f + LABEL_TEXT_X_OFFSET,
         MUSIC_ROW_Y + LABEL_BOX_HEIGHT / 2.f + LABEL_TEXT_Y_OFFSET);
 
     centerTextOnPoint(soundLabel,
-        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f,
+        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f + LABEL_TEXT_X_OFFSET,
         SOUND_ROW_Y + LABEL_BOX_HEIGHT / 2.f + LABEL_TEXT_Y_OFFSET);
 
     centerTextOnPoint(fullscreenLabel,
-        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f,
+        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f + LABEL_TEXT_X_OFFSET,
         FULLSCREEN_ROW_Y + LABEL_BOX_HEIGHT / 2.f + LABEL_TEXT_Y_OFFSET);
 
     centerTextOnPoint(fpsLabel,
-        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f,
+        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f + LABEL_TEXT_X_OFFSET,
         FPS_ROW_Y + LABEL_BOX_HEIGHT / 2.f + LABEL_TEXT_Y_OFFSET);
 
     centerTextOnPoint(resolutionLabel,
-        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f,
+        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f + LABEL_TEXT_X_OFFSET,
         RESOLUTION_ROW_Y + LABEL_BOX_HEIGHT / 2.f + LABEL_TEXT_Y_OFFSET);
 
     //----------------------------------
@@ -503,35 +509,35 @@ void SettingMenu::initializeObjects()
     //----------------------------------
 
     musicMinusSprite.setPosition(
-        BOX_X - ICON_GAP - ICON_SIZE, MUSIC_ROW_Y);
+        BOX_X - ICON_GAP - ICON_SIZE, MUSIC_ROW_Y + ICON_Y_OFFSET);
     musicMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     musicPlusSprite.setPosition(
-        BOX_X + BOX_WIDTH + ICON_GAP, MUSIC_ROW_Y);
+        BOX_X + BOX_WIDTH + ICON_GAP, MUSIC_ROW_Y + ICON_Y_OFFSET);
     musicPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     soundMinusSprite.setPosition(
-        BOX_X - ICON_GAP - ICON_SIZE, SOUND_ROW_Y);
+        BOX_X - ICON_GAP - ICON_SIZE, SOUND_ROW_Y + ICON_Y_OFFSET);
     soundMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     soundPlusSprite.setPosition(
-        BOX_X + BOX_WIDTH + ICON_GAP, SOUND_ROW_Y);
+        BOX_X + BOX_WIDTH + ICON_GAP, SOUND_ROW_Y + ICON_Y_OFFSET);
     soundPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     fpsMinusSprite.setPosition(
-        BOX_X - ICON_GAP - ICON_SIZE, FPS_ROW_Y);
+        BOX_X - ICON_GAP - ICON_SIZE, FPS_ROW_Y + ICON_Y_OFFSET);
     fpsMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     fpsPlusSprite.setPosition(
-        BOX_X + BOX_WIDTH + ICON_GAP, FPS_ROW_Y);
+        BOX_X + BOX_WIDTH + ICON_GAP, FPS_ROW_Y + ICON_Y_OFFSET);
     fpsPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     resolutionMinusSprite.setPosition(
-        RES_BOX_X - ICON_GAP - ICON_SIZE, RESOLUTION_ROW_Y);
+        RES_BOX_X - ICON_GAP - ICON_SIZE, RESOLUTION_ROW_Y + ICON_Y_OFFSET);
     resolutionMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     resolutionPlusSprite.setPosition(
-        RES_BOX_X + RES_BOX_WIDTH + ICON_GAP, RESOLUTION_ROW_Y);
+        RES_BOX_X + RES_BOX_WIDTH + ICON_GAP, RESOLUTION_ROW_Y + ICON_Y_OFFSET);
     resolutionPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     //----------------------------------

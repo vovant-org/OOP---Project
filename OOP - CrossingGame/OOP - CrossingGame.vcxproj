@@ -264,7 +264,9 @@ sfml-window.lib
     <Image Include="ui\Icon\Switch_OFF.png" />
     <Image Include="ui\Icon\Switch_ON.png" />
     <Image Include="ui\Icon\Times.png" />
+    <Image Include="ui\Logo\BACK.png" />
     <Image Include="ui\Logo\CrossingGame_Logo.png" />
+    <Image Include="ui\Logo\SETTING.png" />
     <Image Include="ui\Menu_Map\MenuMap.png" />
   </ItemGroup>
   <ItemGroup>
