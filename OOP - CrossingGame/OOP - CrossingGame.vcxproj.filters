@@ -156,6 +156,9 @@
     <ClCompile Include="MapSelection.cpp">
       <Filter>Source Files\ui</Filter>
     </ClCompile>
+    <ClCompile Include="SettingMenu.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -253,6 +256,9 @@
     </ClInclude>
     <ClInclude Include="MapSelection.h">
       <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="GameState.h">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -359,6 +365,27 @@
       <Filter>Resource Files\ui\Icon</Filter>
     </Image>
     <Image Include="ui\Icon\Lightning.png">
+      <Filter>Resource Files\ui\Icon</Filter>
+    </Image>
+    <Image Include="ui\Button\GoldenBox.png">
+      <Filter>Resource Files\ui\Button</Filter>
+    </Image>
+    <Image Include="ui\Button\SilverBox.png">
+      <Filter>Resource Files\ui\Button</Filter>
+    </Image>
+    <Image Include="ui\Icon\Minus.png">
+      <Filter>Resource Files\ui\Icon</Filter>
+    </Image>
+    <Image Include="ui\Icon\Plus.png">
+      <Filter>Resource Files\ui\Icon</Filter>
+    </Image>
+    <Image Include="ui\Icon\Switch_OFF.png">
+      <Filter>Resource Files\ui\Icon</Filter>
+    </Image>
+    <Image Include="ui\Icon\Switch_ON.png">
+      <Filter>Resource Files\ui\Icon</Filter>
+    </Image>
+    <Image Include="ui\Icon\Times.png">
       <Filter>Resource Files\ui\Icon</Filter>
     </Image>
   </ItemGroup>

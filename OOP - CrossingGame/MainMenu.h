@@ -7,7 +7,10 @@
 #include "MenuBackground.h"
 #include "Button.h"
 
-// Xác định các button trong Main Menu
+//==================================================
+// Button
+//==================================================
+
 enum class MainMenuButton
 {
     Play = 0,
@@ -17,6 +20,10 @@ enum class MainMenuButton
     About,
     Exit
 };
+
+//==================================================
+// Result
+//==================================================
 
 enum class MainMenuResult
 {
@@ -34,63 +41,90 @@ class MainMenu : public Menu
 {
 private:
 
+    //----------------------------------
     // Background
+    //----------------------------------
+
     MenuBackground background;
 
+    //----------------------------------
     // Logo
+    //----------------------------------
+
     sf::Sprite logo;
 
+    //----------------------------------
     // Buttons
+    //----------------------------------
+
     std::vector<Button> buttons;
 
     int selectedIndex = 0;
 
+    //----------------------------------
+    // Result
+    //----------------------------------
+
     MainMenuResult result = MainMenuResult::None;
+
+    //----------------------------------
+    // Helper
+    //----------------------------------
 
     void updateFocus();
 
     void moveSelectionUp();
+
     void moveSelectionDown();
 
 public:
 
     MainMenu();
 
-    //==============================
+    //----------------------------------
     // Background
-    //==============================
+    //----------------------------------
+
     void setBackgroundTexture(const sf::Texture& texture);
+
     void setBackgroundScale(float scaleX, float scaleY);
 
-    //==============================
+    //----------------------------------
     // Logo
-    //==============================
+    //----------------------------------
+
     void setLogoTexture(const sf::Texture& texture);
+
     void setLogoPosition(float x, float y);
+
     void setLogoScale(float scaleX, float scaleY);
 
-    //==============================
-    // Buttons
-    //==============================
+    //----------------------------------
+    // Button
+    //----------------------------------
+
     Button& getButton(MainMenuButton button);
+
     const Button& getButton(MainMenuButton button) const;
 
     std::size_t getButtonCount() const;
 
-    //==============================
+    //----------------------------------
     // Menu
-    //==============================
+    //----------------------------------
+
     void processEvent(const sf::Event& event,
         const sf::RenderWindow& window) override;
 
     void update() override;
 
-    //==============================
+    void draw(sf::RenderWindow& window) const override;
+
+    //----------------------------------
     // Result
-    //==============================
+    //----------------------------------
+
     MainMenuResult getResult() const;
 
     void clearResult();
-
-    void draw(sf::RenderWindow& window) const override;
 };

@@ -126,9 +126,9 @@ void MainMenu::clearResult()
 void MainMenu::processEvent(const sf::Event& event,
     const sf::RenderWindow& window)
 {
-    //------------------------------------------
+    //-----------------------------
     // Keyboard
-    //------------------------------------------
+    //-----------------------------
 
     if (event.type == sf::Event::KeyPressed)
     {
@@ -143,85 +143,55 @@ void MainMenu::processEvent(const sf::Event& event,
             break;
 
         case sf::Keyboard::Enter:
-
-            // Chạy animation nhấn button
+        {
             buttons[selectedIndex].press();
 
-            // Trả về kết quả
-            switch (selectedIndex)
-            {
-            case 0:
-                result = MainMenuResult::Play;
-                break;
-
-            case 1:
-                result = MainMenuResult::Continue;
-                break;
-
-            case 2:
-                result = MainMenuResult::Settings;
-                break;
-
-            case 3:
-                result = MainMenuResult::Leaderboard;
-                break;
-
-            case 4:
-                result = MainMenuResult::About;
-                break;
-
-            case 5:
-                result = MainMenuResult::Exit;
-                break;
-            }
+            result = static_cast<MainMenuResult>(selectedIndex + 1);
 
             break;
+        }
 
         default:
             break;
         }
     }
 
-    //------------------------------------------
+    //-----------------------------
     // Mouse
-    //------------------------------------------
+    //-----------------------------
 
     for (auto& button : buttons)
-    {
         button.processEvent(event, window);
-    }
+
     if (event.type == sf::Event::MouseButtonReleased &&
         event.mouseButton.button == sf::Mouse::Left)
     {
+        sf::Vector2f mousePos =
+            window.mapPixelToCoords(
+                { event.mouseButton.x, event.mouseButton.y });
+
         for (size_t i = 0; i < buttons.size(); i++)
         {
-            if (buttons[i].contains(
-                window.mapPixelToCoords(
-                    { event.mouseButton.x, event.mouseButton.y })))
+            if (buttons[i].contains(mousePos))
             {
                 buttons[i].press();
 
-                switch (i)
-                {
-                case 0: result = MainMenuResult::Play; break;
-                case 1: result = MainMenuResult::Continue; break;
-                case 2: result = MainMenuResult::Settings; break;
-                case 3: result = MainMenuResult::Leaderboard; break;
-                case 4: result = MainMenuResult::About; break;
-                case 5: result = MainMenuResult::Exit; break;
-                }
+                selectedIndex = static_cast<int>(i);
+
+                updateFocus();
+
+                result = static_cast<MainMenuResult>(i + 1);
+
+                break;
             }
         }
     }
 }
 
-
 void MainMenu::update()
 {
     for (auto& button : buttons)
-    {
         button.update();
-    }
 }
 
 void MainMenu::draw(sf::RenderWindow& window) const
@@ -231,7 +201,5 @@ void MainMenu::draw(sf::RenderWindow& window) const
     window.draw(logo);
 
     for (const auto& button : buttons)
-    {
         button.draw(window);
-    }
 }

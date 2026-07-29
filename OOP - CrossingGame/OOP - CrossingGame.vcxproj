@@ -185,6 +185,7 @@ sfml-window.lib
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MapSelection.cpp" />
     <ClCompile Include="MenuBackground.cpp" />
+    <ClCompile Include="SettingMenu.cpp" />
     <ClCompile Include="TrafficLight.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -209,6 +210,7 @@ sfml-window.lib
     <ClInclude Include="CTRUCK.h" />
     <ClInclude Include="CVEHICLE.h" />
     <ClInclude Include="GameOverMenu.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="LeaderboardMenu.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Map.h" />
@@ -250,11 +252,18 @@ sfml-window.lib
     <Image Include="Obstacles\Sky_light.png" />
     <Image Include="ui\Background\CrossingGame_background.png" />
     <Image Include="ui\Button\button_normal.png" />
+    <Image Include="ui\Button\GoldenBox.png" />
+    <Image Include="ui\Button\SilverBox.png" />
     <Image Include="ui\Hint\CrossingGame_Exit_Button.png" />
     <Image Include="ui\Hint\CrossingGame_Select_Button.png" />
     <Image Include="ui\Icon\Heart.png" />
     <Image Include="ui\Icon\LeftArrow.png" />
     <Image Include="ui\Icon\Lightning.png" />
+    <Image Include="ui\Icon\Minus.png" />
+    <Image Include="ui\Icon\Plus.png" />
+    <Image Include="ui\Icon\Switch_OFF.png" />
+    <Image Include="ui\Icon\Switch_ON.png" />
+    <Image Include="ui\Icon\Times.png" />
     <Image Include="ui\Logo\CrossingGame_Logo.png" />
     <Image Include="ui\Menu_Map\MenuMap.png" />
   </ItemGroup>

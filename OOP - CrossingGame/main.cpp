@@ -6,6 +6,7 @@
 #include "MainMenu.h"
 #include "CharacterSelection.h"
 #include "MapSelection.h"
+#include "SettingMenu.h"     // ===== ADDED =====
 // #include "CGAME.h"   ← bật khi implement xong
 
 //==================================================
@@ -18,6 +19,18 @@ const std::string FONT_PATH = "Font/PixelOperator.ttf";
 const std::string BG_PATH = "ui/Background/CrossingGame_background.png";
 const std::string LOGO_PATH = "ui/Logo/CrossingGame_Logo.png";
 const std::string BUTTON_PATH = "ui/Button/button_normal.png";
+
+// ===== ADDED: đường dẫn texture cho SettingMenu =====
+// (Chỉnh lại đường dẫn cho khớp thư mục asset thật của bạn nếu khác)
+const std::string SETTING_PANEL_PATH = "ui/Button/GoldenBox.png";
+const std::string SETTING_BOX_PATH = "ui/Button/SilverBox.png";
+const std::string SETTING_PLUS_PATH = "ui/Icon/Plus.png";
+const std::string SETTING_MINUS_PATH = "ui/Icon/Minus.png";
+const std::string SETTING_SWITCH_ON_PATH = "ui/Icon/Switch_ON.png";
+const std::string SETTING_SWITCH_OFF_PATH = "ui/Icon/Switch_OFF.png";
+const std::string SETTING_TIMES_PATH = "ui/Icon/Times.png";
+const std::string SETTING_BACK_PATH = "ui/Logo/BACK.png";   // ===== ADDED =====
+const std::string SETTING_TITLE_PATH = "ui/Logo/SETTING.png";   // ===== ADDED =====
 
 //==================================================
 // Helper: load chung tài nguyên
@@ -88,6 +101,13 @@ int main()
     sf::View gameView(sf::FloatRect(0.f, 0.f, (float)WIN_W, (float)WIN_H));
     applyLetterboxView(window, gameView);
 
+    // ===== ADDED =====
+    // SettingMenu được thiết kế theo canvas logic 1920x1080 (xem SettingMenu.cpp),
+    // khác với canvas 1280x720 của phần còn lại của game. Vì 1920x1080 và
+    // 1280x720 cùng tỉ lệ 16:9, ta dùng lại đúng applyLetterboxView() cho view
+    // riêng này mà không cần sửa hàm đó.
+    sf::View settingsView(sf::FloatRect(0.f, 0.f, 1920.f, 1080.f));
+
     //--------------------------------------------------
     // Load shared assets
     //--------------------------------------------------
@@ -98,6 +118,11 @@ int main()
 
     float bgScaleX = (float)WIN_W / bgTexture.getSize().x;
     float bgScaleY = (float)WIN_H / bgTexture.getSize().y;
+
+    // ===== ADDED: SettingMenu dùng canvas 1920x1080 (khác 1280x720 của
+    // các màn còn lại), nên cần scale riêng cho cùng 1 ảnh background =====
+    float settingBgScaleX = 1920.f / bgTexture.getSize().x;
+    float settingBgScaleY = 1080.f / bgTexture.getSize().y;
 
     float btnW = 240.f, btnH = 100.f;
     float btnScaleX = btnW / buttonTexture.getSize().x;
@@ -110,12 +135,31 @@ int main()
         return -1;
     }
 
+    // ===== ADDED: load texture cho SettingMenu =====
+    sf::Texture settingPanelTexture, settingBoxTexture;
+    sf::Texture settingPlusTexture, settingMinusTexture;
+    sf::Texture settingSwitchOnTexture, settingSwitchOffTexture;
+    sf::Texture settingTimesTexture;
+    sf::Texture settingBackTexture;   // ===== ADDED =====
+    sf::Texture settingTitleTexture;  // ===== ADDED =====
+
+    if (!loadTexture(settingPanelTexture, SETTING_PANEL_PATH))     return -1;
+    if (!loadTexture(settingBoxTexture, SETTING_BOX_PATH))         return -1;
+    if (!loadTexture(settingPlusTexture, SETTING_PLUS_PATH))       return -1;
+    if (!loadTexture(settingMinusTexture, SETTING_MINUS_PATH))     return -1;
+    if (!loadTexture(settingSwitchOnTexture, SETTING_SWITCH_ON_PATH))  return -1;
+    if (!loadTexture(settingSwitchOffTexture, SETTING_SWITCH_OFF_PATH)) return -1;
+    if (!loadTexture(settingTimesTexture, SETTING_TIMES_PATH))     return -1;
+    if (!loadTexture(settingBackTexture, SETTING_BACK_PATH))       return -1; // ===== ADDED =====
+    if (!loadTexture(settingTitleTexture, SETTING_TITLE_PATH))     return -1; // ===== ADDED =====
+
     std::cout << "[INFO] Nhan F11 de bat/tat toan man hinh\n";
 
     //--------------------------------------------------
     // State machine
     //--------------------------------------------------
-    enum class AppState { MainMenu, CharSelect, MapSelect, Playing, Exit };
+    enum class AppState { MainMenu, CharSelect, MapSelect, Settings, Playing, Exit };
+    // ===== ADDED: "Settings" ở trên =====
     AppState state = AppState::MainMenu;
 
     int selectedCharIndex = 0;
@@ -189,6 +233,35 @@ int main()
     mapSelect.setupLayout();
 
     //--------------------------------------------------
+    // ===== ADDED: Build SettingMenu =====
+    //--------------------------------------------------
+    SettingMenu settingMenu;
+    settingMenu.setBackgroundTexture(bgTexture, settingBgScaleX, settingBgScaleY); // ===== ADDED =====
+    settingMenu.setPanelTexture(settingPanelTexture);
+    settingMenu.setValueBoxTexture(settingBoxTexture);
+    settingMenu.setPlusTexture(settingPlusTexture);
+    settingMenu.setMinusTexture(settingMinusTexture);
+    settingMenu.setSwitchTextures(settingSwitchOnTexture, settingSwitchOffTexture);
+    settingMenu.setTimesTexture(settingTimesTexture);
+    settingMenu.setBackButtonTexture(settingBackTexture); // ===== ADDED =====
+    settingMenu.setTitleTexture(settingTitleTexture);     // ===== ADDED =====
+    settingMenu.setFont(font);
+
+    //--------------------------------------------------
+    // ===== ADDED: chọn view phù hợp theo state hiện tại =====
+    // SettingMenu dùng canvas 1920x1080 (settingsView), các state còn lại
+    // dùng canvas 1280x720 (gameView).
+    //--------------------------------------------------
+    auto applyViewForState = [&](AppState st) {
+        if (st == AppState::Settings)
+            applyLetterboxView(window, settingsView);
+        else
+            applyLetterboxView(window, gameView);
+        };
+
+    applyViewForState(state);
+
+    //--------------------------------------------------
     // Game loop
     //--------------------------------------------------
     sf::Clock clock;
@@ -223,14 +296,14 @@ int main()
                         "Crossing Game", sf::Style::Close);
                 }
                 window.setFramerateLimit(60);
-                applyLetterboxView(window, gameView);
+                applyViewForState(state); // ===== CHANGED: dùng view đúng theo state =====
                 continue; // window vừa được tạo lại, event cũ không còn hợp lệ
             }
 
             // Cửa sổ đổi kích thước (kể cả khi chuyển sang fullscreen)
             if (event.type == sf::Event::Resized)
             {
-                applyLetterboxView(window, gameView);
+                applyViewForState(state); // ===== CHANGED: dùng view đúng theo state =====
             }
 
             switch (state)
@@ -245,6 +318,11 @@ int main()
 
             case AppState::MapSelect:
                 mapSelect.processEvent(event, window);
+                break;
+
+                // ===== ADDED =====
+            case AppState::Settings:
+                settingMenu.processEvent(event, window);
                 break;
 
             default: break;
@@ -275,8 +353,11 @@ int main()
                 break;
 
             case MainMenuResult::Settings:
-                std::cout << "[INFO] Settings — chưa implement\n";
+                // ===== CHANGED: mở SettingMenu thay vì chỉ log =====
                 mainMenu.clearResult();
+                settingMenu.clearResult();
+                state = AppState::Settings;
+                applyViewForState(state);
                 break;
 
             case MainMenuResult::Exit:
@@ -340,6 +421,24 @@ int main()
             }
             break;
 
+            //========================
+            // ===== ADDED =====
+        case AppState::Settings:
+            //========================
+            settingMenu.update();
+
+            switch (settingMenu.getResult())
+            {
+            case SettingMenuResult::Back:
+                settingMenu.clearResult();
+                state = AppState::MainMenu;
+                applyViewForState(state);
+                break;
+
+            default: break;
+            }
+            break;
+
         default: break;
         }
 
@@ -353,6 +452,7 @@ int main()
         case AppState::MainMenu:  mainMenu.draw(window);   break;
         case AppState::CharSelect: charSelect.draw(window); break;
         case AppState::MapSelect:  mapSelect.draw(window);  break;
+        case AppState::Settings:  settingMenu.draw(window); break; // ===== ADDED =====
         default: break;
         }
         window.display();
