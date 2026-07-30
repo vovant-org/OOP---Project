@@ -181,6 +181,7 @@
     <ClCompile Include="MapSelection.cpp" />
     <ClCompile Include="MenuBackground.cpp" />
     <ClCompile Include="MenuManager.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="SettingMenu.cpp" />
     <ClCompile Include="TrafficLight.cpp" />
   </ItemGroup>
@@ -217,6 +218,7 @@
     <ClInclude Include="MenuManager.h" />
     <ClInclude Include="ObstacleHelper.h" />
     <ClInclude Include="PauseMenu.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="SettingMenu.h" />
     <ClInclude Include="TrafficLight.h" />
     <ClInclude Include="WinMenu.h" />
