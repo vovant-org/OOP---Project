@@ -1,6 +1,9 @@
 // CBIKE.cpp — City map
 // Sprite: Citybike_Obstacle.png
 #include "CBIKE.h"
+// CBIKE.cpp — City map
+// Sprite: Citybike_Obstacle.png
+#include "CBIKE.h"
 #include "ObstacleHelper.h"
 
 CBIKE::CBIKE(float startX, float startY, float spd, bool moveRight)
@@ -17,13 +20,12 @@ CBIKE::CBIKE(float startX, float startY, float spd, bool moveRight)
     frameTime = 0.10f;  // Xe đạp: animation vừa phải
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
-    sprite.setScale(0.18f, 0.18f);
 
-    // Lật ảnh nếu đi sang trái
-    if (!isMovingRight) {
-        sprite.setScale(-0.18f, 0.18f);
-        sprite.setOrigin((float)frameWidth, 0.f);
-    }
+    // ===== CHANGED: origin o CHINH GIUA sprite (thay vi goc tren-trai) -
+    // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
+    // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
+    sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
+    sprite.setScale(isMovingRight ? 0.18f : -0.18f, 0.18f);
 
     sprite.setPosition(x, y);
 }

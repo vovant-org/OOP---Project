@@ -1,4 +1,4 @@
-// CCLOUD.cpp — Sky map
+// CCLOUD.cpp // CCLOUD.cpp — Sky map
 // Sprite: Skycloud_Obstacle.png
 // Đám mây: di chuyển chậm, không có animation phức tạp
 #include "CCLOUD.h"
@@ -18,14 +18,12 @@ CCLOUD::CCLOUD(float startX, float startY, float spd, bool moveRight)
     frameTime = 0.20f;  // Cloud: đổi frame rất chậm, lơ lửng
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
-    sprite.setScale(0.20f, 0.20f);
 
-    // Cloud không cần lật vì đối xứng
-    // Nhưng vẫn set origin nếu đi trái để tránh bị nhảy vị trí
-    if (!isMovingRight) {
-        sprite.setScale(-0.20f, 0.20f);
-        sprite.setOrigin((float)frameWidth, 0.f);
-    }
+    // ===== CHANGED: origin o CHINH GIUA sprite (thay vi goc tren-trai) -
+    // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
+    // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
+    sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
+    sprite.setScale(isMovingRight ? 0.20f : -0.20f, 0.20f);
 
     sprite.setPosition(x, y);
 }

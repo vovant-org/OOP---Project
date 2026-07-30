@@ -16,12 +16,12 @@ COLDBIRD::COLDBIRD(float startX, float startY, float spd, bool moveRight)
     frameTime = 0.07f;  // Chim cổ đại: vẫy cánh nhanh
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
-    sprite.setScale(0.15f, 0.15f);
 
-    if (!isMovingRight) {
-        sprite.setScale(-0.15f, 0.15f);
-        sprite.setOrigin((float)frameWidth, 0.f);
-    }
+    // ===== CHANGED: origin o CHINH GIUA sprite (thay vi goc tren-trai) -
+    // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
+    // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
+    sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
+    sprite.setScale(isMovingRight ? 0.15f : -0.15f, 0.15f);
 
     sprite.setPosition(x, y);
 }

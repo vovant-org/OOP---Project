@@ -11,7 +11,7 @@
 #include "MapSelection.h"
 #include "SettingMenu.h"
 #include "AudioManager.h"
-// #include "CGAME.h"   ← bật khi implement xong
+#include "CGAME.h"   // ===== CHANGED: đã implement Bước 1 =====
 
 //==================================================
 // Hằng số
@@ -249,6 +249,11 @@ int main()
     settingMenu.setFont(font);
 
     //--------------------------------------------------
+    // ===== ADDED: Gameplay =====
+    //--------------------------------------------------
+    CGAME game(window);
+
+    //--------------------------------------------------
     // Audio
     //--------------------------------------------------
     AudioManager audio;
@@ -344,6 +349,10 @@ int main()
 
             // ===== CHANGED: 1 dòng duy nhất thay cho switch(state){...} =====
             menuManager.processEvent(event, window);
+
+            // ===== ADDED: CGAME không phải Menu nên xử lý riêng =====
+            if (menuManager.getState() == AppState::Playing)
+                game.HandleInput(event);
         }
 
         //----------------------------------------------
@@ -352,6 +361,10 @@ int main()
 
         // ===== CHANGED: goi update() cho Menu dang active =====
         menuManager.update(dt);
+
+        // ===== ADDED: CGAME không phải Menu nên update riêng =====
+        if (menuManager.getState() == AppState::Playing)
+            game.Update(dt);
 
         switch (menuManager.getState())
         {
@@ -419,11 +432,8 @@ int main()
                     << selectedMapIndex << "\n";
                 mapSelect.clearResult();
 
-                // TODO: khởi tạo CGAME với selectedCharIndex + selectedMapIndex
-                // CGAME game(window, selectedCharIndex, selectedMapIndex);
-                // game.run();
-                // Sau khi game kết thúc → về MainMenu
-                menuManager.setState(AppState::MainMenu);     // ===== CHANGED =====
+                game.Init(selectedMapIndex, selectedCharIndex);   // ===== ADDED =====
+                menuManager.setState(AppState::Playing);           // ===== CHANGED =====
                 break;
 
             case MapSelectionResult::Back:
@@ -456,8 +466,11 @@ int main()
         //----------------------------------------------
         window.clear();
 
-        // ===== CHANGED: 1 dòng duy nhất thay cho switch(state){...} =====
-        menuManager.draw(window);
+        // ===== CHANGED: CGAME không phải Menu nên vẽ riêng =====
+        if (menuManager.getState() == AppState::Playing)
+            game.Draw();
+        else
+            menuManager.draw(window);
 
         window.display();
     }

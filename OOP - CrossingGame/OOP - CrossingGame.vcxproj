@@ -158,6 +158,7 @@
     <ClCompile Include="CBEAST.cpp" />
     <ClCompile Include="CBIKE.cpp" />
     <ClCompile Include="CBIRD.cpp" />
+    <ClCompile Include="CBRUTE.cpp" />
     <ClCompile Include="CCLOUD.cpp" />
     <ClCompile Include="CCROCODILE.cpp" />
     <ClCompile Include="CDINOSAUR.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="COLDBIRD.cpp" />
     <ClCompile Include="COLDBIRD.h" />
     <ClCompile Include="CPEOPLE.cpp" />
+    <ClCompile Include="CPIGLIN.cpp" />
     <ClCompile Include="CTRAIN.cpp" />
     <ClCompile Include="CTRUCK.cpp" />
     <ClCompile Include="CVEHICLE.cpp" />

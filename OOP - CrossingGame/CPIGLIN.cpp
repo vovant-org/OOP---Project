@@ -1,19 +1,19 @@
-// CBIRD.cpp — Sky map
-// Sprite: Skybird_Obstacle.png
-#include "CBIRD.h"
+// CPIGLIN.cpp — Hell map
+// Sprite: Hellpiglin_Obstacle.png
+#include "CPIGLIN.h"
 #include "ObstacleHelper.h"
 
-CBIRD::CBIRD(float startX, float startY, float spd, bool moveRight)
+CPIGLIN::CPIGLIN(float startX, float startY, float spd, bool moveRight)
     : CANIMAL(startX, startY, spd, moveRight)
 {
-    if (!texture.loadFromFile("Obstacles/Skybird_Obstacle.png")) return;
+    if (!texture.loadFromFile("Obstacles/Hellpiglin_Obstacle.png")) return;
 
     sprite.setTexture(texture);
 
     int totalFrames = 4;
     frameWidth = texture.getSize().x / totalFrames;
     frameHeight = texture.getSize().y;
-    frameTime = 0.06f;  // Chim sky: vẫy cánh rất nhanh
+    frameTime = 0.08f;  // Piglin: nhanh nhẹn hơn Brute
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
 
@@ -21,12 +21,12 @@ CBIRD::CBIRD(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? 0.14f : -0.14f, 0.14f);
+    sprite.setScale(isMovingRight ? 0.17f : -0.17f, 0.17f);
 
     sprite.setPosition(x, y);
 }
 
-void CBIRD::Update(float deltaTime)
+void CPIGLIN::Update(float deltaTime)
 {
     OBSTACLE_UPDATE(4)
 }
