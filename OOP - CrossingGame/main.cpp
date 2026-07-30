@@ -3,8 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-#include "AppState.h"        // ===== ADDED =====
-#include "MenuManager.h"     // ===== ADDED =====
+#include "AppState.h"        
+#include "MenuManager.h"   
 
 #include "MainMenu.h"
 #include "CharacterSelection.h"
@@ -34,7 +34,7 @@ const std::string SETTING_TIMES_PATH = "ui/Icon/Times.png";
 const std::string SETTING_BACK_PATH = "ui/Logo/BACK.png";
 const std::string SETTING_TITLE_PATH = "ui/Logo/SETTING.png";
 
-const std::string BGM_PATH = "Sound/Hellmap_backgroundmusic.mp3";
+const std::string BGM_PATH = "Sound/MainMenu_backgroundmusic.mp3";
 const std::string SFX_SELECT_PATH = "Sound/SelectSound.mp3";
 
 //==================================================
@@ -351,7 +351,7 @@ int main()
         //----------------------------------------------
 
         // ===== CHANGED: goi update() cho Menu dang active =====
-        menuManager.update();
+        menuManager.update(dt);
 
         switch (menuManager.getState())
         {

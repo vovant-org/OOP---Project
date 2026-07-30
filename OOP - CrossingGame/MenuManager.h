@@ -62,7 +62,7 @@ public:
     //----------------------------------
 
     void processEvent(const sf::Event& event, const sf::RenderWindow& window);
-    void update();
+    void update(float dt);
     void draw(sf::RenderWindow& window) const;
 
 private:

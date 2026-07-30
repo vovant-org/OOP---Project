@@ -58,10 +58,10 @@ void MenuManager::processEvent(const sf::Event& event, const sf::RenderWindow& w
         m->processEvent(event, window);
 }
 
-void MenuManager::update()
+void MenuManager::update(float dt)
 {
     if (Menu* m = getCurrentMenu())
-        m->update();
+        m->update(dt);
 }
 
 void MenuManager::draw(sf::RenderWindow& window) const

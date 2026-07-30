@@ -787,7 +787,7 @@ void SettingMenu::processEvent(const sf::Event& event,
     }
 }
 
-void SettingMenu::update()
+void SettingMenu::update(float)
 {
     backButton.update();
 }

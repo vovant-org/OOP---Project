@@ -447,26 +447,17 @@ void CharacterSelection::processEvent(const sf::Event& event,
 // update (no deltaTime — required by Menu interface)
 //==================================================
 
-void CharacterSelection::update()
+void CharacterSelection::update(float dt)
 {
     prevButton.update();
     nextButton.update();
     selectButton.update();
     backButton.update();
-}
-
-//==================================================
-// update (with deltaTime — for animation)
-//==================================================
-
-void CharacterSelection::update(float deltaTime)
-{
-    update();   // base update
 
     // Animate preview
     if (frameW <= 0) return;
 
-    frameTimer += deltaTime;
+    frameTimer += dt;
     if (frameTimer >= frameDuration)
     {
         frameTimer = 0.f;

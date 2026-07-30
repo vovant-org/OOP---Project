@@ -199,7 +199,7 @@ void MainMenu::processEvent(const sf::Event& event,
     }
 }
 
-void MainMenu::update()
+void MainMenu::update(float)
 {
     for (auto& button : buttons)
         button.update();

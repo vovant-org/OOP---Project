@@ -176,8 +176,7 @@ public:
     void processEvent(const sf::Event& event,
         const sf::RenderWindow& window) override;
 
-    void update() override;
-    void update(float deltaTime);
+    void update(float deltaTime) override;
 
     void draw(sf::RenderWindow& window) const override;
 };

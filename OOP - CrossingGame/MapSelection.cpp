@@ -362,7 +362,7 @@ void MapSelection::processEvent(const sf::Event& event,
 // update / draw
 //==================================================
 
-void MapSelection::update()
+void MapSelection::update(float)
 {
     prevButton.update();
     nextButton.update();
