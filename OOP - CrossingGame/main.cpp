@@ -2,6 +2,7 @@
 // Luồng: MainMenu → CharacterSelection → MapSelection → Game
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <memory>
 
 #include "AppState.h"        
 #include "MenuManager.h"   
@@ -36,6 +37,21 @@ const std::string SETTING_TITLE_PATH = "ui/Logo/SETTING.png";
 
 const std::string BGM_PATH = "Sound/MainMenu_backgroundmusic.mp3";
 const std::string SFX_SELECT_PATH = "Sound/SelectSound.mp3";
+
+// Use heap-allocated textures (unique_ptr) to avoid large stack usage in main()
+static std::unique_ptr<sf::Texture> bgTexture;
+static std::unique_ptr<sf::Texture> logoTexture;
+static std::unique_ptr<sf::Texture> buttonTexture;
+
+static std::unique_ptr<sf::Texture> settingPanelTexture;
+static std::unique_ptr<sf::Texture> settingBoxTexture;
+static std::unique_ptr<sf::Texture> settingPlusTexture;
+static std::unique_ptr<sf::Texture> settingMinusTexture;
+static std::unique_ptr<sf::Texture> settingSwitchOnTexture;
+static std::unique_ptr<sf::Texture> settingSwitchOffTexture;
+static std::unique_ptr<sf::Texture> settingTimesTexture;
+static std::unique_ptr<sf::Texture> settingBackTexture;
+static std::unique_ptr<sf::Texture> settingTitleTexture;
 
 //==================================================
 // Helper: load chung tài nguyên
@@ -113,24 +129,27 @@ int main()
     sf::View settingsView(sf::FloatRect(0.f, 0.f, 1920.f, 1080.f));
 
     //--------------------------------------------------
-    // Load shared assets
+    // Load shared assets (allocate textures on heap)
     //--------------------------------------------------
-    sf::Texture bgTexture, logoTexture, buttonTexture;
-    if (!loadTexture(bgTexture, BG_PATH))     return -1;
-    if (!loadTexture(logoTexture, LOGO_PATH))   return -1;
-    if (!loadTexture(buttonTexture, BUTTON_PATH)) return -1;
+    bgTexture = std::make_unique<sf::Texture>();
+    logoTexture = std::make_unique<sf::Texture>();
+    buttonTexture = std::make_unique<sf::Texture>();
 
-    float bgScaleX = (float)WIN_W / bgTexture.getSize().x;
-    float bgScaleY = (float)WIN_H / bgTexture.getSize().y;
+    if (!loadTexture(*bgTexture, BG_PATH))     return -1;
+    if (!loadTexture(*logoTexture, LOGO_PATH))   return -1;
+    if (!loadTexture(*buttonTexture, BUTTON_PATH)) return -1;
+
+    float bgScaleX = (float)WIN_W / bgTexture->getSize().x;
+    float bgScaleY = (float)WIN_H / bgTexture->getSize().y;
 
     // SettingMenu dùng canvas 1920x1080 (khác 1280x720 của các màn còn
     // lại), nên cần scale riêng cho cùng 1 ảnh background
-    float settingBgScaleX = 1920.f / bgTexture.getSize().x;
-    float settingBgScaleY = 1080.f / bgTexture.getSize().y;
+    float settingBgScaleX = 1920.f / bgTexture->getSize().x;
+    float settingBgScaleY = 1080.f / bgTexture->getSize().y;
 
     float btnW = 240.f, btnH = 100.f;
-    float btnScaleX = btnW / buttonTexture.getSize().x;
-    float btnScaleY = btnH / buttonTexture.getSize().y;
+    float btnScaleX = btnW / buttonTexture->getSize().x;
+    float btnScaleY = btnH / buttonTexture->getSize().y;
 
     sf::Font font;
     if (!font.loadFromFile(FONT_PATH))
@@ -139,22 +158,26 @@ int main()
         return -1;
     }
 
-    sf::Texture settingPanelTexture, settingBoxTexture;
-    sf::Texture settingPlusTexture, settingMinusTexture;
-    sf::Texture settingSwitchOnTexture, settingSwitchOffTexture;
-    sf::Texture settingTimesTexture;
-    sf::Texture settingBackTexture;
-    sf::Texture settingTitleTexture;
+    // allocate and load setting textures
+    settingPanelTexture = std::make_unique<sf::Texture>();
+    settingBoxTexture = std::make_unique<sf::Texture>();
+    settingPlusTexture = std::make_unique<sf::Texture>();
+    settingMinusTexture = std::make_unique<sf::Texture>();
+    settingSwitchOnTexture = std::make_unique<sf::Texture>();
+    settingSwitchOffTexture = std::make_unique<sf::Texture>();
+    settingTimesTexture = std::make_unique<sf::Texture>();
+    settingBackTexture = std::make_unique<sf::Texture>();
+    settingTitleTexture = std::make_unique<sf::Texture>();
 
-    if (!loadTexture(settingPanelTexture, SETTING_PANEL_PATH))     return -1;
-    if (!loadTexture(settingBoxTexture, SETTING_BOX_PATH))         return -1;
-    if (!loadTexture(settingPlusTexture, SETTING_PLUS_PATH))       return -1;
-    if (!loadTexture(settingMinusTexture, SETTING_MINUS_PATH))     return -1;
-    if (!loadTexture(settingSwitchOnTexture, SETTING_SWITCH_ON_PATH))  return -1;
-    if (!loadTexture(settingSwitchOffTexture, SETTING_SWITCH_OFF_PATH)) return -1;
-    if (!loadTexture(settingTimesTexture, SETTING_TIMES_PATH))     return -1;
-    if (!loadTexture(settingBackTexture, SETTING_BACK_PATH))       return -1;
-    if (!loadTexture(settingTitleTexture, SETTING_TITLE_PATH))     return -1;
+    if (!loadTexture(*settingPanelTexture, SETTING_PANEL_PATH))     return -1;
+    if (!loadTexture(*settingBoxTexture, SETTING_BOX_PATH))         return -1;
+    if (!loadTexture(*settingPlusTexture, SETTING_PLUS_PATH))       return -1;
+    if (!loadTexture(*settingMinusTexture, SETTING_MINUS_PATH))     return -1;
+    if (!loadTexture(*settingSwitchOnTexture, SETTING_SWITCH_ON_PATH))  return -1;
+    if (!loadTexture(*settingSwitchOffTexture, SETTING_SWITCH_OFF_PATH)) return -1;
+    if (!loadTexture(*settingTimesTexture, SETTING_TIMES_PATH))     return -1;
+    if (!loadTexture(*settingBackTexture, SETTING_BACK_PATH))       return -1;
+    if (!loadTexture(*settingTitleTexture, SETTING_TITLE_PATH))     return -1;
 
     std::cout << "[INFO] Nhan F11 de bat/tat toan man hinh\n";
 
@@ -170,16 +193,16 @@ int main()
     // Build MainMenu
     //--------------------------------------------------
     MainMenu mainMenu;
-    mainMenu.setBackgroundTexture(bgTexture);
+    mainMenu.setBackgroundTexture(*bgTexture);
     mainMenu.setBackgroundScale(bgScaleX, bgScaleY);
-    mainMenu.setLogoTexture(logoTexture);
+    mainMenu.setLogoTexture(*logoTexture);
     mainMenu.setLogoScale(0.40f, 0.40f);
     mainMenu.setLogoPosition(330.f, -50.f);
 
     {
         float bx = 515.f, startY = 250.f, spacing = 55.f;
-        auto setupBtn = [&](Button& btn, const std::string& text, float y) {
-            btn.setTexture(buttonTexture);
+            auto setupBtn = [&](Button& btn, const std::string& text, float y) {
+            btn.setTexture(*buttonTexture);
             btn.setFont(font);
             btn.setText(text);
             btn.setCharacterSize(28);
@@ -200,7 +223,7 @@ int main()
     //--------------------------------------------------
     CharacterSelection charSelect;
     charSelect.setWindowSize((float)WIN_W, (float)WIN_H);
-    charSelect.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
+    charSelect.setBackgroundTexture(*bgTexture, bgScaleX, bgScaleY);
     charSelect.loadFont(FONT_PATH);
     charSelect.loadCharacterTexture(0, "Character/Chicken_character.png");
     charSelect.loadCharacterTexture(1, "Character/Knight_character.png");
@@ -212,7 +235,7 @@ int main()
         "ui/Icon/Heart.png",
         "ui/Icon/Lightning.png");
 
-    charSelect.setupButtons(buttonTexture, btnW, btnH, btnScaleX, btnScaleY);
+    charSelect.setupButtons(*buttonTexture, btnW, btnH, btnScaleX, btnScaleY);
     charSelect.setupLayout();
 
     //--------------------------------------------------
@@ -220,7 +243,7 @@ int main()
     //--------------------------------------------------
     MapSelection mapSelect;
     mapSelect.setWindowSize((float)WIN_W, (float)WIN_H);
-    mapSelect.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
+    mapSelect.setBackgroundTexture(*bgTexture, bgScaleX, bgScaleY);
     mapSelect.loadFont(FONT_PATH);
     mapSelect.loadMapThumbnail(0, "Map/City_map.png");
     mapSelect.loadMapThumbnail(1, "Map/Ancient_map.png");
@@ -230,22 +253,22 @@ int main()
     mapSelect.loadArrowTexture(
         "ui/Icon/LeftArrow.png");
 
-    mapSelect.setupButtons(buttonTexture, btnW, btnH, btnScaleX, btnScaleY);
+    mapSelect.setupButtons(*buttonTexture, btnW, btnH, btnScaleX, btnScaleY);
     mapSelect.setupLayout();
 
     //--------------------------------------------------
     // Build SettingMenu
     //--------------------------------------------------
     SettingMenu settingMenu;
-    settingMenu.setBackgroundTexture(bgTexture, settingBgScaleX, settingBgScaleY);
-    settingMenu.setPanelTexture(settingPanelTexture);
-    settingMenu.setValueBoxTexture(settingBoxTexture);
-    settingMenu.setPlusTexture(settingPlusTexture);
-    settingMenu.setMinusTexture(settingMinusTexture);
-    settingMenu.setSwitchTextures(settingSwitchOnTexture, settingSwitchOffTexture);
-    settingMenu.setTimesTexture(settingTimesTexture);
-    settingMenu.setBackButtonTexture(settingBackTexture);
-    settingMenu.setTitleTexture(settingTitleTexture);
+    settingMenu.setBackgroundTexture(*bgTexture, settingBgScaleX, settingBgScaleY);
+    settingMenu.setPanelTexture(*settingPanelTexture);
+    settingMenu.setValueBoxTexture(*settingBoxTexture);
+    settingMenu.setPlusTexture(*settingPlusTexture);
+    settingMenu.setMinusTexture(*settingMinusTexture);
+    settingMenu.setSwitchTextures(*settingSwitchOnTexture, *settingSwitchOffTexture);
+    settingMenu.setTimesTexture(*settingTimesTexture);
+    settingMenu.setBackButtonTexture(*settingBackTexture);
+    settingMenu.setTitleTexture(*settingTitleTexture);
     settingMenu.setFont(font);
 
     //--------------------------------------------------
