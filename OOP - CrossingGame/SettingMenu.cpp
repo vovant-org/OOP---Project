@@ -1,6 +1,11 @@
 #include "SettingMenu.h"
-
+#include "AudioManager.h"
 #include <string>
+
+void SettingMenu::setAudioManager(AudioManager* manager)
+{
+    audio = manager;
+}
 
 //==================================================
 // Layout Constants (internal to this file)
@@ -776,7 +781,7 @@ void SettingMenu::processEvent(const sf::Event& event,
         if (backButton.contains(mousePos))
         {
             backButton.press();
-
+            if (audio) audio->playSound("select");
             result = SettingMenuResult::Back;
         }
     }

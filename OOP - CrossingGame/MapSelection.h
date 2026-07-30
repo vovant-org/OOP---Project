@@ -10,6 +10,8 @@
 #include "Button.h"
 #include "MenuBackground.h"
 
+class AudioManager;
+
 // ── Kết quả ──────────────────────────────────────────────────
 enum class MapSelectionResult
 {
@@ -80,6 +82,7 @@ private:
 
     // Result
     MapSelectionResult result = MapSelectionResult::None;
+    AudioManager* audio = nullptr;
 
     // Helpers
     void updatePreview();
@@ -92,6 +95,8 @@ private:
 public:
 
     MapSelection();
+
+    void setAudioManager(AudioManager* manager);
 
     void setWindowSize(float w, float h);
     void setBackgroundTexture(const sf::Texture& tex, float sx, float sy);

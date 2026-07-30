@@ -7,6 +7,8 @@
 #include "Menu.h"
 #include "Button.h"
 
+class AudioManager;
+
 //==================================================
 // Result
 //==================================================
@@ -151,6 +153,8 @@ private:
 
     int resolutionIndex = 2;
 
+    AudioManager* audio = nullptr;
+
     //----------------------------------
     // Helper Functions
     //----------------------------------
@@ -179,6 +183,8 @@ public:
     //----------------------------------
 
     SettingMenu();
+
+    void setAudioManager(AudioManager* manager);
 
     //----------------------------------
     // Texture Setters

@@ -1,4 +1,11 @@
 #include "MainMenu.h"
+#include "AudioManager.h"
+
+// ADDED Audio
+void MainMenu::setAudioManager(AudioManager* manager)
+{
+    audio = manager;
+}
 
 //==================================================
 // Constructor
@@ -146,6 +153,8 @@ void MainMenu::processEvent(const sf::Event& event,
         {
             buttons[selectedIndex].press();
 
+            if (audio) audio->playSound("select");   // ===== ADDED =====
+
             result = static_cast<MainMenuResult>(selectedIndex + 1);
 
             break;
@@ -175,6 +184,8 @@ void MainMenu::processEvent(const sf::Event& event,
             if (buttons[i].contains(mousePos))
             {
                 buttons[i].press();
+
+                if (audio) audio->playSound("select");   // ===== ADDED =====
 
                 selectedIndex = static_cast<int>(i);
 

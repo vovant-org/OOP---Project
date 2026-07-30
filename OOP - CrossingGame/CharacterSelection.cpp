@@ -1,6 +1,13 @@
 // CharacterSelection.cpp
 #include "CharacterSelection.h"
+#include "AudioManager.h"
 #include <iostream>
+
+// ===== ADDED =====
+void CharacterSelection::setAudioManager(AudioManager* manager)
+{
+    audio = manager;
+}
 
 //==================================================
 // Helper: scale sprite theo kích thước mong muốn (px) thay vì
@@ -395,11 +402,13 @@ void CharacterSelection::processEvent(const sf::Event& event,
 
         case sf::Keyboard::Return:
             selectButton.press();
+            if (audio) audio->playSound("select");
             result = CharacterSelectionResult::Selected;
             break;
 
         case sf::Keyboard::Escape:
             backButton.press();
+            if (audio) audio->playSound("select");
             result = CharacterSelectionResult::Back;
             break;
 
@@ -422,8 +431,15 @@ void CharacterSelection::processEvent(const sf::Event& event,
 
         if (prevButton.contains(mp))   selectPrev();
         if (nextButton.contains(mp))   selectNext();
-        if (selectButton.contains(mp)) result = CharacterSelectionResult::Selected;
-        if (backButton.contains(mp))   result = CharacterSelectionResult::Back;
+        if (selectButton.contains(mp)) {
+            if (audio) audio->playSound("select");
+            result = CharacterSelectionResult::Selected;
+        }
+        if (backButton.contains(mp))
+        {
+            if (audio) audio->playSound("select");
+            result = CharacterSelectionResult::Back;
+        }
     }
 }
 

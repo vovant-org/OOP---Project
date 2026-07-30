@@ -7,6 +7,8 @@
 #include "MenuBackground.h"
 #include "Button.h"
 
+class AudioManager;
+
 //==================================================
 // Button
 //==================================================
@@ -67,6 +69,9 @@ private:
 
     MainMenuResult result = MainMenuResult::None;
 
+    // Audio
+    AudioManager* audio = nullptr;
+
     //----------------------------------
     // Helper
     //----------------------------------
@@ -80,6 +85,9 @@ private:
 public:
 
     MainMenu();
+
+    // Audio
+    void setAudioManager(AudioManager* manager);
 
     //----------------------------------
     // Background

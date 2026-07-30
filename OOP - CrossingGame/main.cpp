@@ -20,7 +20,8 @@ const std::string FONT_PATH = "Font/PixelOperator.ttf";
 const std::string BG_PATH = "ui/Background/CrossingGame_background.png";
 const std::string LOGO_PATH = "ui/Logo/CrossingGame_Logo.png";
 const std::string BUTTON_PATH = "ui/Button/button_normal.png";
-const std::string BGM_PATH = "Sound/Hellmap_backgroundmusic.mp3";
+const std::string BGM_PATH = "Sound/Skymap_backgroundmusic.mp3";
+const std::string SFX_SELECT_PATH = "Sound/SelectSound.mp3";
 
 // ===== ADDED: đường dẫn texture cho SettingMenu =====
 // (Chỉnh lại đường dẫn cho khớp thư mục asset thật của bạn nếu khác)
@@ -257,6 +258,9 @@ int main()
     if (!audio.loadMusic(BGM_PATH))
         return -1;
 
+    if (!audio.loadSound("select", SFX_SELECT_PATH))
+        return -1;
+
     audio.setMusicVolume(settingMenu.getMusicVolume());
     audio.playMusic(true);
 
@@ -264,6 +268,11 @@ int main()
         {
             audio.setMusicVolume(volume);
         });
+
+    mainMenu.setAudioManager(&audio);
+    charSelect.setAudioManager(&audio);
+    mapSelect.setAudioManager(&audio);
+    settingMenu.setAudioManager(&audio);
 
     //--------------------------------------------------
     // ===== ADDED: chọn view phù hợp theo state hiện tại =====

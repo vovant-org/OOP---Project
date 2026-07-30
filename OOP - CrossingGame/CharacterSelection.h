@@ -10,6 +10,8 @@
 #include "Button.h"
 #include "MenuBackground.h"
 
+class AudioManager;
+
 enum class CharacterSelectionResult
 {
     None = 0,
@@ -116,6 +118,9 @@ private:
 
     CharacterSelectionResult result = CharacterSelectionResult::None;
 
+    // ===== ADDED =====
+    AudioManager* audio = nullptr;
+
     //--------------------------------------------------
     // Helpers
     //--------------------------------------------------
@@ -135,6 +140,9 @@ private:
 public:
 
     CharacterSelection();
+
+    // ===== ADDED =====
+    void setAudioManager(AudioManager* manager);
 
     void setWindowSize(float w, float h);
 

@@ -1,7 +1,13 @@
 // MapSelection.cpp
 #include "MapSelection.h"
+#include "AudioManager.h"
 #include <iostream>
 using namespace std;
+
+void MapSelection::setAudioManager(AudioManager* manager)
+{
+    audio = manager;
+}
 
 //==================================================
 // Helper: scale sprite theo kích thước mong muốn (px) thay vì
@@ -312,11 +318,13 @@ void MapSelection::processEvent(const sf::Event& event,
 
         case sf::Keyboard::Return:
             playButton.press();
+            if (audio) audio->playSound("select");
             result = MapSelectionResult::Selected;
             break;
 
         case sf::Keyboard::Escape:
             backButton.press();
+            if (audio) audio->playSound("select");
             result = MapSelectionResult::Back;
             break;
 
@@ -337,8 +345,16 @@ void MapSelection::processEvent(const sf::Event& event,
 
         if (prevButton.contains(mp)) selectPrev();
         if (nextButton.contains(mp)) selectNext();
-        if (playButton.contains(mp)) result = MapSelectionResult::Selected;
-        if (backButton.contains(mp)) result = MapSelectionResult::Back;
+        if (playButton.contains(mp)) 
+        {
+            if (audio) audio->playSound("select");   // ===== ADDED =====
+            result = MapSelectionResult::Selected;
+        }
+        if (backButton.contains(mp)) 
+        {
+            if (audio) audio->playSound("select");   // ===== ADDED =====
+            result = MapSelectionResult::Back;
+        }
     }
 }
 
