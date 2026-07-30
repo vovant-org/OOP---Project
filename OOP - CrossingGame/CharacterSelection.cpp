@@ -368,14 +368,7 @@ void CharacterSelection::updateStatsText()
     statHPText.setFillColor(sf::Color(200, 220, 255));
     statHPText.setPosition(lx, ty + dy * 2.f);
 
-    // Skill — đưa sang cột bên phải của box, canh giữa theo chiều dọc
-    // với hàng Speed/HP thay vì xếp thêm 1 hàng bên dưới (dễ tràn box)
-    statSkillText.setString("Skill : " + c.skill);
-    statSkillText.setCharacterSize(20);
-    statSkillText.setFillColor(sf::Color(200, 220, 255));
-    float skillX = boxX + boxW * 0.58f;
-    float skillY = ty + dy * 1.5f;
-    statSkillText.setPosition(skillX, skillY);
+   
 }
 
 //==================================================
