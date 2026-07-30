@@ -162,6 +162,9 @@
     <ClCompile Include="AudioManager.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="MenuManager.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -261,6 +264,12 @@
       <Filter>Header Files\ui</Filter>
     </ClInclude>
     <ClInclude Include="AudioManager.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="AppState.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuManager.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,8 +4,11 @@
 #pragma once
 
 // Kích thước màn hình
-#define SCREEN_WIDTH  1920.f
-#define SCREEN_HEIGHT 1080.f
+// ===== CHANGED: khớp canvas gameplay thực tế 1280x720 (giống
+// MainMenu/CharacterSelection/MapSelection), không phải 1920x1080
+// (đó là canvas riêng của SettingMenu) =====
+#define SCREEN_WIDTH  1280.f
+#define SCREEN_HEIGHT 720.f
 
 // Macro Update chung: animation + di chuyển + wrap-around
 // frameCount: số frame trong sprite sheet (thường là 4)

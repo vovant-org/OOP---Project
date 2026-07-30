@@ -178,11 +178,13 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MapSelection.cpp" />
     <ClCompile Include="MenuBackground.cpp" />
+    <ClCompile Include="MenuManager.cpp" />
     <ClCompile Include="SettingMenu.cpp" />
     <ClCompile Include="TrafficLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutMenu.h" />
+    <ClInclude Include="AppState.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="CANGLE.h" />
@@ -210,6 +212,7 @@
     <ClInclude Include="MapSelection.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="MenuBackground.h" />
+    <ClInclude Include="MenuManager.h" />
     <ClInclude Include="ObstacleHelper.h" />
     <ClInclude Include="PauseMenu.h" />
     <ClInclude Include="SettingMenu.h" />
