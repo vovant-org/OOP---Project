@@ -13,7 +13,7 @@ CTRUCK::CTRUCK(float startX, float startY, float spd, bool moveRight)
     int totalFrames = 4;
     frameWidth = texture.getSize().x / totalFrames;
     frameHeight = texture.getSize().y;
-    frameTime = 0.12f;  // Xe tải: animation chậm hơn, xe nặng
+    frameTime = 0.2f;  // Xe tải: animation chậm hơn, xe nặng
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
 
@@ -21,7 +21,7 @@ CTRUCK::CTRUCK(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? 0.22f : -0.22f, 0.22f);
+    sprite.setScale(isMovingRight ? -0.48f : 0.48f, 0.48f);
 
     sprite.setPosition(x, y);
 }

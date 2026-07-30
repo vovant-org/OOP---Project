@@ -13,7 +13,7 @@ CPIGLIN::CPIGLIN(float startX, float startY, float spd, bool moveRight)
     int totalFrames = 4;
     frameWidth = texture.getSize().x / totalFrames;
     frameHeight = texture.getSize().y;
-    frameTime = 0.08f;  // Piglin: nhanh nhẹn hơn Brute
+    frameTime = 0.30f;  // Piglin: nhanh nhẹn hơn Brute
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
 
@@ -21,7 +21,7 @@ CPIGLIN::CPIGLIN(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? 0.17f : -0.17f, 0.17f);
+    sprite.setScale(isMovingRight ? -0.14f : 0.14f, 0.14f);
 
     sprite.setPosition(x, y);
 }

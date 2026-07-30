@@ -13,7 +13,7 @@ CANGLE::CANGLE(float startX, float startY, float spd, bool moveRight)
     int totalFrames = 4;
     frameWidth = texture.getSize().x / totalFrames;
     frameHeight = texture.getSize().y;
-    frameTime = 0.08f;  // Angle: bay nhẹ nhàng
+    frameTime = 0.18f;  // Angle: bay nhẹ nhàng
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
 
@@ -21,7 +21,7 @@ CANGLE::CANGLE(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? 0.16f : -0.16f, 0.16f);
+    sprite.setScale(isMovingRight ? -0.65f : 0.65f, 0.65f);
 
     sprite.setPosition(x, y);
 }

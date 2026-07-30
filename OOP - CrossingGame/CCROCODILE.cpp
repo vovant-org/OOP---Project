@@ -21,7 +21,7 @@ CCROCODILE::CCROCODILE(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? 0.18f : -0.18f, 0.18f);
+    sprite.setScale(isMovingRight ? -0.18f : 0.18f, 0.18f);
 
     sprite.setPosition(x, y);
 }

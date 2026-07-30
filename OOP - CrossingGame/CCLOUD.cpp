@@ -15,7 +15,7 @@ CCLOUD::CCLOUD(float startX, float startY, float spd, bool moveRight)
     int totalFrames = 4;
     frameWidth = texture.getSize().x / totalFrames;
     frameHeight = texture.getSize().y;
-    frameTime = 0.20f;  // Cloud: đổi frame rất chậm, lơ lửng
+    frameTime = 0.3f;  // Cloud: đổi frame rất chậm, lơ lửng
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
 
@@ -23,7 +23,7 @@ CCLOUD::CCLOUD(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? 0.20f : -0.20f, 0.20f);
+    sprite.setScale(isMovingRight ? -1.5f : 1.5f, 1.5f);
 
     sprite.setPosition(x, y);
 }

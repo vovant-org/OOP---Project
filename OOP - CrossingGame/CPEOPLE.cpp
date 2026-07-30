@@ -14,7 +14,7 @@ namespace
 
     // Scale hien thi nhan vat tren canvas 1280x720 (frame goc ~260x220px
     // qua to neu ve nguyen kich thuoc)
-    constexpr float CHAR_SCALE = 0.4f;
+    constexpr float CHAR_SCALE = 0.3f;
 
     // 1 buoc di chuyen (tam thoi dung gia tri co dinh - se doi lai
     // theo kich thuoc o luoi thuc te cua map khi lam collision/tile)

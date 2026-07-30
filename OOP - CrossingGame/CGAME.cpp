@@ -165,17 +165,17 @@ void CGAME::Init(int mapIndex, int characterIndex)
     case 0: // City — chỉ có xe cộ
     {
         const float* y = CITY_LANE_Y;
-        vehicles.push_back(new CBIKE(100.f, y[0], 90.f, true));
-        vehicles.push_back(new CTRUCK(700.f, y[0], 90.f, true));
+        vehicles.push_back(new CBIKE(1100.f, y[0], 180.f, true));
+        vehicles.push_back(new CTRUCK(1000.f, y[0], 280.f, true));
 
-        vehicles.push_back(new CMOTOR(300.f, y[1], 130.f, false));
-        vehicles.push_back(new CTRUCK(1000.f, y[1], 70.f, false));
+        vehicles.push_back(new CMOTOR(300.f, y[1], 350.f, false));
+        vehicles.push_back(new CTRUCK(1000.f, y[1], 240.f, false));
 
-        vehicles.push_back(new CBIKE(150.f, y[2], 100.f, true));
-        vehicles.push_back(new CMOTOR(800.f, y[2], 140.f, true));
+        vehicles.push_back(new CBIKE(150.f, y[2], 160.f, true));
+        vehicles.push_back(new CMOTOR(800.f, y[2], 300.f, true));
 
-        vehicles.push_back(new CTRUCK(400.f, y[3], 80.f, false));
-        vehicles.push_back(new CBIKE(1100.f, y[3], 110.f, false));
+        vehicles.push_back(new CTRUCK(400.f, y[3], 275.f, false));
+        vehicles.push_back(new CBIKE(1100.f, y[3] + 28.f, 210.f, false));
         break;
     }
 
@@ -199,13 +199,13 @@ void CGAME::Init(int mapIndex, int characterIndex)
     case 2: // Hell — cả xe cộ lẫn thú vật (ít lane hơn, platform to hơn)
     {
         const float* y = HELL_LANE_Y;
-        vehicles.push_back(new CHELLMOTOR(100.f, y[0], 150.f, true));
-        animals.push_back(new CPIGLIN(500.f, y[0], 120.f, true));
+        vehicles.push_back(new CHELLMOTOR(100.f, y[0], 180.f, true));
+        animals.push_back(new CPIGLIN(500.f, y[0], 80.f, true));
 
-        vehicles.push_back(new CTRAIN(300.f, y[1], 200.f, false));
+        vehicles.push_back(new CTRAIN(300.f, y[1], 250.f, false));
         animals.push_back(new CBRUTE(900.f, y[1], 70.f, false));
 
-        vehicles.push_back(new CHELLMOTOR(150.f, y[2], 160.f, true));
+        vehicles.push_back(new CHELLMOTOR(150.f, y[2], 170.f, true));
         animals.push_back(new CBRUTE(700.f, y[2], 75.f, true));
         break;
     }
@@ -213,17 +213,17 @@ void CGAME::Init(int mapIndex, int characterIndex)
     case 3: // Sky — chỉ có thú vật (chim/mây/thiên thần)
     {
         const float* y = SKY_LANE_Y;
-        animals.push_back(new CCLOUD(100.f, y[0], 60.f, true));
-        animals.push_back(new CBIRD(700.f, y[0], 130.f, true));
+        animals.push_back(new CCLOUD(1000.f, y[0], 100.f, true));
+        animals.push_back(new CBIRD(700.f, y[0], 180.f, true));
 
-        animals.push_back(new CANGLE(300.f, y[1], 100.f, false));
-        animals.push_back(new CCLOUD(1000.f, y[1], 55.f, false));
+        animals.push_back(new CANGLE(300.f, y[1], 150.f, false));
+        animals.push_back(new CCLOUD(1600.f, y[1], 95.f, false));
 
-        animals.push_back(new CBIRD(150.f, y[2], 140.f, true));
-        animals.push_back(new CANGLE(800.f, y[2], 95.f, true));
+        animals.push_back(new CBIRD(150.f, y[2], 160.f, true));
+        animals.push_back(new CANGLE(800.f, y[2], 130.f, true));
 
-        animals.push_back(new CCLOUD(400.f, y[3], 65.f, false));
-        animals.push_back(new CBIRD(1100.f, y[3], 150.f, false));
+        animals.push_back(new CCLOUD(1000.f, y[3], 100.f, false));
+        animals.push_back(new CBIRD(1500.f, y[3], 160.f, false));
         break;
     }
 

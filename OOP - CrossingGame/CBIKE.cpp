@@ -17,7 +17,7 @@ CBIKE::CBIKE(float startX, float startY, float spd, bool moveRight)
     int totalFrames = 4;
     frameWidth = texture.getSize().x / totalFrames;
     frameHeight = texture.getSize().y;
-    frameTime = 0.10f;  // Xe đạp: animation vừa phải
+    frameTime = 0.18f;  // Xe đạp: animation vừa phải
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
 
@@ -25,7 +25,7 @@ CBIKE::CBIKE(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? 0.18f : -0.18f, 0.18f);
+    sprite.setScale(isMovingRight ? -0.31f : 0.31f, 0.31f);
 
     sprite.setPosition(x, y);
 }
