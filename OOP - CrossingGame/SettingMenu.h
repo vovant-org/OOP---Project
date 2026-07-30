@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include<functional>
 
 #include "Menu.h"
 #include "Button.h"
@@ -130,6 +131,7 @@ private:
     //----------------------------------
 
     int musicVolume = 100;
+    std::function<void(int)> onMusicVolumeChanged;
 
     int soundVolume = 100;
 
@@ -249,6 +251,8 @@ public:
     //----------------------------------
 
     void setMusicVolume(int volume);
+
+    void setOnMusicVolumeChanged(std::function<void(int)> callback);
 
     void setSoundVolume(int volume);
 

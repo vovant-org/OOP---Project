@@ -83,9 +83,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)..\SFML\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-d.lib
-;sfml-window-d.lib
-;sfml-system-d.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-d.lib;sfml-audio.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -106,9 +104,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)..\SFML\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics.lib;
-sfml-window.lib
-;sfml-system.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-d.lib;sfml-audio.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -127,9 +123,7 @@ sfml-window.lib
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)..\SFML\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-d.lib
-;sfml-window-d.lib
-;sfml-system-d.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-d.lib;sfml-audio.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -150,15 +144,14 @@ sfml-window.lib
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)..\SFML\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics.lib;
-sfml-window.lib
-;sfml-system.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-d.lib;sfml-audio.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="CANGLE.cpp" />
     <ClCompile Include="CANIMAL.cpp" />
@@ -190,6 +183,7 @@ sfml-window.lib
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutMenu.h" />
+    <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="CANGLE.h" />
     <ClInclude Include="CANIMAL.h" />
@@ -210,7 +204,6 @@ sfml-window.lib
     <ClInclude Include="CTRUCK.h" />
     <ClInclude Include="CVEHICLE.h" />
     <ClInclude Include="GameOverMenu.h" />
-    <ClInclude Include="GameState.h" />
     <ClInclude Include="LeaderboardMenu.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Map.h" />

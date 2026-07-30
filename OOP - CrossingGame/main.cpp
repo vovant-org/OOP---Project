@@ -6,7 +6,8 @@
 #include "MainMenu.h"
 #include "CharacterSelection.h"
 #include "MapSelection.h"
-#include "SettingMenu.h"     // ===== ADDED =====
+#include "SettingMenu.h"
+#include "AudioManager.h"
 // #include "CGAME.h"   ← bật khi implement xong
 
 //==================================================
@@ -19,6 +20,7 @@ const std::string FONT_PATH = "Font/PixelOperator.ttf";
 const std::string BG_PATH = "ui/Background/CrossingGame_background.png";
 const std::string LOGO_PATH = "ui/Logo/CrossingGame_Logo.png";
 const std::string BUTTON_PATH = "ui/Button/button_normal.png";
+const std::string BGM_PATH = "Sound/Hellmap_backgroundmusic.mp3";
 
 // ===== ADDED: đường dẫn texture cho SettingMenu =====
 // (Chỉnh lại đường dẫn cho khớp thư mục asset thật của bạn nếu khác)
@@ -248,6 +250,22 @@ int main()
     settingMenu.setFont(font);
 
     //--------------------------------------------------
+    // ===== ADDED: Audio =====
+    //--------------------------------------------------
+    AudioManager audio;
+
+    if (!audio.loadMusic(BGM_PATH))
+        return -1;
+
+    audio.setMusicVolume(settingMenu.getMusicVolume());
+    audio.playMusic(true);
+
+    settingMenu.setOnMusicVolumeChanged([&audio](int volume)
+        {
+            audio.setMusicVolume(volume);
+        });
+
+    //--------------------------------------------------
     // ===== ADDED: chọn view phù hợp theo state hiện tại =====
     // SettingMenu dùng canvas 1920x1080 (settingsView), các state còn lại
     // dùng canvas 1280x720 (gameView).
@@ -441,6 +459,8 @@ int main()
 
         default: break;
         }
+
+        audio.update();
 
         //----------------------------------------------
         // Draw

@@ -941,6 +941,14 @@ void SettingMenu::setMusicVolume(int volume)
     musicVolume = volume;
 
     updateTexts();
+
+    if (onMusicVolumeChanged)
+        onMusicVolumeChanged(musicVolume);
+}
+
+void SettingMenu::setOnMusicVolumeChanged(std::function<void(int)> callback)
+{
+    onMusicVolumeChanged = std::move(callback);
 }
 
 void SettingMenu::setSoundVolume(int volume)
