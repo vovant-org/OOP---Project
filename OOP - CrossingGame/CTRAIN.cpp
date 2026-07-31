@@ -23,12 +23,17 @@ CTRAIN::CTRAIN(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? -0.25f : 0.25f, 0.25f);
+    sprite.setScale(isMovingRight ? -0.17f : 0.17f, 0.17f);
 
     sprite.setPosition(x, y);
 }
 
 void CTRAIN::Update(float deltaTime)
 {
+    // ===== ADDED (Bước 5): dừng hẳn (không di chuyển, không animate)
+    // khi đèn giao thông điều khiển lane này đang đỏ =====
+    if (isStopped)
+        return;
+
     OBSTACLE_UPDATE(4)
 }

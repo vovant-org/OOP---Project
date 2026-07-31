@@ -14,11 +14,11 @@ namespace
 
     // Scale hien thi nhan vat tren canvas 1280x720 (frame goc ~260x220px
     // qua to neu ve nguyen kich thuoc)
-    constexpr float CHAR_SCALE = 0.3f;
+    constexpr float CHAR_SCALE = 0.25f;   // ===== CHANGED: to hon (0.25 → 0.35) =====
 
     // 1 buoc di chuyen (tam thoi dung gia tri co dinh - se doi lai
     // theo kich thuoc o luoi thuc te cua map khi lam collision/tile)
-    constexpr float MOVE_STEP = 20.f;
+    constexpr float MOVE_STEP = 25.f;     // ===== CHANGED: ngan hon (64 → 40) =====
 
     // Canvas gameplay - khop voi WIN_W/WIN_H (1280x720) trong main.cpp
     constexpr float CANVAS_W = 1280.f;
@@ -201,4 +201,16 @@ void CPEOPLE::Reset(float startX, float startY)
     sprite.setTextureRect(sf::IntRect(
         0, direction * frameHeight, frameWidth, frameHeight));
     sprite.setPosition(x, y);
+}
+
+// ===== ADDED (Bước 4) =====
+void CPEOPLE::TriggerDeath()
+{
+    isAlive = false;
+    direction = 4;   // DIE
+    currentFrame = 0;
+    elapsedTime = 0.f;
+
+    sprite.setTextureRect(sf::IntRect(
+        0, direction * frameHeight, frameWidth, frameHeight));
 }

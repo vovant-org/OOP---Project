@@ -21,7 +21,7 @@ CBRUTE::CBRUTE(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? -0.28f : 0.28f, 0.28f);
+    sprite.setScale(isMovingRight ? -0.26f : 0.26f, 0.26f);
 
     sprite.setPosition(x, y);
 }

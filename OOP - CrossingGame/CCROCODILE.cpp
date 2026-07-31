@@ -13,7 +13,7 @@ CCROCODILE::CCROCODILE(float startX, float startY, float spd, bool moveRight)
     int totalFrames = 4;
     frameWidth = texture.getSize().x / totalFrames;
     frameHeight = texture.getSize().y;
-    frameTime = 0.15f;  // Cá sấu: di chuyển chậm, nguy hiểm
+    frameTime = 0.25f;  // Cá sấu: di chuyển chậm, nguy hiểm
 
     sprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
 
@@ -21,7 +21,7 @@ CCROCODILE::CCROCODILE(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? -0.18f : 0.18f, 0.18f);
+    sprite.setScale(isMovingRight ? -0.23f : 0.23f, 0.23f);
 
     sprite.setPosition(x, y);
 }

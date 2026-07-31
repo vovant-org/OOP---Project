@@ -21,12 +21,17 @@ CMOTOR::CMOTOR(float startX, float startY, float spd, bool moveRight)
     // giup (x,y) dai dien dung TAM obstacle, dat lane chinh xac hon.
     // Lat trai/phai gio chi can doi dau scale, khong can doi origin nua =====
     sprite.setOrigin(frameWidth / 2.f, frameHeight / 2.f);
-    sprite.setScale(isMovingRight ? -0.35f : 0.35f, 0.35f);
+    sprite.setScale(isMovingRight ? -0.30f : 0.30f, 0.30f);
 
     sprite.setPosition(x, y);
 }
 
 void CMOTOR::Update(float deltaTime)
 {
+    // ===== ADDED (Bước 5): dừng hẳn (không di chuyển, không animate)
+    // khi đèn giao thông điều khiển lane này đang đỏ =====
+    if (isStopped)
+        return;
+
     OBSTACLE_UPDATE(4)
 }

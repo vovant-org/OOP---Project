@@ -33,6 +33,9 @@ public:
     void SetDead() { isAlive = false; }
     void Reset(float startX, float startY);
 
+    // ===== ADDED (Bước 4): chuyển sang tư thế/animation chết khi va chạm =====
+    void TriggerDeath();
+
     float getX() const { return x; }
     float getY() const { return y; }
 };

@@ -25,10 +25,11 @@ private:
     int frameWidth, frameHeight;
 
 public:
-    // Khởi tạo đèn ở một tọa độ cụ thể
-    TrafficLight(float startX, float startY);
+    // ===== CHANGED: cho phep tuy chinh thoi gian do/xanh rieng cho tung den.
+    // Neu khong truyen thi dung mac dinh (do 4s, xanh 5s) nhu truoc =====
+    TrafficLight(float startX, float startY, float redDur = 4.f, float greenDur = 5.f);
 
-    // Nạp texture (sprite sheet 2 frame: xanh + đỏ)
+    // Nạp texture (sprite sheet 4 frame: đỏ tĩnh - đỏ nhấp nháy - xanh tĩnh - xanh nhấp nháy)
     bool loadTexture(const std::string& path);
 
     void Update(float deltaTime); // Hàm này đếm thời gian và chuyển trạng thái
