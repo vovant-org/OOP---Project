@@ -28,5 +28,10 @@ CPIGLIN::CPIGLIN(float startX, float startY, float spd, bool moveRight)
 
 void CPIGLIN::Update(float deltaTime)
 {
+    // ===== ADDED: dừng hẳn (không di chuyển, không animate) khi đèn
+    // giao thông điều khiển road này đang đỏ (giống CVEHICLE) =====
+    if (isStopped)
+        return;
+
     OBSTACLE_UPDATE(4)
 }

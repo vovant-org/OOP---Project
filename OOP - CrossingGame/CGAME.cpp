@@ -254,21 +254,63 @@ void CGAME::Init(int mapIndex, int characterIndex)
     case 1: // Ancient — chỉ có thú vật
     {
         const float* y = ANCIENT_LANE_Y;
+
+        // ===== ADDED: map Ancient co 4 road (khac City/Hell/Sky, moi
+        // road o day chi co 1 "lane" duy nhat - duong mon dat), giua cac
+        // road la 1 dai co/bui ran an toan (tong 3 dai). Moi dai co 1 den
+        // dieu khien CA ROAD NGAY DUOI no. Road0 (tren cung, gan vach
+        // dich) khong co dai phia truoc nen luon chay tu do.
+        float medianY[3] =
+        {
+            140.f,   // dai giua road0 va road1 -> dieu khien road1
+            265.f,   // dai giua road1 va road2 -> dieu khien road2
+            395.f    // dai giua road2 va road3 -> dieu khien road3
+        };
+
+        // Thoi gian do/xanh rieng cho tung den - chinh o day de doi nhip
+        float medianRedDur[3] = { 2.f, 4.f, 5.f };
+        float medianGreenDur[3] = { 14.f, 9.f, 6.f };
+
+        TrafficLight* roadLight[4] = { nullptr, nullptr, nullptr, nullptr };
+        for (int i = 0; i < 3; ++i)
+        {
+            TrafficLight* tl = new TrafficLight(40.f, medianY[i], medianRedDur[i], medianGreenDur[i]);
+            tl->loadTexture(LIGHT_PATHS[1]);
+            lights.push_back(tl);
+            roadLight[i + 1] = tl; // den thu i dieu khien road (i+1)
+        }
+
+        // Road 0 (y[0]) - khong den, luon chay
         animals.push_back(new CCROCODILE(3100.f, y[0], 100.f, true));
+        animals.back()->SetTrafficLight(roadLight[0]);
         animals.push_back(new CDINOSAUR(2700.f, y[0], 280.f, true));
+        animals.back()->SetTrafficLight(roadLight[0]);
         animals.push_back(new CDINOSAUR(2000.f, y[0] - 20.f, 300.f, false));
+        animals.back()->SetTrafficLight(roadLight[0]);
 
+        // Road 1 (y[1]) - dieu khien boi den o dai 1
         animals.push_back(new COLDBIRD(300.f, y[1], 350.f, false));
+        animals.back()->SetTrafficLight(roadLight[1]);
         animals.push_back(new CBEAST(1000.f, y[1], 130.f, false));
+        animals.back()->SetTrafficLight(roadLight[1]);
         animals.push_back(new CCROCODILE(1000.f, y[1] - 10.f, 80.f, true));
+        animals.back()->SetTrafficLight(roadLight[1]);
 
+        // Road 2 (y[2]) - dieu khien boi den o dai 2
         animals.push_back(new CCROCODILE(150.f, y[2], 85.f, true));
+        animals.back()->SetTrafficLight(roadLight[2]);
         animals.push_back(new CBEAST(800.f, y[2], 180.f, true));
+        animals.back()->SetTrafficLight(roadLight[2]);
         animals.push_back(new CBEAST(800.f, y[2], 150.f, false));
+        animals.back()->SetTrafficLight(roadLight[2]);
 
+        // Road 3 (y[3]) - dieu khien boi den o dai 3
         animals.push_back(new CDINOSAUR(400.f, y[3], 285.f, false));
+        animals.back()->SetTrafficLight(roadLight[3]);
         animals.push_back(new COLDBIRD(1100.f, y[3], 150.f, false));
+        animals.back()->SetTrafficLight(roadLight[3]);
         animals.push_back(new COLDBIRD(1100.f, y[3], 300.f, true));
+        animals.back()->SetTrafficLight(roadLight[3]);
 
         break;
     }
@@ -316,49 +358,101 @@ void CGAME::Init(int mapIndex, int characterIndex)
         vehicles.push_back(new CHELLMOTOR(100.f, y[2], 320.f, false));
         vehicles.back()->SetTrafficLight(roadLight[1]);
         animals.push_back(new CPIGLIN(500.f, y[2], 120.f, false));
+        animals.back()->SetTrafficLight(roadLight[1]);
         vehicles.push_back(new CTRAIN(100.f, y[3] - 15.f, 390.f, true));
         vehicles.back()->SetTrafficLight(roadLight[1]);
         animals.push_back(new CPIGLIN(500.f, y[3], 180.f, true));
+        animals.back()->SetTrafficLight(roadLight[1]);
 
         // Road 2 (y[4], y[5]) - dieu khien boi den o vach 2
         animals.push_back(new CPIGLIN(500.f, y[4], 240.f, false));
+        animals.back()->SetTrafficLight(roadLight[2]);
         animals.push_back(new CPIGLIN(500.f, y[4], 120.f, false));
+        animals.back()->SetTrafficLight(roadLight[2]);
         vehicles.push_back(new CTRAIN(300.f, y[5], 310.f, true));
         vehicles.back()->SetTrafficLight(roadLight[2]);
         animals.push_back(new CBRUTE(900.f, y[5], 100.f, true));
+        animals.back()->SetTrafficLight(roadLight[2]);
 
         // Road 3 (y[6], y[7]) - dieu khien boi den o vach 3
         vehicles.push_back(new CHELLMOTOR(150.f, y[6], 300.f, false));
         vehicles.back()->SetTrafficLight(roadLight[3]);
         animals.push_back(new CPIGLIN(150.f, y[6], 140.f, false));
+        animals.back()->SetTrafficLight(roadLight[3]);
         vehicles.push_back(new CHELLMOTOR(150.f, y[7], 170.f, true));
         vehicles.back()->SetTrafficLight(roadLight[3]);
         animals.push_back(new CBRUTE(700.f, y[7], 75.f, true));
+        animals.back()->SetTrafficLight(roadLight[3]);
         break;
     }
 
     case 3: // Sky — chỉ có thú vật (chim/mây/thiên thần)
     {
         const float* y = SKY_LANE_Y;
+
+        // ===== ADDED: giong City - map Sky co 4 road (moi road 2 lane,
+        // chia boi vach ke), giua cac road la 1 dai may an toan (tong 3
+        // dai). Moi dai 1 den dieu khien CA ROAD (2 lane) NGAY DUOI no.
+        // Road0 (tren cung, gan vach dich) khong co den.
+        float medianY[3] =
+        {
+            120.f,   // dai giua road0 va road1 -> dieu khien road1
+            255.f,   // dai giua road1 va road2 -> dieu khien road2
+            380.f    // dai giua road2 va road3 -> dieu khien road3
+        };
+
+        // Thoi gian do/xanh rieng cho tung den - chinh o day de doi nhip
+        float medianRedDur[3] = { 3.f, 4.f, 5.f };
+        float medianGreenDur[3] = { 5.f, 4.f, 3.f };
+
+        TrafficLight* roadLight[4] = { nullptr, nullptr, nullptr, nullptr };
+        for (int i = 0; i < 3; ++i)
+        {
+            TrafficLight* tl = new TrafficLight(50.f, medianY[i], medianRedDur[i], medianGreenDur[i]);
+            tl->loadTexture(LIGHT_PATHS[3]);
+            lights.push_back(tl);
+            roadLight[i + 1] = tl; // den thu i dieu khien road (i+1)
+        }
+
+        // Road 0 (y[0], y[1]) - khong den, luon bay tu do
         animals.push_back(new CBIRD(700.f, y[0], 380.f, false));
+        animals.back()->SetTrafficLight(roadLight[0]);
         animals.push_back(new CANGLE(700.f, y[0], 210.f, false));
+        animals.back()->SetTrafficLight(roadLight[0]);
         animals.push_back(new CCLOUD(1000.f, y[1], 150.f, true));
+        animals.back()->SetTrafficLight(roadLight[0]);
         animals.push_back(new CBIRD(700.f, y[1], 350.f, true));
+        animals.back()->SetTrafficLight(roadLight[0]);
 
+        // Road 1 (y[2], y[3]) - dieu khien boi den o dai 1
         animals.push_back(new CBIRD(300.f, y[2], 150.f, false));
+        animals.back()->SetTrafficLight(roadLight[1]);
         animals.push_back(new CANGLE(300.f, y[2], 230.f, false));
+        animals.back()->SetTrafficLight(roadLight[1]);
         animals.push_back(new CANGLE(300.f, y[3], 160.f, true));
+        animals.back()->SetTrafficLight(roadLight[1]);
         animals.push_back(new CCLOUD(1600.f, y[3], 95.f, true));
+        animals.back()->SetTrafficLight(roadLight[1]);
 
+        // Road 2 (y[4], y[5]) - dieu khien boi den o dai 2
         animals.push_back(new CBIRD(150.f, y[4], 400.f, false));
+        animals.back()->SetTrafficLight(roadLight[2]);
         animals.push_back(new CANGLE(800.f, y[4], 200.f, false));
+        animals.back()->SetTrafficLight(roadLight[2]);
         animals.push_back(new CBIRD(150.f, y[5], 260.f, true));
+        animals.back()->SetTrafficLight(roadLight[2]);
         animals.push_back(new CANGLE(800.f, y[5], 120.f, true));
+        animals.back()->SetTrafficLight(roadLight[2]);
 
+        // Road 3 (y[6], y[7]) - dieu khien boi den o dai 3
         animals.push_back(new CBIRD(1500.f, y[6], 380.f, false));
+        animals.back()->SetTrafficLight(roadLight[3]);
         animals.push_back(new CANGLE(1500.f, y[6], 200.f, false));
+        animals.back()->SetTrafficLight(roadLight[3]);
         animals.push_back(new CCLOUD(1000.f, y[7], 140.f, true));
+        animals.back()->SetTrafficLight(roadLight[3]);
         animals.push_back(new CBIRD(1500.f, y[7] + 5.f, 280.f, true));
+        animals.back()->SetTrafficLight(roadLight[3]);
         break;
     }
 
@@ -454,7 +548,14 @@ void CGAME::Update(float dt)
     }
 
     for (auto* a : animals)
+    {
+        // ===== ADDED: dong bo trang thai dung/chay tu den giao thong vao
+        // animal, y het cach lam voi vehicles ben tren =====
+        if (TrafficLight* tl = a->GetTrafficLight())
+            a->SetStopped(tl->GetCurrentState() == RED);
+
         a->Update(dt);
+    }
 
     // ===== ADDED (Bước 4) =====
     if (CheckCollision())
