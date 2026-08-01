@@ -78,6 +78,7 @@ CGAME::CGAME(sf::RenderWindow& window)
     score(0),
     isGameOver(false),
     isPaused(false),
+    isWin(false),
     savePath("save.dat")
 {
 }
@@ -157,6 +158,7 @@ void CGAME::Init(int mapIndex, int characterIndex)
     score = 0;
     isGameOver = false;
     isPaused = false;
+    isWin = false;   // ===== ADDED =====
 
     //----------------------------------
     // ===== ADDED (Bước 3): spawn vehicles/animals theo currentMap =====
@@ -531,6 +533,11 @@ void CGAME::Update(float dt)
         return;
     }
 
+    // ===== ADDED: da thang thi dung han gameplay (obstacle dong bang),
+    // cho main.cpp thoi gian hien WinMenu =====
+    if (isWin)
+        return;
+
     if (player)
         player->Update(dt);
 
@@ -635,8 +642,19 @@ void CGAME::OnDeath()
 
 void CGAME::OnLevelComplete()
 {
-    level++;
+    // ===== ADDED: qua du 3 man (level hien tai la man thu may nguoi choi
+    // vua hoan thanh) -> thang, dung lai khong tang level/reset player nua =====
+    const int WIN_AFTER_LEVEL = 3;
+
     score += 100;
+
+    if (level >= WIN_AFTER_LEVEL)
+    {
+        isWin = true;
+        return;
+    }
+
+    level++;
 
     // Dua player ve lai vach xuat phat de bat dau lane hien tai lai tu dau
     if (player)
