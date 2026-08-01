@@ -51,4 +51,9 @@ public:
     void Pause() { isPaused = true; }
     void Resume() { isPaused = false; }
     bool IsGameOver() const { return isGameOver; }
+    bool IsPaused() const { return isPaused; }   // ===== ADDED =====
+
+    // ===== ADDED: de GameOverMenu/HUD hien thi diem/level =====
+    int GetScore() const { return score; }
+    int GetLevel() const { return level; }
 };

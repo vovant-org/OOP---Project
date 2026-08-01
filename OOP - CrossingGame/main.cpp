@@ -12,6 +12,8 @@
 #include "SettingMenu.h"
 #include "AudioManager.h"
 #include "CGAME.h"   // ===== CHANGED: đã implement Bước 1 =====
+#include "PauseMenu.h"      // ===== ADDED =====
+#include "GameOverMenu.h"   // ===== ADDED =====
 
 //==================================================
 // Hằng số
@@ -33,6 +35,7 @@ const std::string SETTING_SWITCH_OFF_PATH = "ui/Icon/Switch_OFF.png";
 const std::string SETTING_TIMES_PATH = "ui/Icon/Times.png";
 const std::string SETTING_BACK_PATH = "ui/Logo/BACK.png";
 const std::string SETTING_TITLE_PATH = "ui/Logo/SETTING.png";
+const std::string PAUSE_ICON_PATH = "ui/Icon/Pause.png";   // ===== ADDED =====
 
 const std::string BGM_PATH = "Sound/MainMenu_backgroundmusic.mp3";
 const std::string SFX_SELECT_PATH = "Sound/SelectSound.mp3";
@@ -156,6 +159,11 @@ int main()
     if (!loadTexture(settingBackTexture, SETTING_BACK_PATH))       return -1;
     if (!loadTexture(settingTitleTexture, SETTING_TITLE_PATH))     return -1;
 
+    // ===== ADDED: icon Pause goc tren-phai khi dang Playing =====
+    sf::Texture pauseIconTexture;
+    if (!loadTexture(pauseIconTexture, PAUSE_ICON_PATH))
+        return -1;
+
     std::cout << "[INFO] Nhan F11 de bat/tat toan man hinh\n";
 
     //--------------------------------------------------
@@ -165,6 +173,15 @@ int main()
 
     int selectedCharIndex = 0;
     int selectedMapIndex = 0;
+
+    // ===== ADDED: SettingMenu co the duoc mo tu MainMenu HOAC tu
+    // PauseMenu -> can biet quay ve dau khi bam Back =====
+    AppState settingsReturnState = AppState::MainMenu;
+
+    // ===== ADDED: cho gameover co 1 khoang delay nho de choi het
+    // animation chet truoc khi hien GameOverMenu =====
+    float gameOverTimer = 0.f;
+    const float GAME_OVER_DELAY = 1.2f;
 
     //--------------------------------------------------
     // Build MainMenu
@@ -254,6 +271,67 @@ int main()
     CGAME game(window);
 
     //--------------------------------------------------
+    // ===== ADDED: PauseMenu / GameOverMenu =====
+    // Dung chung buttonTexture/font/scale voi cac menu khac,
+    // canh giua theo canvas 1280x720 (WIN_W x WIN_H).
+    //--------------------------------------------------
+    PauseMenu pauseMenu;
+    pauseMenu.setFont(font);
+    pauseMenu.setOverlaySize((float)WIN_W, (float)WIN_H);
+    {
+        float bx = 515.f, startY = 260.f, spacing = 55.f;
+        auto setupPauseBtn = [&](PauseMenuButton b, const std::string& text, float y) {
+            Button& btn = pauseMenu.getButton(b);
+            btn.setTexture(buttonTexture);
+            btn.setFont(font);
+            btn.setText(text);
+            btn.setCharacterSize(28);
+            btn.setScale(btnScaleX, btnScaleY);
+            btn.setPosition(bx, y);
+            btn.setFocused(false);
+            };
+        setupPauseBtn(PauseMenuButton::Resume, "RESUME", startY);
+        setupPauseBtn(PauseMenuButton::Restart, "RESTART", startY + spacing);
+        setupPauseBtn(PauseMenuButton::Settings, "SETTINGS", startY + spacing * 2);
+        setupPauseBtn(PauseMenuButton::MainMenu, "MAIN MENU", startY + spacing * 3);
+    }
+
+    GameOverMenu gameOverMenu;
+    gameOverMenu.setFont(font);
+    gameOverMenu.setOverlaySize((float)WIN_W, (float)WIN_H);
+    {
+        float bx = 515.f, startY = 420.f, spacing = 55.f;
+        auto setupOverBtn = [&](GameOverMenuButton b, const std::string& text, float y) {
+            Button& btn = gameOverMenu.getButton(b);
+            btn.setTexture(buttonTexture);
+            btn.setFont(font);
+            btn.setText(text);
+            btn.setCharacterSize(28);
+            btn.setScale(btnScaleX, btnScaleY);
+            btn.setPosition(bx, y);
+            btn.setFocused(false);
+            };
+        setupOverBtn(GameOverMenuButton::Retry, "RETRY", startY);
+        setupOverBtn(GameOverMenuButton::MainMenu, "MAIN MENU", startY + spacing);
+    }
+
+    //--------------------------------------------------
+    // ===== ADDED: nut icon Pause, goc tren-phai man hinh, chi hien
+    // va bam duoc khi dang o state Playing =====
+    //--------------------------------------------------
+    Button pauseButton;
+    {
+        const float ICON_SIZE = 80.f;
+        float isx = ICON_SIZE / pauseIconTexture.getSize().x;
+        float isy = ICON_SIZE / pauseIconTexture.getSize().y;
+
+        pauseButton.setTexture(pauseIconTexture);
+        pauseButton.setScale(isx, isy);
+        pauseButton.setPosition((float)WIN_W - ICON_SIZE - 16.f, 16.f);
+        pauseButton.setFocused(false);
+    }
+
+    //--------------------------------------------------
     // Audio
     //--------------------------------------------------
     AudioManager audio;
@@ -276,6 +354,8 @@ int main()
     charSelect.setAudioManager(&audio);
     mapSelect.setAudioManager(&audio);
     settingMenu.setAudioManager(&audio);
+    pauseMenu.setAudioManager(&audio);      // ===== ADDED =====
+    gameOverMenu.setAudioManager(&audio);   // ===== ADDED =====
 
     //--------------------------------------------------
     // ===== CHANGED: MenuManager thay cho 3 khoi switch(state) =====
@@ -296,6 +376,8 @@ int main()
     menuManager.registerMenu(AppState::CharSelect, &charSelect);
     menuManager.registerMenu(AppState::MapSelect, &mapSelect);
     menuManager.registerMenu(AppState::Settings, &settingMenu);
+    menuManager.registerMenu(AppState::Pause, &pauseMenu);       // ===== ADDED =====
+    menuManager.registerMenu(AppState::GameOver, &gameOverMenu); // ===== ADDED =====
     // AppState::Playing / Exit: chưa có Menu tương ứng (CGAME chưa xong) -
     // cứ để trống, MenuManager tự bỏ qua processEvent/update/draw cho các
     // state này (xem getCurrentMenu() trả nullptr).
@@ -347,6 +429,42 @@ int main()
                 menuManager.reapplyView();    // ===== CHANGED =====
             }
 
+            // ===== ADDED: ESC khi dang choi -> mo PauseMenu. Dung continue
+            // de tranh event ESC nay bi forward tiep xuong PauseMenu ngay
+            // trong cung 1 vong lap (PauseMenu cung dang bat ESC = Resume) =====
+            if (event.type == sf::Event::KeyPressed &&
+                event.key.code == sf::Keyboard::Escape &&
+                menuManager.getState() == AppState::Playing)
+            {
+                game.Pause();
+                pauseMenu.clearResult();
+                menuManager.setState(AppState::Pause);
+                continue;
+            }
+
+            // ===== ADDED: bấm icon Pause góc trên-phải (chỉ khi đang
+            // Playing) -> cùng hành động với phím ESC ở trên =====
+            if (menuManager.getState() == AppState::Playing)
+            {
+                pauseButton.processEvent(event, window);
+
+                if (event.type == sf::Event::MouseButtonReleased &&
+                    event.mouseButton.button == sf::Mouse::Left)
+                {
+                    sf::Vector2f mousePos = window.mapPixelToCoords(
+                        { event.mouseButton.x, event.mouseButton.y });
+
+                    if (pauseButton.contains(mousePos))
+                    {
+                        pauseButton.press();
+                        game.Pause();
+                        pauseMenu.clearResult();
+                        menuManager.setState(AppState::Pause);
+                        continue;
+                    }
+                }
+            }
+
             // ===== CHANGED: 1 dòng duy nhất thay cho switch(state){...} =====
             menuManager.processEvent(event, window);
 
@@ -364,7 +482,29 @@ int main()
 
         // ===== ADDED: CGAME không phải Menu nên update riêng =====
         if (menuManager.getState() == AppState::Playing)
+        {
             game.Update(dt);
+            pauseButton.update();   // ===== ADDED =====
+
+            // ===== ADDED: cho animation chet choi 1 doan ngan
+            // (GAME_OVER_DELAY) roi moi chuyen sang GameOverMenu =====
+            if (game.IsGameOver())
+            {
+                gameOverTimer += dt;
+
+                if (gameOverTimer >= GAME_OVER_DELAY)
+                {
+                    gameOverTimer = 0.f;
+                    gameOverMenu.setStats(game.GetScore(), game.GetLevel());
+                    gameOverMenu.clearResult();
+                    menuManager.setState(AppState::GameOver);
+                }
+            }
+            else
+            {
+                gameOverTimer = 0.f;
+            }
+        }
 
         switch (menuManager.getState())
         {
@@ -387,6 +527,7 @@ int main()
             case MainMenuResult::Settings:
                 mainMenu.clearResult();
                 settingMenu.clearResult();
+                settingsReturnState = AppState::MainMenu;     // ===== ADDED =====
                 menuManager.setState(AppState::Settings);     // ===== CHANGED =====
                 break;
 
@@ -451,7 +592,63 @@ int main()
             {
             case SettingMenuResult::Back:
                 settingMenu.clearResult();
-                menuManager.setState(AppState::MainMenu);     // ===== CHANGED =====
+                // ===== CHANGED: quay lai dung noi da mo Settings
+                // (MainMenu hoac Pause) thay vi luon ve MainMenu =====
+                menuManager.setState(settingsReturnState);
+                break;
+
+            default: break;
+            }
+            break;
+
+            //========================
+        case AppState::Pause:   // ===== ADDED =====
+            //========================
+            switch (pauseMenu.getResult())
+            {
+            case PauseMenuResult::Resume:
+                pauseMenu.clearResult();
+                game.Resume();
+                menuManager.setState(AppState::Playing);
+                break;
+
+            case PauseMenuResult::Restart:
+                pauseMenu.clearResult();
+                game.Init(selectedMapIndex, selectedCharIndex);
+                menuManager.setState(AppState::Playing);
+                break;
+
+            case PauseMenuResult::Settings:
+                pauseMenu.clearResult();
+                settingMenu.clearResult();
+                settingsReturnState = AppState::Pause;
+                menuManager.setState(AppState::Settings);
+                break;
+
+            case PauseMenuResult::MainMenu:
+                pauseMenu.clearResult();
+                game.Resume();   // tranh treo isPaused=true khi vao lai game sau nay
+                menuManager.setState(AppState::MainMenu);
+                break;
+
+            default: break;
+            }
+            break;
+
+            //========================
+        case AppState::GameOver:   // ===== ADDED =====
+            //========================
+            switch (gameOverMenu.getResult())
+            {
+            case GameOverMenuResult::Retry:
+                gameOverMenu.clearResult();
+                game.Init(selectedMapIndex, selectedCharIndex);
+                menuManager.setState(AppState::Playing);
+                break;
+
+            case GameOverMenuResult::MainMenu:
+                gameOverMenu.clearResult();
+                menuManager.setState(AppState::MainMenu);
                 break;
 
             default: break;
@@ -468,9 +665,22 @@ int main()
 
         // ===== CHANGED: CGAME không phải Menu nên vẽ riêng =====
         if (menuManager.getState() == AppState::Playing)
+        {
             game.Draw();
-        else
+            pauseButton.draw(window);   // ===== ADDED =====
+        }
+        else if (menuManager.getState() == AppState::Pause ||
+            menuManager.getState() == AppState::GameOver)
+        {
+            // ===== ADDED: ve man hinh game dong bang lam nen, roi ve
+            // PauseMenu/GameOverMenu (co overlay mo den) len tren =====
+            game.Draw();
             menuManager.draw(window);
+        }
+        else
+        {
+            menuManager.draw(window);
+        }
 
         window.display();
     }

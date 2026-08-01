@@ -16,5 +16,7 @@ enum class AppState
     MapSelect,
     Settings,
     Playing,
+    Pause,      // ===== ADDED: pause overlay khi dang Playing =====
+    GameOver,   // ===== ADDED: overlay khi CGAME::IsGameOver() =====
     Exit
 };

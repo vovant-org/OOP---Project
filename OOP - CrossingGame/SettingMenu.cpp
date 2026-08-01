@@ -58,7 +58,7 @@ namespace
     constexpr float TITLE_TEX_WIDTH = 1827.f;
     constexpr float TITLE_TEX_HEIGHT = 861.f;
 
-    constexpr float TITLE_Y = 225.f;  
+    constexpr float TITLE_Y = 225.f;
 
     constexpr float TITLE_WIDTH = 330.f;
     constexpr float TITLE_HEIGHT =
@@ -673,6 +673,16 @@ void SettingMenu::processEvent(const sf::Event& event,
     const sf::RenderWindow& window)
 {
     backButton.processEvent(event, window);
+
+    // ===== ADDED: ESC = Back, giống các menu khác (PauseMenu, ...) =====
+    if (event.type == sf::Event::KeyPressed &&
+        event.key.code == sf::Keyboard::Escape)
+    {
+        backButton.press();
+        if (audio) audio->playSound("select");
+        result = SettingMenuResult::Back;
+        return;
+    }
 
     if (event.type != sf::Event::MouseButtonReleased)
         return;
