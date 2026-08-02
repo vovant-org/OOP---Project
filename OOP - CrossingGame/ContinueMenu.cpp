@@ -98,10 +98,10 @@ void ContinueMenu::refresh()
 
     for (int m = 0; m < 4; ++m)
     {
-        int outMap = 0, outChar = 0, outLevel = 1, outScore = 0;
+        int outMap = 0, outChar = 0, outLevel = 1, outScore = 0, outMode = 1;
 
         if (!CGAME::PeekSaveInfo(CGAME::GetSavePathForMap(m),
-            outMap, outChar, outLevel, outScore))
+            outMap, outChar, outLevel, outScore, outMode))
             continue;
 
         Button btn;

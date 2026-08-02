@@ -37,4 +37,14 @@ public:
     float getX() const { return x; }
     float getY() const { return y; }
     bool getDirection() const { return isMovingRight; }
+
+    // ===== ADDED: dung cho ModeSelect (Easy/Hard/Nightmare) chinh toc
+    // do dong loat sau khi obstacle da duoc tao. Clamp toi thieu de
+    // tranh Easy mode lam obstacle gan nhu dung yen =====
+    void AdjustSpeed(float delta)
+    {
+        speed += delta;
+        if (speed < 20.f)
+            speed = 20.f;
+    }
 };

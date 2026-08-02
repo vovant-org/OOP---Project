@@ -18,6 +18,7 @@ private:
     sf::Sprite  mapSprite;
     int currentMap;   // 0=City 1=Ancient 2=Hell 3=Sky
     int characterIndex; // ===== ADDED (Bước 6): luu de Save/Load / Continue biet dung nhan vat nao =====
+    int difficultyMode; // ===== ADDED: 0=Easy 1=Hard 2=Nightmare, dung khi Init() spawn obstacle =====
 
     // Entities
     CPEOPLE* player;
@@ -47,6 +48,12 @@ public:
     ~CGAME();
 
     void Init(int mapIndex, int characterIndex);
+
+    // ===== ADDED: goi TRUOC Init() de chon do kho cho lan choi nay.
+    // Neu khong goi, giu nguyen gia tri cu (mac dinh Hard=1) - nen
+    // Retry/Restart/PlayAgua tu dong giu nguyen do kho da chon =====
+    void SetDifficultyMode(int mode) { difficultyMode = mode; }
+    int GetDifficultyMode() const { return difficultyMode; }
     void Update(float dt);
     void Draw();
     void HandleInput(sf::Event& event);
@@ -70,7 +77,8 @@ public:
     // load hẳn (không đụng vào state của bất kỳ CGAME nào đang chạy) =====
     static const std::string& GetSavePathForMap(int mapIndex);
     static bool PeekSaveInfo(const std::string& path,
-        int& outMap, int& outCharacter, int& outLevel, int& outScore);
+        int& outMap, int& outCharacter, int& outLevel, int& outScore,
+        int& outMode);
 
     void Pause() { isPaused = true; }
     void Resume() { isPaused = false; }
