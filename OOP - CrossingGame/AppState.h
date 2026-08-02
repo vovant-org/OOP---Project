@@ -14,8 +14,10 @@ enum class AppState
     MainMenu = 0,
     CharSelect,
     MapSelect,
+    ModeSelect,   // ===== ADDED: chọn EASY/HARD/NIGHTMARE trước khi chơi =====
     Settings,
     Playing,
+    ContinueSelect,   // ===== ADDED: chọn map nào để Continue =====
     Pause,      // ===== ADDED: pause overlay khi dang Playing =====
     GameOver,   // ===== ADDED: overlay khi CGAME::IsGameOver() =====
     Win,        // ===== ADDED: overlay khi CGAME::IsWin() =====

@@ -180,6 +180,12 @@
     <ClCompile Include="WinMenu.cpp">
       <Filter>Source Files\ui</Filter>
     </ClCompile>
+    <ClCompile Include="ContinueMenu.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeSelection.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -286,6 +292,12 @@
     </ClInclude>
     <ClInclude Include="MenuManager.h">
       <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="ContinueMenu.h">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeSelection.h">
+      <Filter>Header Files\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

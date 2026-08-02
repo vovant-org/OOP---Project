@@ -1,6 +1,8 @@
 // CGAME.cpp
 #include "CGAME.h"
 #include <iostream>
+#include <fstream>   // ===== ADDED (Bước 6) =====
+#include <sstream>   // ===== ADDED: build chuoi HUD =====
 
 // ===== ADDED (Bước 3): các lớp obstacle cụ thể theo map =====
 #include "CBIKE.h"
@@ -18,6 +20,7 @@
 #include "CBIRD.h"
 #include "CCLOUD.h"
 #include "TrafficLight.h"   // ===== ADDED (Bước 5) =====
+#include "AudioManager.h"   // ===== ADDED: doi nhac nen theo map =====
 
 namespace
 {
@@ -35,6 +38,26 @@ namespace
         "Map/Ancient_map.png",
         "Map/Hell_map.png",
         "Map/Sky_map.png"
+    };
+
+    // ===== ADDED (Bước 6, sửa lại): moi map co file save rieng, khong
+    // con dung chung "save.dat" nua =====
+    const std::string SAVE_PATHS[4] =
+    {
+        "Save/city.sav",
+        "Save/ancient.sav",
+        "Save/hell.sav",
+        "Save/sky.sav"
+    };
+
+    // ===== ADDED: nhac nen rieng cho tung map, phat thay cho nhac nen
+    // MainMenu ngay khi Init() (vao Playing) =====
+    const std::string MAP_MUSIC_PATHS[4] =
+    {
+        "Sound/Citymap_backgroundmusic.mp3",
+        "Sound/Ancientmap_backgroundmusic.mp3",
+        "Sound/Hellmap_backgroundmusic.mp3",
+        "Sound/Skymap_backgroundmusic.mp3"
     };
 
     // Duong dan nhan vat, dung thu tu index giong CharacterSelection
@@ -73,6 +96,7 @@ namespace
 CGAME::CGAME(sf::RenderWindow& window)
     : mWindow(window),
     currentMap(0),
+    characterIndex(0),
     player(nullptr),
     level(1),
     score(0),
@@ -117,6 +141,17 @@ void CGAME::Init(int mapIndex, int characterIndex)
 
     currentMap = mapIndex;
 
+    // ===== ADDED (Bước 6, sửa lại): moi map luu vao file rieng =====
+    savePath = SAVE_PATHS[currentMap];
+
+    // ===== ADDED: doi nhac nen sang bai rieng cua map nay, thay cho
+    // nhac nen MainMenu =====
+    if (audio)
+    {
+        audio->loadMusic(MAP_MUSIC_PATHS[currentMap]);
+        audio->playMusic(true);
+    }
+
     if (!mapTexture.loadFromFile(MAP_PATHS[currentMap]))
     {
         std::cout << "[CGAME] Cannot load map: "
@@ -136,6 +171,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
 
     if (characterIndex < 0 || characterIndex > 3)
         characterIndex = 0;
+
+    this->characterIndex = characterIndex;   // ===== ADDED (Bước 6) =====
 
     delete player; // phong khi Init duoc goi lai (choi lai / doi map)
 
@@ -573,6 +610,30 @@ void CGAME::Update(float dt)
 // Draw
 //==================================================
 
+// ===== ADDED: nhan con tro AudioManager tu main.cpp =====
+void CGAME::SetAudioManager(AudioManager* manager)
+{
+    audio = manager;
+}
+
+// ===== ADDED: HUD font setup =====
+void CGAME::SetFont(const sf::Font& font)
+{
+    hudScoreText.setFont(font);
+    hudScoreText.setCharacterSize(22);
+    hudScoreText.setFillColor(sf::Color::White);
+    hudScoreText.setOutlineColor(sf::Color::Black);
+    hudScoreText.setOutlineThickness(2.f);
+    hudScoreText.setPosition(16.f, 14.f);
+
+    hudLevelText.setFont(font);
+    hudLevelText.setCharacterSize(22);
+    hudLevelText.setFillColor(sf::Color::White);
+    hudLevelText.setOutlineColor(sf::Color::Black);
+    hudLevelText.setOutlineThickness(2.f);
+    hudLevelText.setPosition(16.f, 42.f);
+}
+
 void CGAME::Draw()
 {
     mWindow.draw(mapSprite);
@@ -588,6 +649,19 @@ void CGAME::Draw()
 
     if (player)
         player->Draw(mWindow);
+
+    // ===== ADDED: HUD Score/Level, goc tren-trai (doi xung voi icon
+    // Pause o goc tren-phai do main.cpp ve) =====
+    std::ostringstream ossScore;
+    ossScore << "Score: " << score;
+    hudScoreText.setString(ossScore.str());
+
+    std::ostringstream ossLevel;
+    ossLevel << "Level: " << level;
+    hudLevelText.setString(ossLevel.str());
+
+    mWindow.draw(hudScoreText);
+    mWindow.draw(hudLevelText);
 }
 
 //==================================================
@@ -660,6 +734,10 @@ void CGAME::OnLevelComplete()
     if (player)
         player->Reset(CANVAS_W / 2.f, CANVAS_H - 40.f);
 
+    // ===== ADDED (Bước 6): checkpoint - luu lai tien do moi lan qua man,
+    // de nut "Continue" o MainMenu nap lai duoc dung cho =====
+    SaveGame(savePath);
+
     // TODO (nâng cao, không bắt buộc): tăng speed cua vehicles/animals
     // theo level de tang do kho moi lan qua man
 }
@@ -670,12 +748,68 @@ void CGAME::OnLevelComplete()
 
 void CGAME::SaveGame(const std::string& path)
 {
-    // TODO (Bước 6): ghi level/score/currentMap ra file tại path
-    (void)path;
+    std::ofstream out(path);
+
+    if (!out.is_open())
+    {
+        std::cout << "[CGAME] Cannot open save file for writing: " << path << "\n";
+        return;
+    }
+
+    // Format don gian: moi gia tri 1 dong, theo thu tu co dinh
+    out << currentMap << "\n"
+        << characterIndex << "\n"
+        << level << "\n"
+        << score << "\n";
 }
 
-void CGAME::LoadGame(const std::string& path)
+bool CGAME::LoadGame(const std::string& path)
 {
-    // TODO (Bước 6): đọc level/score/currentMap từ file tại path
-    (void)path;
+    std::ifstream in(path);
+
+    if (!in.is_open())
+    {
+        std::cout << "[CGAME] No save file found: " << path << "\n";
+        return false;
+    }
+
+    int savedMap = 0, savedCharacter = 0, savedLevel = 1, savedScore = 0;
+
+    if (!(in >> savedMap >> savedCharacter >> savedLevel >> savedScore))
+    {
+        std::cout << "[CGAME] Save file is corrupted: " << path << "\n";
+        return false;
+    }
+
+    // Dung lai Init() de load dung map/nhan vat/spawn obstacle nhu binh
+    // thuong, roi ghi de level/score bang gia tri da luu
+    Init(savedMap, savedCharacter);
+
+    level = savedLevel;
+    score = savedScore;
+
+    return true;
+}
+
+// ===== ADDED (Bước 6, sửa lại) =====
+const std::string& CGAME::GetSavePathForMap(int mapIndex)
+{
+    if (mapIndex < 0 || mapIndex > 3)
+        mapIndex = 0;
+
+    return SAVE_PATHS[mapIndex];
+}
+
+bool CGAME::PeekSaveInfo(const std::string& path,
+    int& outMap, int& outCharacter, int& outLevel, int& outScore)
+{
+    std::ifstream in(path);
+
+    if (!in.is_open())
+        return false;
+
+    if (!(in >> outMap >> outCharacter >> outLevel >> outScore))
+        return false;
+
+    return true;
 }

@@ -170,6 +170,7 @@
     <ClCompile Include="CObstacle.cpp" />
     <ClCompile Include="COLDBIRD.cpp" />
     <ClCompile Include="COLDBIRD.h" />
+    <ClCompile Include="ContinueMenu.cpp" />
     <ClCompile Include="CPEOPLE.cpp" />
     <ClCompile Include="CPIGLIN.cpp" />
     <ClCompile Include="CTRAIN.cpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="MapSelection.cpp" />
     <ClCompile Include="MenuBackground.cpp" />
     <ClCompile Include="MenuManager.cpp" />
+    <ClCompile Include="ModeSelection.cpp" />
     <ClCompile Include="PauseMenu.cpp" />
     <ClCompile Include="SettingMenu.cpp" />
     <ClCompile Include="TrafficLight.cpp" />
@@ -205,6 +207,7 @@
     <ClInclude Include="CHELLMOTOR.h" />
     <ClInclude Include="CMOTOR.h" />
     <ClInclude Include="CObstacle.h" />
+    <ClInclude Include="ContinueMenu.h" />
     <ClInclude Include="CPEOPLE.h" />
     <ClInclude Include="CPIGLIN.h" />
     <ClInclude Include="CTRAIN.h" />
@@ -218,6 +221,7 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="MenuBackground.h" />
     <ClInclude Include="MenuManager.h" />
+    <ClInclude Include="ModeSelection.h" />
     <ClInclude Include="ObstacleHelper.h" />
     <ClInclude Include="PauseMenu.h" />
     <ClInclude Include="SettingMenu.h" />

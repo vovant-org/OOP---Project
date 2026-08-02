@@ -15,6 +15,8 @@
 #include "PauseMenu.h"      // ===== ADDED =====
 #include "GameOverMenu.h"   // ===== ADDED =====
 #include "WinMenu.h"        // ===== ADDED =====
+#include "ContinueMenu.h"   // ===== ADDED =====
+#include "ModeSelection.h"  // ===== ADDED =====
 
 //==================================================
 // Hằng số
@@ -174,6 +176,7 @@ int main()
 
     int selectedCharIndex = 0;
     int selectedMapIndex = 0;
+    int selectedMode = 0;   // ===== ADDED: 0=Easy 1=Hard 2=Nightmare (chua dung toi) =====
 
     // ===== ADDED: SettingMenu co the duoc mo tu MainMenu HOAC tu
     // PauseMenu -> can biet quay ve dau khi bam Back =====
@@ -256,6 +259,17 @@ int main()
     mapSelect.setupLayout();
 
     //--------------------------------------------------
+    // Build ModeSelection
+    //--------------------------------------------------
+    ModeSelection modeSelect;
+    modeSelect.setWindowSize((float)WIN_W, (float)WIN_H);
+    modeSelect.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
+    modeSelect.loadFont(FONT_PATH);
+    modeSelect.loadBoxTexture(SETTING_BOX_PATH);   // tái dùng SilverBox có sẵn
+    modeSelect.setupButtons(buttonTexture, btnW, btnH, btnScaleX, btnScaleY);
+    modeSelect.setupLayout();
+
+    //--------------------------------------------------
     // Build SettingMenu
     //--------------------------------------------------
     SettingMenu settingMenu;
@@ -274,6 +288,7 @@ int main()
     // ===== ADDED: Gameplay =====
     //--------------------------------------------------
     CGAME game(window);
+    game.SetFont(font);   // ===== ADDED: HUD Score/Level =====
 
     //--------------------------------------------------
     // ===== ADDED: PauseMenu / GameOverMenu =====
@@ -340,6 +355,13 @@ int main()
         setupWinBtn(WinMenuButton::MainMenu, "MAIN MENU", startY + spacing);
     }
 
+    // ===== ADDED: ContinueMenu - man hinh chon map nao de Continue =====
+    ContinueMenu continueMenu;
+    continueMenu.setWindowSize((float)WIN_W, (float)WIN_H);
+    continueMenu.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
+    continueMenu.setFont(font);
+    continueMenu.setButtonTexture(buttonTexture, btnScaleX, btnScaleY);
+
     //--------------------------------------------------
     // ===== ADDED: nut icon Pause, goc tren-phai man hinh, chi hien
     // va bam duoc khi dang o state Playing =====
@@ -378,10 +400,12 @@ int main()
     mainMenu.setAudioManager(&audio);
     charSelect.setAudioManager(&audio);
     mapSelect.setAudioManager(&audio);
-    settingMenu.setAudioManager(&audio);
+    modeSelect.setAudioManager(&audio);   // ===== ADDED =====    settingMenu.setAudioManager(&audio);
     pauseMenu.setAudioManager(&audio);      // ===== ADDED =====
     gameOverMenu.setAudioManager(&audio);   // ===== ADDED =====
     winMenu.setAudioManager(&audio);        // ===== ADDED =====
+    continueMenu.setAudioManager(&audio);   // ===== ADDED =====
+    game.SetAudioManager(&audio);           // ===== ADDED: nhac nen theo map =====
 
     //--------------------------------------------------
     // ===== CHANGED: MenuManager thay cho 3 khoi switch(state) =====
@@ -401,10 +425,12 @@ int main()
     menuManager.registerMenu(AppState::MainMenu, &mainMenu);
     menuManager.registerMenu(AppState::CharSelect, &charSelect);
     menuManager.registerMenu(AppState::MapSelect, &mapSelect);
+    menuManager.registerMenu(AppState::ModeSelect, &modeSelect);   // ===== ADDED =====
     menuManager.registerMenu(AppState::Settings, &settingMenu);
     menuManager.registerMenu(AppState::Pause, &pauseMenu);       // ===== ADDED =====
     menuManager.registerMenu(AppState::GameOver, &gameOverMenu); // ===== ADDED =====
     menuManager.registerMenu(AppState::Win, &winMenu);           // ===== ADDED =====
+    menuManager.registerMenu(AppState::ContinueSelect, &continueMenu); // ===== ADDED =====
     // AppState::Playing / Exit: chưa có Menu tương ứng (CGAME chưa xong) -
     // cứ để trống, MenuManager tự bỏ qua processEvent/update/draw cho các
     // state này (xem getCurrentMenu() trả nullptr).
@@ -565,8 +591,13 @@ int main()
                 break;
 
             case MainMenuResult::Continue:
-                std::cout << "[INFO] Continue — chưa implement\n";
                 mainMenu.clearResult();
+
+                // ===== CHANGED (lưu riêng từng map): mở màn hình chọn
+                // map nào để tiếp tục, thay vì load thẳng 1 file chung =====
+                continueMenu.refresh();
+                continueMenu.clearResult();
+                menuManager.setState(AppState::ContinueSelect);
                 break;
 
             case MainMenuResult::Settings:
@@ -618,14 +649,40 @@ int main()
                     << selectedMapIndex << "\n";
                 mapSelect.clearResult();
 
-                game.Init(selectedMapIndex, selectedCharIndex);   // ===== ADDED =====
-                menuManager.setState(AppState::Playing);           // ===== CHANGED =====
+                // ===== CHANGED: qua ModeSelect truoc, chua vao Playing ngay =====
+                modeSelect.clearResult();
+                menuManager.setState(AppState::ModeSelect);
                 break;
 
             case MapSelectionResult::Back:
                 mapSelect.clearResult();
                 menuManager.setState(AppState::CharSelect);   // ===== CHANGED =====
                 break;
+            default: break;
+            }
+            break;
+
+            //========================
+        case AppState::ModeSelect:   // ===== ADDED =====
+            //========================
+            switch (modeSelect.getResult())
+            {
+            case ModeSelectionResult::Selected:
+                selectedMode = modeSelect.getSelectedMode();   // 0=Easy,1=Hard,2=Nightmare
+                std::cout << "[INFO] Mode selected: " << selectedMode << "\n";
+                modeSelect.clearResult();
+
+                // TODO: khi lam do kho that, truyen selectedMode vao
+                // game.Init(...) hoac 1 ham rieng nhu game.SetDifficulty(selectedMode)
+                game.Init(selectedMapIndex, selectedCharIndex);
+                menuManager.setState(AppState::Playing);
+                break;
+
+            case ModeSelectionResult::Back:
+                modeSelect.clearResult();
+                menuManager.setState(AppState::MapSelect);
+                break;
+
             default: break;
             }
             break;
@@ -673,6 +730,12 @@ int main()
             case PauseMenuResult::MainMenu:
                 pauseMenu.clearResult();
                 game.Resume();   // tranh treo isPaused=true khi vao lai game sau nay
+
+                // ===== ADDED: doi lai nhac nen MainMenu (dang phat nhac
+                // rieng cua map) =====
+                audio.loadMusic(BGM_PATH);
+                audio.playMusic(true);
+
                 menuManager.setState(AppState::MainMenu);
                 break;
 
@@ -693,6 +756,11 @@ int main()
 
             case GameOverMenuResult::MainMenu:
                 gameOverMenu.clearResult();
+
+                // ===== ADDED: doi lai nhac nen MainMenu =====
+                audio.loadMusic(BGM_PATH);
+                audio.playMusic(true);
+
                 menuManager.setState(AppState::MainMenu);
                 break;
 
@@ -713,6 +781,47 @@ int main()
 
             case WinMenuResult::MainMenu:
                 winMenu.clearResult();
+
+                // ===== ADDED: doi lai nhac nen MainMenu =====
+                audio.loadMusic(BGM_PATH);
+                audio.playMusic(true);
+
+                menuManager.setState(AppState::MainMenu);
+                break;
+
+            default: break;
+            }
+            break;
+
+            //========================
+        case AppState::ContinueSelect:   // ===== ADDED =====
+            //========================
+            switch (continueMenu.getResult())
+            {
+            case ContinueMenuResult::Selected:
+            {
+                continueMenu.clearResult();
+
+                int mapIdx = continueMenu.getSelectedMapIndex();
+
+                if (game.LoadGame(CGAME::GetSavePathForMap(mapIdx)))
+                {
+                    selectedMapIndex = game.GetCurrentMap();
+                    selectedCharIndex = game.GetCharacterIndex();
+                    menuManager.setState(AppState::Playing);
+                }
+                else
+                {
+                    // Không nên xảy ra (continueMenu chỉ hiện map đã
+                    // confirm có save qua refresh()), nhưng phòng hờ
+                    std::cout << "[WARN] Continue: save bị mất giữa chừng\n";
+                    menuManager.setState(AppState::MainMenu);
+                }
+                break;
+            }
+
+            case ContinueMenuResult::Back:
+                continueMenu.clearResult();
                 menuManager.setState(AppState::MainMenu);
                 break;
 
