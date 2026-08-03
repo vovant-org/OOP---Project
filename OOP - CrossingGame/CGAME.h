@@ -7,7 +7,7 @@
 #include "CANIMAL.h"
 #include "TrafficLight.h"
 
-class AudioManager;   // ===== ADDED: forward declare, chi can con tro =====
+class AudioManager;   // forward declare, chi can con tro
 
 class CGAME {
 private:
@@ -16,9 +16,9 @@ private:
     // Map
     sf::Texture mapTexture;
     sf::Sprite  mapSprite;
-    int currentMap;   // 0=City 1=Ancient 2=Hell 3=Sky
-    int characterIndex; // ===== ADDED (Bước 6): luu de Save/Load / Continue biet dung nhan vat nao =====
-    int difficultyMode; // ===== ADDED: 0=Easy 1=Hard 2=Nightmare, dung khi Init() spawn obstacle =====
+    int currentMap;      // 0=City 1=Ancient 2=Hell 3=Sky
+    int characterIndex;  // luu de Save/Load / Continue biet dung nhan vat nao
+    int difficultyMode;  // 0=Easy 1=Hard 2=Nightmare, dung khi Init() spawn obstacle
 
     // Entities
     CPEOPLE* player;
@@ -29,18 +29,21 @@ private:
     // Game state
     int  level;
     int  score;
+    int  playerHP;
+    int  playerMaxHP;
     bool isGameOver;
     bool isPaused;
-    bool isWin;   // ===== ADDED =====
+    bool isWin;
 
     // Save/Load
     std::string savePath;
 
-    // ===== ADDED: HUD hien Score/Level trong luc Playing =====
+    // HUD (Score/Level/HP trong luc Playing)
     sf::Text hudScoreText;
     sf::Text hudLevelText;
+    sf::Text hudHPText;
 
-    // ===== ADDED: doi nhac nen theo map khi Init() =====
+    // Doi nhac nen theo map khi Init()
     AudioManager* audio = nullptr;
 
 public:
@@ -48,33 +51,33 @@ public:
     ~CGAME();
 
     void Init(int mapIndex, int characterIndex);
-
-    // ===== ADDED: goi TRUOC Init() de chon do kho cho lan choi nay.
-    // Neu khong goi, giu nguyen gia tri cu (mac dinh Hard=1) - nen
-    // Retry/Restart/PlayAgua tu dong giu nguyen do kho da chon =====
-    void SetDifficultyMode(int mode) { difficultyMode = mode; }
-    int GetDifficultyMode() const { return difficultyMode; }
     void Update(float dt);
     void Draw();
     void HandleInput(sf::Event& event);
 
-    // ===== ADDED: nap font cho HUD (goi 1 lan sau khi tao CGAME) =====
+    // Goi TRUOC Init() de chon do kho cho lan choi nay. Neu khong goi,
+    // giu nguyen gia tri cu (mac dinh Hard=1) - nen Retry/Restart/PlayAgain
+    // tu dong giu nguyen do kho da chon
+    void SetDifficultyMode(int mode) { difficultyMode = mode; }
+    int GetDifficultyMode() const { return difficultyMode; }
+
+    // Nap font cho HUD (goi 1 lan sau khi tao CGAME)
     void SetFont(const sf::Font& font);
 
-    // ===== ADDED: de Init() tu doi sang nhac nen rieng cua tung map =====
+    // De Init() tu doi sang nhac nen rieng cua tung map
     void SetAudioManager(AudioManager* manager);
 
     bool CheckCollision();
     bool CheckFinish();
     void OnDeath();
+    void OnHit();   // mat 1 tim (chua het HP) - reset vi tri, chua Game Over
     void OnLevelComplete();
 
     void SaveGame(const std::string& path);
-    bool LoadGame(const std::string& path);   // ===== CHANGED: tra ve true/false =====
+    bool LoadGame(const std::string& path);
 
-    // ===== ADDED (Bước 6, sửa lại): static vì không cần 1 instance CGAME
-    // sống - dùng để ContinueMenu liệt kê các save có sẵn mà không phải
-    // load hẳn (không đụng vào state của bất kỳ CGAME nào đang chạy) =====
+    // Static vi khong can 1 instance CGAME song - dung de ContinueMenu
+    // liet ke cac save co san ma khong phai load han
     static const std::string& GetSavePathForMap(int mapIndex);
     static bool PeekSaveInfo(const std::string& path,
         int& outMap, int& outCharacter, int& outLevel, int& outScore,
@@ -83,15 +86,16 @@ public:
     void Pause() { isPaused = true; }
     void Resume() { isPaused = false; }
     bool IsGameOver() const { return isGameOver; }
-    bool IsPaused() const { return isPaused; }   // ===== ADDED =====
-    bool IsWin() const { return isWin; }         // ===== ADDED =====
+    bool IsPaused() const { return isPaused; }
+    bool IsWin() const { return isWin; }
 
-    // ===== ADDED: de GameOverMenu/HUD hien thi diem/level =====
     int GetScore() const { return score; }
     int GetLevel() const { return level; }
+    int GetPlayerHP() const { return playerHP; }
+    int GetPlayerMaxHP() const { return playerMaxHP; }
 
-    // ===== ADDED (Bước 6): de main.cpp dong bo lai lua chon map/nhan vat
-    // sau khi Continue (LoadGame), va biet duong dan file save =====
+    // De main.cpp dong bo lai lua chon map/nhan vat sau khi Continue
+    // (LoadGame), va biet duong dan file save
     int GetCurrentMap() const { return currentMap; }
     int GetCharacterIndex() const { return characterIndex; }
     const std::string& GetSavePath() const { return savePath; }

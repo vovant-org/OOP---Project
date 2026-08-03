@@ -5,7 +5,6 @@
 class CPEOPLE {
 private:
     float x, y;
-    float speed;
     bool  isAlive;
 
     sf::Texture texture;
@@ -16,6 +15,11 @@ private:
     int frameWidth, frameHeight;
     float frameTime, elapsedTime;
 
+    // Cooldown giua 2 lan di chuyen - the hien do "nhanh/cham" khac nhau
+    // giua cac nhan vat (xem SetMoveCooldown)
+    float moveCooldown;
+    float moveCooldownTimer;
+
 public:
     CPEOPLE(float startX, float startY);
     bool loadTexture(const std::string& path);
@@ -25,6 +29,10 @@ public:
     void MoveLeft();
     void MoveRight();
 
+    // Thoi gian (giay) phai cho giua 2 lan di chuyen - nhan vat speed
+    // cao thi truyen so nho (di lien tuc duoc), speed thap truyen so lon
+    void SetMoveCooldown(float seconds) { moveCooldown = seconds; }
+
     void Update(float dt);
     void Draw(sf::RenderWindow& window);
 
@@ -33,7 +41,6 @@ public:
     void SetDead() { isAlive = false; }
     void Reset(float startX, float startY);
 
-    // ===== ADDED (Bước 4): chuyển sang tư thế/animation chết khi va chạm =====
     void TriggerDeath();
 
     float getX() const { return x; }

@@ -38,9 +38,9 @@ private:
     std::array<CharacterInfo, CHARACTER_COUNT> charInfos =
     { {
         { "Chicken", 4, 3, "Jump"  },
-        { "Knight",  3, 5, "Block" },
+        { "Knight",  2, 5, "Block" },
         { "Dog",     5, 2, "Dash"  },
-        { "Luffy",   4, 4, "Gear"  }
+        { "Luffy",   3, 4, "Gear"  }
     } };
 
     //--------------------------------------------------

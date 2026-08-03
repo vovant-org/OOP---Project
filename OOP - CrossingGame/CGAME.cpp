@@ -70,6 +70,15 @@ namespace
         "Character/Luffy_character.png"
     };
 
+    // HP toi da theo nhan vat - khop CharacterSelection::charInfos
+    // (Chicken 3, Knight 5, Dog 2, Luffy 4)
+    const int CHARACTER_MAX_HP[4] = { 3, 5, 2, 4 };
+
+    // Cooldown (giay) giua 2 lan di chuyen - suy tu chi so Speed trong
+    // CharacterSelection (Chicken 4, Knight 2, Dog 5, Luffy 3): speed
+    // cang cao thi cooldown cang ngan (di lien tuc duoc)
+    const float CHARACTER_MOVE_COOLDOWN[4] = { 0.15f, 0.25f, 0.10f, 0.20f };
+
     // ===== CHANGED (fix lane sai + đè vào hàng spawn): toa do Y gio la
     // TAM obstacle (vi origin da chuan hoa ve giua sprite), va lane cuoi
     // cung duoc keo len xa hon hang spawn cua nguoi choi (y = CANVAS_H-40 = 680)
@@ -101,6 +110,8 @@ CGAME::CGAME(sf::RenderWindow& window)
     player(nullptr),
     level(1),
     score(0),
+    playerHP(0),
+    playerMaxHP(0),
     isGameOver(false),
     isPaused(false),
     isWin(false),
@@ -181,12 +192,16 @@ void CGAME::Init(int mapIndex, int characterIndex)
     float startY = CANVAS_H - 40.f; // gan mep duoi man hinh
 
     player = new CPEOPLE(startX, startY);
+    player->SetMoveCooldown(CHARACTER_MOVE_COOLDOWN[characterIndex]);
 
     if (!player->loadTexture(CHARACTER_PATHS[characterIndex]))
     {
         std::cout << "[CGAME] Cannot load character: "
             << CHARACTER_PATHS[characterIndex] << "\n";
     }
+
+    playerMaxHP = CHARACTER_MAX_HP[characterIndex];
+    playerHP = playerMaxHP;
 
     //----------------------------------
     // Game state
@@ -655,9 +670,16 @@ void CGAME::Update(float dt)
         a->Update(dt);
     }
 
-    // ===== ADDED (Bước 4) =====
+    // Va chạm: mất 1 tim, hết tim mới thực sự Game Over
     if (CheckCollision())
-        OnDeath();
+    {
+        playerHP--;
+
+        if (playerHP <= 0)
+            OnDeath();
+        else
+            OnHit();
+    }
 }
 
 //==================================================
@@ -686,6 +708,13 @@ void CGAME::SetFont(const sf::Font& font)
     hudLevelText.setOutlineColor(sf::Color::Black);
     hudLevelText.setOutlineThickness(2.f);
     hudLevelText.setPosition(16.f, 42.f);
+
+    hudHPText.setFont(font);
+    hudHPText.setCharacterSize(22);
+    hudHPText.setFillColor(sf::Color(255, 90, 90));
+    hudHPText.setOutlineColor(sf::Color::Black);
+    hudHPText.setOutlineThickness(2.f);
+    hudHPText.setPosition(16.f, 70.f);
 }
 
 void CGAME::Draw()
@@ -704,8 +733,7 @@ void CGAME::Draw()
     if (player)
         player->Draw(mWindow);
 
-    // ===== ADDED: HUD Score/Level, goc tren-trai (doi xung voi icon
-    // Pause o goc tren-phai do main.cpp ve) =====
+    // HUD Score/Level/HP, goc tren-trai (doi xung icon Pause tren-phai)
     std::ostringstream ossScore;
     ossScore << "Score: " << score;
     hudScoreText.setString(ossScore.str());
@@ -714,8 +742,13 @@ void CGAME::Draw()
     ossLevel << "Level: " << level;
     hudLevelText.setString(ossLevel.str());
 
+    std::ostringstream ossHP;
+    ossHP << "HP: " << playerHP << "/" << playerMaxHP;
+    hudHPText.setString(ossHP.str());
+
     mWindow.draw(hudScoreText);
     mWindow.draw(hudLevelText);
+    mWindow.draw(hudHPText);
 }
 
 //==================================================
@@ -763,9 +796,14 @@ void CGAME::OnDeath()
         player->TriggerDeath();   // đổi sang animation chết
 
     isGameOver = true;
+}
 
-    // TODO (main.cpp / Bước sau): sau khi animation chết chạy xong,
-    // hiển thị GameOverMenu hoặc quay về MainMenu, hiện score...
+// Mất 1 tim nhưng vẫn còn tim khác - đưa player về vạch xuất phát,
+// giữ nguyên level/score/obstacle, KHÔNG kết thúc game
+void CGAME::OnHit()
+{
+    if (player)
+        player->Reset(CANVAS_W / 2.f, CANVAS_H - 40.f);
 }
 
 void CGAME::OnLevelComplete()
