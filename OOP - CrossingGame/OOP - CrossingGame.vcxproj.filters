@@ -19,9 +19,6 @@
     <Filter Include="Source Files\entities">
       <UniqueIdentifier>{5056f95f-38e1-46f3-8720-5181b7be9fba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\map">
-      <UniqueIdentifier>{dc827bfc-ab7d-4579-aedd-c9382e3d192d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\ui">
       <UniqueIdentifier>{eb47dd5f-7470-461c-aba6-afdfa6e68a12}</UniqueIdentifier>
     </Filter>
@@ -30,9 +27,6 @@
     </Filter>
     <Filter Include="Header Files\entities">
       <UniqueIdentifier>{c751efff-4ebc-448a-9a58-5c94843b60e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\map">
-      <UniqueIdentifier>{57462696-abe0-4d64-a3ef-9a926f51869c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\ui">
       <UniqueIdentifier>{4caf3bc1-5bda-46f4-b15e-ba75b337b4fd}</UniqueIdentifier>
@@ -73,6 +67,12 @@
     <Filter Include="Resource Files\ui\Icon">
       <UniqueIdentifier>{7b4360c3-4f7b-4fe2-ada5-97c6551dc295}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AdvancedFunction">
+      <UniqueIdentifier>{55e5b5f8-29d4-47a3-876b-b9292855d015}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AdvancedFunction">
+      <UniqueIdentifier>{b9ebb735-f647-46ee-bfc8-e7fcbe341776}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CANIMAL.cpp">
@@ -80,9 +80,6 @@
     </ClCompile>
     <ClCompile Include="CPEOPLE.cpp">
       <Filter>Source Files\entities</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Source Files\map</Filter>
     </ClCompile>
     <ClCompile Include="CTRUCK.cpp">
       <Filter>Source Files\entities</Filter>
@@ -186,11 +183,11 @@
     <ClCompile Include="ModeSelection.cpp">
       <Filter>Source Files\ui</Filter>
     </ClCompile>
+    <ClCompile Include="RollingRockManager.cpp">
+      <Filter>Source Files\AdvancedFunction</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Map.h">
-      <Filter>Header Files\map</Filter>
-    </ClInclude>
     <ClInclude Include="CANIMAL.h">
       <Filter>Header Files\entities</Filter>
     </ClInclude>
@@ -298,6 +295,9 @@
     </ClInclude>
     <ClInclude Include="ModeSelection.h">
       <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="RollingRockManager.h">
+      <Filter>Header Files\AdvancedFunction</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

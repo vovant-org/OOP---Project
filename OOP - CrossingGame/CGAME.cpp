@@ -96,6 +96,11 @@ namespace
         "Obstacles/Hell_light.png",
         "Obstacles/Sky_light.png"
     };
+
+    // ===== ADDED: texture cho co che canh bao + da lan (rieng Ancient +
+    // Nightmare - xem CGAME::Init) =====
+    const std::string ROCK_TEXTURE_PATH = "Obstacles/RollingRock.png";
+    const std::string SIGN_TEXTURE_PATH = "ui/Icon/RollingSign.png";
 }
 
 //==================================================
@@ -569,6 +574,27 @@ void CGAME::Init(int mapIndex, int characterIndex)
     default:
         break;
     }
+
+    //----------------------------------
+    // ===== ADDED: co che canh bao + da lan - chi bat cho Ancient +
+    // Nightmare (mấy map/do kho khac se nang cap sau) =====
+    //----------------------------------
+
+    rockManager.Reset();
+    rockManager.SetActive(false);
+
+    if (currentMap == 1 && difficultyMode == 2)
+    {
+        // RollingRockManager mac dinh canvasW/canvasH = 1280x720, khop
+        // CANVAS_W/CANVAS_H o day nen khong can set lai
+
+        if (!rockManager.LoadTextures(ROCK_TEXTURE_PATH, SIGN_TEXTURE_PATH))
+        {
+            std::cout << "[CGAME] Cannot load rolling-rock textures\n";
+        }
+
+        rockManager.SetActive(true);
+    }
 }
 
 //==================================================
@@ -646,6 +672,10 @@ void CGAME::Update(float dt)
 
     if (player)
         player->Update(dt);
+
+    // ===== ADDED: co che canh bao + da lan - tu Update() se khong lam gi
+    // neu SetActive(false) (khong phai Ancient + Nightmare) =====
+    rockManager.Update(dt, player);
 
     // ===== ADDED (Bước 5): cap nhat den, roi dong bo trang thai
     // dung/chay vao tung xe TRUOC khi goi Update() cua xe =====
@@ -732,6 +762,10 @@ void CGAME::Draw()
 
     if (player)
         player->Draw(mWindow);
+
+    // ===== ADDED: ve canh bao / da lan LEN TREN player de nguoi choi
+    // luon thay ro nguy hiem (khong lam gi neu dang tat) =====
+    rockManager.Draw(mWindow);
 
     // HUD Score/Level/HP, goc tren-trai (doi xung icon Pause tren-phai)
     std::ostringstream ossScore;

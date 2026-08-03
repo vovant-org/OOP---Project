@@ -20,6 +20,13 @@ private:
     float moveCooldown;
     float moveCooldownTimer;
 
+    // ===== ADDED: trang thai "choang" khi bi hon da (RollingRockManager)
+    // va trung - khong the di chuyen va bi day (bounce) ngau nhien sang
+    // trai/phai, giu nguyen sprite/animation hien tai (khong doi anh) =====
+    bool  isStunned;
+    float stunTimer;
+    float bounceVelocity;
+
 public:
     CPEOPLE(float startX, float startY);
     bool loadTexture(const std::string& path);
@@ -42,6 +49,12 @@ public:
     void Reset(float startX, float startY);
 
     void TriggerDeath();
+
+    // ===== ADDED: kich hoat trang thai choang 1 giay - khong the di
+    // chuyen, bi bat ra ngau nhien sang trai (bounceRight=false) hoac
+    // phai (bounceRight=true). Goi tu RollingRockManager khi va cham. =====
+    void TriggerStun(bool bounceRight);
+    bool IsStunned() const { return isStunned; }
 
     float getX() const { return x; }
     float getY() const { return y; }

@@ -6,6 +6,7 @@
 #include "CVEHICLE.h"
 #include "CANIMAL.h"
 #include "TrafficLight.h"
+#include "RollingRockManager.h"   // ===== ADDED: co che canh bao + da lan (Ancient/Nightmare) =====
 
 class AudioManager;   // forward declare, chi can con tro
 
@@ -25,6 +26,11 @@ private:
     std::vector<CVEHICLE*> vehicles;
     std::vector<CANIMAL*>  animals;
     std::vector<TrafficLight*> lights;
+
+    // ===== ADDED: co che canh bao + da lan, chi kich hoat khi
+    // currentMap==1 (Ancient) va difficultyMode==2 (Nightmare) - xem
+    // CGAME::Init() =====
+    RollingRockManager rockManager;
 
     // Game state
     int  level;
