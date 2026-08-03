@@ -9,18 +9,18 @@
 namespace
 {
     constexpr float WARNING_DURATION = 2.f;
-    constexpr float COOLDOWN_DURATION = 10.f;
+    constexpr float COOLDOWN_DURATION = 4.f;
 
-    constexpr float ROCK_SPEED = 320.f;          // px/s, tu tren xuong
-    constexpr float ROCK_TARGET_WIDTH = 300.f;    // px hien thi
+    constexpr float ROCK_SPEED = 330.f;          // px/s, tu tren xuong
+    constexpr float ROCK_TARGET_WIDTH = 650.f;    // px hien thi
     constexpr float ROCK_FRAME_TIME = 0.06f;
 
     // Hon da co nhieu khoang trong (khoi/lua) quanh vien, nen thu nho
     // hitbox lai so voi kich thuoc hien thi de va cham cam giac chinh
     // xac hon (1.f = full sprite, 0.6f = 60% kich thuoc hien thi)
-    constexpr float ROCK_HITBOX_SCALE = 0.15f;
+    constexpr float ROCK_HITBOX_SCALE = 0.17f;
 
-    constexpr float SIGN_SIZE = 100.f;            // px hien thi moi mui ten
+    constexpr float SIGN_SIZE = 160.f;            // px hien thi moi mui ten
     constexpr float SIGN_SPACING = 35.f;
 
     // Chia be rong canvas thanh cac "cot" cach deu, chon ngau nhien

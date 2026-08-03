@@ -24,7 +24,7 @@ namespace
 
     // ===== ADDED: thong so cho trang thai "choang" (khong doi animation,
     // chi khoa di chuyen + bat ra trai/phai theo quan tinh giam dan) =====
-    constexpr float STUN_DURATION = 1.3f;   // choang dung 1 giay
+    constexpr float STUN_DURATION = 1.5f;   // choang dung 1.5 giay
     constexpr float BOUNCE_SPEED = 260.f;  // px/s, van toc bat ra ban dau
     constexpr float BOUNCE_DECAY = 6.f;    // he so giam dan van toc bat ra
 
