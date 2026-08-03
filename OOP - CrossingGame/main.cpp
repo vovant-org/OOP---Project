@@ -672,8 +672,9 @@ int main()
                 std::cout << "[INFO] Mode selected: " << selectedMode << "\n";
                 modeSelect.clearResult();
 
-                // TODO: khi lam do kho that, truyen selectedMode vao
-                // game.Init(...) hoac 1 ham rieng nhu game.SetDifficulty(selectedMode)
+                // ===== CHANGED: mode gio da anh huong toc do/so luong
+                // obstacle + so den giao thong, xem CGAME::Init() =====
+                game.SetDifficultyMode(selectedMode);
                 game.Init(selectedMapIndex, selectedCharIndex);
                 menuManager.setState(AppState::Playing);
                 break;
@@ -808,6 +809,7 @@ int main()
                 {
                     selectedMapIndex = game.GetCurrentMap();
                     selectedCharIndex = game.GetCharacterIndex();
+                    selectedMode = game.GetDifficultyMode();   // ===== ADDED =====
                     menuManager.setState(AppState::Playing);
                 }
                 else
