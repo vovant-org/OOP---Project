@@ -57,7 +57,8 @@ CPEOPLE::CPEOPLE(float startX, float startY)
     moveCooldownTimer(0.f),
     isStunned(false),
     stunTimer(0.f),
-    bounceVelocity(0.f)
+    bounceVelocity(0.f),
+    windPushVelocity(0.f)
 {
 }
 
@@ -205,6 +206,15 @@ void CPEOPLE::Update(float dt)
         return;
     }
 
+    // ===== ADDED: gio day dat lien tuc (khong khoa di chuyen, chi troi
+    // them ngang) - ap dung ca khi dang bam phim di chuyen binh thuong =====
+    if (windPushVelocity != 0.f)
+    {
+        x += windPushVelocity * dt;
+        ClampToCanvas(x, y, frameWidth, frameHeight);
+        sprite.setPosition(x, y);
+    }
+
     if (frameWidth <= 0 || frameHeight <= 0)
         return;
 
@@ -260,6 +270,7 @@ void CPEOPLE::Reset(float startX, float startY)
     isStunned = false;
     stunTimer = 0.f;
     bounceVelocity = 0.f;
+    windPushVelocity = 0.f;
 
     sprite.setTextureRect(sf::IntRect(
         0, direction * frameHeight, frameWidth, frameHeight));
@@ -281,7 +292,7 @@ void CPEOPLE::TriggerDeath()
         0, direction * frameHeight, frameWidth, frameHeight));
 }
 
-// ===== ADDED: kich hoat trang thai choang 1 giay - goi tu
+// ===== ADDED: kich hoat trang thai choang 1.5 giay - goi tu
 // RollingRockManager::Update() khi hon da va cham player. Khong doi
 // animation, chi khoa di chuyen va bat nhan vat ra trai/phai =====
 void CPEOPLE::TriggerStun(bool bounceRight)

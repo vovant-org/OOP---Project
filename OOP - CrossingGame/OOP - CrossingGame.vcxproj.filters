@@ -189,6 +189,9 @@
     <ClCompile Include="MeteoriteManager.cpp">
       <Filter>Source Files\AdvancedFunction</Filter>
     </ClCompile>
+    <ClCompile Include="WindGustManager.cpp">
+      <Filter>Source Files\AdvancedFunction</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CANIMAL.h">
@@ -303,6 +306,9 @@
       <Filter>Header Files\AdvancedFunction</Filter>
     </ClInclude>
     <ClInclude Include="MeteoriteManager.h">
+      <Filter>Header Files\AdvancedFunction</Filter>
+    </ClInclude>
+    <ClInclude Include="WindGustManager.h">
       <Filter>Header Files\AdvancedFunction</Filter>
     </ClInclude>
   </ItemGroup>

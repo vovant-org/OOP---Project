@@ -105,6 +105,11 @@ namespace
     // ===== ADDED: texture cho co che thien thach (Hell + Nightmare) =====
     const std::string METEORITE_TEXTURE_PATH = "Obstacles/Meteorite.png";
     const std::string METEORITE_SIGN_TEXTURE_PATH = "ui/Icon/MeteoriteSign.png";
+
+    // ===== ADDED: texture cho co che gio giat (Sky + Nightmare) =====
+    const std::string WIND_TEXTURE_PATH_1 = "Obstacles/Wind_frame1.png";
+    const std::string WIND_TEXTURE_PATH_2 = "Obstacles/Wind_frame2.png";
+    const std::string WIND_SIGN_TEXTURE_PATH = "ui/Icon/WindSign.png";
 }
 
 //==================================================
@@ -620,6 +625,26 @@ void CGAME::Init(int mapIndex, int characterIndex)
 
         meteoriteManager.SetActive(true);
     }
+
+    //----------------------------------
+    // ===== ADDED: co che gio giat - chi bat cho Sky + Nightmare =====
+    //----------------------------------
+
+    windGustManager.Reset();
+    windGustManager.SetActive(false);
+
+    if (currentMap == 3 && difficultyMode == 2)
+    {
+        // WindGustManager mac dinh canvasW/canvasH = 1280x720, khop
+        // CANVAS_W/CANVAS_H o day nen khong can set lai
+
+        if (!windGustManager.LoadTextures(WIND_TEXTURE_PATH_1, WIND_TEXTURE_PATH_2, WIND_SIGN_TEXTURE_PATH))
+        {
+            std::cout << "[CGAME] Cannot load wind-gust textures\n";
+        }
+
+        windGustManager.SetActive(true);
+    }
 }
 
 //==================================================
@@ -743,6 +768,13 @@ void CGAME::Update(float dt)
             OnHit();
     }
 
+    // ===== ADDED: co che gio giat - tu Update() se khong lam gi neu
+    // SetActive(false) (khong phai Sky + Nightmare). Khac voi rockManager/
+    // meteoriteManager, gio KHONG khoa di chuyen va KHONG gay damage -
+    // chi lien tuc day nhan vat troi ngang qua ApplyWindPush() (xem
+    // CPEOPLE::Update) trong suot pha Active =====
+    windGustManager.Update(dt, player);
+
     // ===== ADDED (Bước 5): cap nhat den, roi dong bo trang thai
     // dung/chay vao tung xe TRUOC khi goi Update() cua xe =====
     for (auto* l : lights)
@@ -836,6 +868,10 @@ void CGAME::Draw()
     // ===== ADDED: ve canh bao / thien thach LEN TREN player, cung logic
     // nhu rockManager (khong lam gi neu dang tat) =====
     meteoriteManager.Draw(mWindow);
+
+    // ===== ADDED: ve canh bao / dai gio LEN TREN player, cung logic nhu
+    // rockManager/meteoriteManager (khong lam gi neu dang tat) =====
+    windGustManager.Draw(mWindow);
 
     // HUD Score/Level/HP, goc tren-trai (doi xung icon Pause tren-phai)
     std::ostringstream ossScore;
