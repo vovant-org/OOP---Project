@@ -21,11 +21,13 @@ private:
     float moveCooldownTimer;
 
     // ===== ADDED: trang thai "choang" khi bi hon da (RollingRockManager)
-    // va trung - khong the di chuyen va bi day (bounce) ngau nhien sang
-    // trai/phai, giu nguyen sprite/animation hien tai (khong doi anh) =====
+    // va trung, HOAC bi day lui theo chieu doc (TrainManager) - khong the
+    // di chuyen va bi bat/day theo bounceVelocity(X,Y), giu nguyen
+    // sprite/animation hien tai (khong doi anh) =====
     bool  isStunned;
     float stunTimer;
-    float bounceVelocity;
+    float bounceVelocity;    // truc X (RollingRockManager - trai/phai)
+    float bounceVelocityY;   // truc Y (TrainManager - day lui len/xuong)
 
     // ===== ADDED: bi gio day dat (WindGustManager, Sky/Nightmare) - KHONG
     // khoa di chuyen nhu stun, chi cong them 1 luong troi ngang moi frame
@@ -60,6 +62,13 @@ public:
     // phai (bounceRight=true). Goi tu RollingRockManager khi va cham. =====
     void TriggerStun(bool bounceRight);
     bool IsStunned() const { return isStunned; }
+
+    // ===== ADDED: kich hoat trang thai choang 1 giay theo TRUC DOC - dung
+    // rieng cho TrainManager khi player co tinh di chuyen VAO 1 road dang
+    // co tau chay (Running): pushDown=true day xuong duoi (khi player dang
+    // di len), pushDown=false day len tren (khi player dang di xuong).
+    // Khac TriggerStun (bat trai/phai), ham nay bat len/xuong. =====
+    void TriggerPushback(bool pushDown);
 
     // ===== ADDED: goi MOI FRAME tu WindGustManager khi dang trong pha
     // Active de day nhan vat troi ngang (px/s). Goi voi 0.f khi het gio

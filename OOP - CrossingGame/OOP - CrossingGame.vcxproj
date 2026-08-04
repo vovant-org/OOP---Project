@@ -188,6 +188,7 @@
     <ClCompile Include="RollingRockManager.cpp" />
     <ClCompile Include="SettingMenu.cpp" />
     <ClCompile Include="TrafficLight.cpp" />
+    <ClCompile Include="TrainManager.cpp" />
     <ClCompile Include="WindGustManager.cpp" />
     <ClCompile Include="WinMenu.cpp" />
   </ItemGroup>
@@ -229,6 +230,7 @@
     <ClInclude Include="RollingRockManager.h" />
     <ClInclude Include="SettingMenu.h" />
     <ClInclude Include="TrafficLight.h" />
+    <ClInclude Include="TrainManager.h" />
     <ClInclude Include="WindGustManager.h" />
     <ClInclude Include="WinMenu.h" />
   </ItemGroup>

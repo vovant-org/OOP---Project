@@ -24,9 +24,13 @@ namespace
 
     // ===== ADDED: thong so cho trang thai "choang" (khong doi animation,
     // chi khoa di chuyen + bat ra trai/phai theo quan tinh giam dan) =====
-    constexpr float STUN_DURATION = 1.5f;   // choang dung 1.5 giay
+    constexpr float STUN_DURATION = 1.5f;   // choang dung 1.5 giay (RollingRockManager)
     constexpr float BOUNCE_SPEED = 260.f;  // px/s, van toc bat ra ban dau
     constexpr float BOUNCE_DECAY = 6.f;    // he so giam dan van toc bat ra
+
+    // ===== ADDED: choang rieng khi bi TrainManager day lui (co tinh chay
+    // vao road dang co tau chay) - 1 giay, ngan hon STUN_DURATION o tren =====
+    constexpr float PUSHBACK_STUN_DURATION = 1.f;
 
     // Origin sprite o giua-duoi, nen:
     //   be ngang chiem [x - halfW, x + halfW], be doc chiem [y - fullH, y]
@@ -58,6 +62,7 @@ CPEOPLE::CPEOPLE(float startX, float startY)
     isStunned(false),
     stunTimer(0.f),
     bounceVelocity(0.f),
+    bounceVelocityY(0.f),
     windPushVelocity(0.f)
 {
 }
@@ -192,7 +197,10 @@ void CPEOPLE::Update(float dt)
         stunTimer -= dt;
 
         x += bounceVelocity * dt;
+        y += bounceVelocityY * dt;
+
         bounceVelocity *= std::exp(-BOUNCE_DECAY * dt);
+        bounceVelocityY *= std::exp(-BOUNCE_DECAY * dt);
 
         ClampToCanvas(x, y, frameWidth, frameHeight);
         sprite.setPosition(x, y);
@@ -201,6 +209,7 @@ void CPEOPLE::Update(float dt)
         {
             isStunned = false;
             bounceVelocity = 0.f;
+            bounceVelocityY = 0.f;
         }
 
         return;
@@ -270,6 +279,7 @@ void CPEOPLE::Reset(float startX, float startY)
     isStunned = false;
     stunTimer = 0.f;
     bounceVelocity = 0.f;
+    bounceVelocityY = 0.f;
     windPushVelocity = 0.f;
 
     sprite.setTextureRect(sf::IntRect(
@@ -303,6 +313,22 @@ void CPEOPLE::TriggerStun(bool bounceRight)
     isStunned = true;
     stunTimer = STUN_DURATION;
     bounceVelocity = (bounceRight ? 1.f : -1.f) * BOUNCE_SPEED;
+    bounceVelocityY = 0.f;
+}
+
+// ===== ADDED: kich hoat trang thai choang 1 giay THEO TRUC DOC - goi tu
+// TrainManager::TryBlockEntry() khi player co tinh di chuyen vao 1 road
+// dang co tau chay. Khac TriggerStun (bat trai/phai), ham nay day
+// nguoc len/xuong tuy huong player vua co gang di =====
+void CPEOPLE::TriggerPushback(bool pushDown)
+{
+    if (!isAlive || isStunned)
+        return;
+
+    isStunned = true;
+    stunTimer = PUSHBACK_STUN_DURATION;
+    bounceVelocity = 0.f;
+    bounceVelocityY = (pushDown ? 1.f : -1.f) * BOUNCE_SPEED;
 }
 
 // ===== ADDED: du doan vi tri neu di chuyen 1 buoc (MOVE_STEP) theo huong

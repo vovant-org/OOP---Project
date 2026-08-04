@@ -110,6 +110,12 @@ namespace
     const std::string WIND_TEXTURE_PATH_1 = "Obstacles/Wind_frame1.png";
     const std::string WIND_TEXTURE_PATH_2 = "Obstacles/Wind_frame2.png";
     const std::string WIND_SIGN_TEXTURE_PATH = "ui/Icon/WindSign.png";
+
+    // ===== ADDED: texture cho co che tau hoa (City + Nightmare) =====
+    const std::string TRAIN_HEAD_TEXTURE_PATH = "Obstacles/ModernTrain_frame1.png";
+    const std::string TRAIN_BODY_TEXTURE_PATH = "Obstacles/ModernTrain_frame2.png";
+    const std::string TRAIN_RAIL_TEXTURE_PATH = "Obstacles/Rail.png";
+    const std::string TRAIN_SIGN_TEXTURE_PATH = "ui/Icon/TrainSign.png";
 }
 
 //==================================================
@@ -645,6 +651,39 @@ void CGAME::Init(int mapIndex, int characterIndex)
 
         windGustManager.SetActive(true);
     }
+
+    //----------------------------------
+    // ===== ADDED: co che tau hoa - chi bat cho City + Nightmare =====
+    //----------------------------------
+
+    trainManager.Reset();
+    trainManager.SetActive(false);
+
+    if (currentMap == 0 && difficultyMode == 2)
+    {
+        if (!trainManager.LoadTextures(TRAIN_HEAD_TEXTURE_PATH, TRAIN_BODY_TEXTURE_PATH,
+            TRAIN_RAIL_TEXTURE_PATH, TRAIN_SIGN_TEXTURE_PATH))
+        {
+            std::cout << "[CGAME] Cannot load train textures\n";
+        }
+
+        // City co 4 road (moi road = 2 lane trong CITY_LANE_Y) - tau hoa
+        // dung TAM cua tung road (trung binh 2 lane) de ve rail/tau va
+        // xac dinh vung "an obstacle"
+        const float* cy = CITY_LANE_Y;
+        float roadCenters[TrainManager::ROAD_COUNT] =
+        {
+            (cy[0] + cy[1]) / 2.f,
+            (cy[2] + cy[3]) / 2.f,
+            (cy[4] + cy[5]) / 2.f,
+            (cy[6] + cy[7]) / 2.f
+        };
+        trainManager.SetRoadCenters(roadCenters);
+
+        trainManager.SetRoadCenters(roadCenters);
+
+        trainManager.SetActive(true);
+    }
 }
 
 //==================================================
@@ -669,7 +708,8 @@ void CGAME::HandleInput(sf::Event& event)
     {
         float nx, ny;
         player->PeekNextPosition(0, nx, ny);
-        if (!meteoriteManager.IsPositionBlocked(nx, ny))
+        if (!meteoriteManager.IsPositionBlocked(nx, ny) &&
+            !trainManager.TryBlockEntry(player, player->getY(), ny))
             player->MoveUp();
         break;
     }
@@ -679,7 +719,8 @@ void CGAME::HandleInput(sf::Event& event)
     {
         float nx, ny;
         player->PeekNextPosition(1, nx, ny);
-        if (!meteoriteManager.IsPositionBlocked(nx, ny))
+        if (!meteoriteManager.IsPositionBlocked(nx, ny) &&
+            !trainManager.TryBlockEntry(player, player->getY(), ny))
             player->MoveDown();
         break;
     }
@@ -689,7 +730,8 @@ void CGAME::HandleInput(sf::Event& event)
     {
         float nx, ny;
         player->PeekNextPosition(2, nx, ny);
-        if (!meteoriteManager.IsPositionBlocked(nx, ny))
+        if (!meteoriteManager.IsPositionBlocked(nx, ny) &&
+            !trainManager.TryBlockEntry(player, player->getY(), ny))
             player->MoveLeft();
         break;
     }
@@ -699,7 +741,8 @@ void CGAME::HandleInput(sf::Event& event)
     {
         float nx, ny;
         player->PeekNextPosition(3, nx, ny);
-        if (!meteoriteManager.IsPositionBlocked(nx, ny))
+        if (!meteoriteManager.IsPositionBlocked(nx, ny) &&
+            !trainManager.TryBlockEntry(player, player->getY(), ny))
             player->MoveRight();
         break;
     }
@@ -774,6 +817,23 @@ void CGAME::Update(float dt)
     // chi lien tuc day nhan vat troi ngang qua ApplyWindPush() (xem
     // CPEOPLE::Update) trong suot pha Active =====
     windGustManager.Update(dt, player);
+
+    // ===== ADDED: co che tau hoa - tu Update() se khong lam gi neu
+    // SetActive(false) (khong phai City + Nightmare) =====
+    trainManager.Update(dt, player);
+
+    // ===== ADDED: player DUNG SAN tren road ma tau chay toi va cham trung
+    // (khac voi TryBlockEntry o HandleInput - do la truong hop CO Y DINH
+    // di chuyen vao, khong mat HP) -> mat 2 HP (nang hon va cham xe thuong) =====
+    if (trainManager.ConsumePlayerHit())
+    {
+        playerHP -= 2;
+
+        if (playerHP <= 0)
+            OnDeath();
+        else
+            OnHit();
+    }
 
     // ===== ADDED (Bước 5): cap nhat den, roi dong bo trang thai
     // dung/chay vao tung xe TRUOC khi goi Update() cua xe =====
@@ -853,10 +913,24 @@ void CGAME::Draw()
         l->Draw(mWindow);
 
     for (auto* v : vehicles)
+    {
+        // ===== ADDED: xe nam tren road dang bi TrainManager "chiem"
+        // (Warning hoac Running) thi tam thoi bien mat, khong ve nua =====
+        sf::FloatRect vBox = v->GetBoundingBox();
+        if (trainManager.IsRoadActive(vBox.top + vBox.height / 2.f))
+            continue;
+
         v->Draw(mWindow);
+    }
 
     for (auto* a : animals)
+    {
+        sf::FloatRect aBox = a->GetBoundingBox();
+        if (trainManager.IsRoadActive(aBox.top + aBox.height / 2.f))
+            continue;
+
         a->Draw(mWindow);
+    }
 
     if (player)
         player->Draw(mWindow);
@@ -872,6 +946,10 @@ void CGAME::Draw()
     // ===== ADDED: ve canh bao / dai gio LEN TREN player, cung logic nhu
     // rockManager/meteoriteManager (khong lam gi neu dang tat) =====
     windGustManager.Draw(mWindow);
+
+    // ===== ADDED: ve rail/bien bao/tau LEN TREN player, cung logic nhu
+    // 3 manager kia (khong lam gi neu dang tat) =====
+    trainManager.Draw(mWindow);
 
     // HUD Score/Level/HP, goc tren-trai (doi xung icon Pause tren-phai)
     std::ostringstream ossScore;
@@ -904,13 +982,24 @@ bool CGAME::CheckCollision()
 
     for (auto* v : vehicles)
     {
-        if (pBox.intersects(v->GetBoundingBox()))
+        sf::FloatRect vBox = v->GetBoundingBox();
+
+        // ===== ADDED: xe dang bi TrainManager "an" thi khong tinh va cham =====
+        if (trainManager.IsRoadActive(vBox.top + vBox.height / 2.f))
+            continue;
+
+        if (pBox.intersects(vBox))
             return true;
     }
 
     for (auto* a : animals)
     {
-        if (pBox.intersects(a->GetBoundingBox()))
+        sf::FloatRect aBox = a->GetBoundingBox();
+
+        if (trainManager.IsRoadActive(aBox.top + aBox.height / 2.f))
+            continue;
+
+        if (pBox.intersects(aBox))
             return true;
     }
 
