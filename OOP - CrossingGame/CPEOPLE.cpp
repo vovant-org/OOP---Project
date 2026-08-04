@@ -17,7 +17,7 @@ namespace
     constexpr float CHAR_SCALE = 0.25f;
 
     // 1 buoc di chuyen (o luoi)
-    constexpr float MOVE_STEP = 28.f;
+    constexpr float MOVE_STEP = 21.f;
 
     constexpr float CANVAS_W = 1280.f;
     constexpr float CANVAS_H = 720.f;
@@ -261,7 +261,18 @@ void CPEOPLE::Draw(sf::RenderWindow& window)
 
 sf::FloatRect CPEOPLE::GetBoundingBox() const
 {
-    return sprite.getGlobalBounds();
+    sf::FloatRect box = sprite.getGlobalBounds();
+
+    // Thu nhỏ hitbox theo % chiều rộng/cao để tránh va chạm "oan"
+    float shrinkX = box.width * 0.25f;   // giảm 25% mỗi bên ngang
+    float shrinkY = box.height * 0.25f;  // giảm 25% mỗi bên dọc
+
+    box.left += shrinkX;
+    box.top += shrinkY;
+    box.width -= shrinkX * 2.f;
+    box.height -= shrinkY * 2.f;
+
+    return box;
 }
 
 void CPEOPLE::Reset(float startX, float startY)

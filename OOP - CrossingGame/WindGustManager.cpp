@@ -10,12 +10,12 @@ namespace
 {
     constexpr float WARNING_DURATION = 1.5f;
     constexpr float ACTIVE_DURATION = 1.8f;
-    constexpr float IDLE_COOLDOWN = 7.f;
+    constexpr float IDLE_COOLDOWN = 6.f;
 
-    constexpr float WIND_PUSH_SPEED = 150.f;   // px/s, day nhan vat troi ngang
+    constexpr float WIND_PUSH_SPEED = 190.f;   // px/s, day nhan vat troi ngang
     constexpr float WIND_FRAME_TIME = 0.13f;   // toc do xen ke frame1/frame2
 
-    constexpr float SIGN_SIZE = 90.f;
+    constexpr float SIGN_SIZE = 70.f;
     constexpr int   SIGN_PER_ROAD = 2;         // so icon xep doc trong PHAM VI 1 road
     constexpr float SIGN_MARGIN_X = 60.f;
 

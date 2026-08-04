@@ -83,10 +83,10 @@ namespace
     // TAM obstacle (vi origin da chuan hoa ve giua sprite), va lane cuoi
     // cung duoc keo len xa hon hang spawn cua nguoi choi (y = CANVAS_H-40 = 680)
     // de chua du khong gian cho sprite cao (train, brute...) =====
-    const float CITY_LANE_Y[] = { 125.f, 180.f, 250.f, 300.f, 370.f, 420.f, 490.f, 540.f };
+    const float CITY_LANE_Y[] = { 125.f, 170.f, 255.f, 300.f, 385.f, 420.f, 510.f, 540.f };
     const float ANCIENT_LANE_Y[] = { 160.f, 280.f, 420.f, 550.f };
     const float HELL_LANE_Y[] = { 105.f, 137.f, 220.f, 270.f, 360.f, 400.f, 510.f, 550.f };
-    const float SKY_LANE_Y[] = { 125.f, 180.f, 255.f, 310.f, 375.f, 430.f, 515.f, 570.f };
+    const float SKY_LANE_Y[] = { 125.f, 180.f, 255.f, 310.f, 385.f, 430.f, 520.f, 570.f };
 
     // ===== ADDED (Bước 5): texture den giao thong rieng theo tung map =====
     const std::string LIGHT_PATHS[4] =
@@ -308,8 +308,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CBIKE(600.f, y[0], 260.f, false), roadLight[0]);
-            addVehicle(new CTRUCK(1600.f, y[1], 220.f, true), roadLight[0]);
+            addVehicle(new CBIKE(600.f, y[0], 260.f, true), roadLight[0]);
+            addVehicle(new CTRUCK(1600.f, y[1], 220.f, false), roadLight[0]);
         }
 
         // Road 1 (y[2], y[3]) - dieu khien boi den o vach 1
@@ -322,8 +322,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CMOTOR(700.f, y[2], 300.f, true), roadLight[1]);
-            addVehicle(new CBIKE(1500.f, y[3], 200.f, false), roadLight[1]);
+            addVehicle(new CMOTOR(700.f, y[2], 300.f, false), roadLight[1]);
+            addVehicle(new CBIKE(1500.f, y[3], 200.f, true), roadLight[1]);
         }
 
         // Road 2 (y[4], y[5]) - dieu khien boi den o vach 2
@@ -336,8 +336,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CTRUCK(1400.f, y[4], 260.f, false), roadLight[2]);
-            addVehicle(new CBIKE(500.f, y[5], 220.f, true), roadLight[2]);
+            addVehicle(new CTRUCK(1400.f, y[4], 260.f, true), roadLight[2]);
+            addVehicle(new CBIKE(500.f, y[5], 220.f, false), roadLight[2]);
         }
 
         // Road 3 (y[6], y[7]) - dieu khien boi den o vach 3
@@ -350,8 +350,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CMOTOR(900.f, y[6], 330.f, true), roadLight[3]);
-            addVehicle(new CTRUCK(1700.f, y[7], 200.f, false), roadLight[3]);
+            addVehicle(new CMOTOR(900.f, y[6], 330.f, false), roadLight[3]);
+            addVehicle(new CTRUCK(1700.f, y[7], 200.f, true), roadLight[3]);
         }
         break;
     }
@@ -460,8 +460,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CHELLMOTOR(700.f, y[0], 350.f, false), roadLight[0]);
-            addVehicle(new CTRAIN(1400.f, y[1], 300.f, true), roadLight[0]);
+            addVehicle(new CHELLMOTOR(700.f, y[0], 350.f, true), roadLight[0]);
+            addVehicle(new CTRAIN(1400.f, y[1] - 8.f, 300.f, false), roadLight[0]);
         }
 
         // Road 1 (y[2], y[3]) - dieu khien boi den o vach 1
@@ -474,8 +474,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CHELLMOTOR(900.f, y[2], 300.f, false), roadLight[1]);
-            addAnimal(new CBRUTE(1500.f, y[3], 90.f, true), roadLight[1]);
+            addVehicle(new CHELLMOTOR(900.f, y[2], 300.f, true), roadLight[1]);
+            addAnimal(new CBRUTE(1500.f, y[3], 90.f, false), roadLight[1]);
         }
 
         // Road 2 (y[4], y[5]) - dieu khien boi den o vach 2
@@ -488,8 +488,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addAnimal(new CPIGLIN(1300.f, y[4], 200.f, false), roadLight[2]);
-            addVehicle(new CHELLMOTOR(1600.f, y[5], 280.f, true), roadLight[2]);
+            addAnimal(new CPIGLIN(1300.f, y[4], 200.f, true), roadLight[2]);
+            addVehicle(new CHELLMOTOR(1600.f, y[5], 280.f, false), roadLight[2]);
         }
 
         // Road 3 (y[6], y[7]) - dieu khien boi den o vach 3
@@ -502,8 +502,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CHELLMOTOR(1000.f, y[6], 260.f, false), roadLight[3]);
-            addAnimal(new CBRUTE(1700.f, y[7], 95.f, true), roadLight[3]);
+            addVehicle(new CHELLMOTOR(1000.f, y[6], 260.f, true), roadLight[3]);
+            addAnimal(new CBRUTE(1700.f, y[7], 95.f, false), roadLight[3]);
         }
         break;
     }
@@ -538,8 +538,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addAnimal(new CANGLE(1300.f, y[0], 260.f, false), roadLight[0]);
-            addAnimal(new CCLOUD(1600.f, y[1], 180.f, true), roadLight[0]);
+            addAnimal(new CANGLE(1300.f, y[0], 260.f, true), roadLight[0]);
+            addAnimal(new CCLOUD(1600.f, y[1], 180.f, false), roadLight[0]);
         }
 
         // Road 1 (y[2], y[3]) - dieu khien boi den o dai 1
@@ -552,8 +552,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addAnimal(new CBIRD(1900.f, y[2], 300.f, false), roadLight[1]);
-            addAnimal(new CANGLE(2200.f, y[3], 220.f, true), roadLight[1]);
+            addAnimal(new CBIRD(1900.f, y[2], 300.f, true), roadLight[1]);
+            addAnimal(new CANGLE(2200.f, y[3], 220.f, false), roadLight[1]);
         }
 
         // Road 2 (y[4], y[5]) - dieu khien boi den o dai 2
@@ -566,8 +566,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addAnimal(new CCLOUD(1400.f, y[4], 190.f, false), roadLight[2]);
-            addAnimal(new CBIRD(1700.f, y[5], 340.f, true), roadLight[2]);
+            addAnimal(new CCLOUD(1400.f, y[4], 190.f, true), roadLight[2]);
+            addAnimal(new CBIRD(1700.f, y[5], 340.f, false), roadLight[2]);
         }
 
         // Road 3 (y[6], y[7]) - dieu khien boi den o dai 3
@@ -580,8 +580,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
         if (difficultyMode == 2)
         {
-            addAnimal(new CANGLE(600.f, y[6], 250.f, false), roadLight[3]);
-            addAnimal(new CCLOUD(2000.f, y[7], 170.f, true), roadLight[3]);
+            addAnimal(new CANGLE(600.f, y[6], 250.f, true), roadLight[3]);
+            addAnimal(new CCLOUD(2000.f, y[7], 170.f, false), roadLight[3]);
         }
         break;
     }

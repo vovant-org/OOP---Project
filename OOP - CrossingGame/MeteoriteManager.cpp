@@ -12,7 +12,7 @@ namespace
     constexpr float IDLE_COOLDOWN = 5.f;    // cho 5s giua 2 lan spawn
 
     constexpr float METEORITE_FALL_SPEED = 500.f;   // px/s, tu tren xuong
-    constexpr float METEORITE_TARGET_WIDTH = 220.f; // px hien thi
+    constexpr float METEORITE_TARGET_WIDTH = 320.f; // px hien thi
     constexpr float METEORITE_FRAME_TIME = 0.07f;   // toc do lap frame 0-1-2 luc roi
 
     constexpr float IMPACT_DURATION = 0.15f;   // frame 4 (impact flash) hien thi trong bao lau
