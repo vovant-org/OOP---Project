@@ -56,6 +56,12 @@ public:
     void TriggerStun(bool bounceRight);
     bool IsStunned() const { return isStunned; }
 
+    // ===== ADDED: du doan vi tri (x,y) neu di chuyen 1 buoc theo huong dir
+    // (0=UP,1=DOWN,2=LEFT,3=RIGHT), KHONG thuc su di chuyen - dung de CGAME
+    // kiem tra o ke tiep co dang bi MeteoriteManager chan (ho da) hay khong
+    // TRUOC KHI goi Move...() that su =====
+    void PeekNextPosition(int dir, float& outX, float& outY) const;
+
     float getX() const { return x; }
     float getY() const { return y; }
 };

@@ -293,3 +293,23 @@ void CPEOPLE::TriggerStun(bool bounceRight)
     stunTimer = STUN_DURATION;
     bounceVelocity = (bounceRight ? 1.f : -1.f) * BOUNCE_SPEED;
 }
+
+// ===== ADDED: du doan vi tri neu di chuyen 1 buoc (MOVE_STEP) theo huong
+// dir, dung chung logic clamp voi Move...() nhung KHONG thay doi state
+// cua nhan vat - de CGAME::HandleInput() kiem tra truoc voi MeteoriteManager =====
+void CPEOPLE::PeekNextPosition(int dir, float& outX, float& outY) const
+{
+    outX = x;
+    outY = y;
+
+    switch (dir)
+    {
+    case 0: outY -= MOVE_STEP; break;   // UP
+    case 1: outY += MOVE_STEP; break;   // DOWN
+    case 2: outX -= MOVE_STEP; break;   // LEFT
+    case 3: outX += MOVE_STEP; break;   // RIGHT
+    default: break;
+    }
+
+    ClampToCanvas(outX, outY, frameWidth, frameHeight);
+}

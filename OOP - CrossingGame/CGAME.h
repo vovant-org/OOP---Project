@@ -7,6 +7,7 @@
 #include "CANIMAL.h"
 #include "TrafficLight.h"
 #include "RollingRockManager.h"   // ===== ADDED: co che canh bao + da lan (Ancient/Nightmare) =====
+#include "MeteoriteManager.h"            // ===== ADDED: co che canh bao + thien thach (Hell/Nightmare) =====
 
 class AudioManager;   // forward declare, chi can con tro
 
@@ -31,6 +32,11 @@ private:
     // currentMap==1 (Ancient) va difficultyMode==2 (Nightmare) - xem
     // CGAME::Init() =====
     RollingRockManager rockManager;
+
+    // ===== ADDED: co che canh bao + thien thach, chi kich hoat khi
+    // currentMap==2 (Hell) va difficultyMode==2 (Nightmare) - xem
+    // CGAME::Init() =====
+    MeteoriteManager meteoriteManager;
 
     // Game state
     int  level;

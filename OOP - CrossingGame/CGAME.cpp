@@ -101,6 +101,10 @@ namespace
     // Nightmare - xem CGAME::Init) =====
     const std::string ROCK_TEXTURE_PATH = "Obstacles/RollingRock.png";
     const std::string SIGN_TEXTURE_PATH = "ui/Icon/RollingSign.png";
+
+    // ===== ADDED: texture cho co che thien thach (Hell + Nightmare) =====
+    const std::string METEORITE_TEXTURE_PATH = "Obstacles/Meteorite.png";
+    const std::string METEORITE_SIGN_TEXTURE_PATH = "ui/Icon/MeteoriteSign.png";
 }
 
 //==================================================
@@ -595,6 +599,27 @@ void CGAME::Init(int mapIndex, int characterIndex)
 
         rockManager.SetActive(true);
     }
+
+    //----------------------------------
+    // ===== ADDED: co che canh bao + thien thach - chi bat cho Hell +
+    // Nightmare =====
+    //----------------------------------
+
+    meteoriteManager.Reset();
+    meteoriteManager.SetActive(false);
+
+    if (currentMap == 2 && difficultyMode == 2)
+    {
+        // MeteoriteManager mac dinh canvasW/canvasH = 1280x720, khop
+        // CANVAS_W/CANVAS_H o day nen khong can set lai
+
+        if (!meteoriteManager.LoadTextures(METEORITE_TEXTURE_PATH, METEORITE_SIGN_TEXTURE_PATH))
+        {
+            std::cout << "[CGAME] Cannot load meteorite textures\n";
+        }
+
+        meteoriteManager.SetActive(true);
+    }
 }
 
 //==================================================
@@ -609,27 +634,50 @@ void CGAME::HandleInput(sf::Event& event)
     if (event.type != sf::Event::KeyPressed)
         return;
 
+    // ===== ADDED: truoc khi thuc su di chuyen, du doan o ke tiep va kiem
+    // tra xem co dang la "ho da" (Meteorite vua roi trung, con hieu luc
+    // trong 5s) hay khong - neu co thi bo qua input nay (player bi chan) =====
     switch (event.key.code)
     {
     case sf::Keyboard::Up:
     case sf::Keyboard::W:
-        player->MoveUp();
+    {
+        float nx, ny;
+        player->PeekNextPosition(0, nx, ny);
+        if (!meteoriteManager.IsPositionBlocked(nx, ny))
+            player->MoveUp();
         break;
+    }
 
     case sf::Keyboard::Down:
     case sf::Keyboard::S:
-        player->MoveDown();
+    {
+        float nx, ny;
+        player->PeekNextPosition(1, nx, ny);
+        if (!meteoriteManager.IsPositionBlocked(nx, ny))
+            player->MoveDown();
         break;
+    }
 
     case sf::Keyboard::Left:
     case sf::Keyboard::A:
-        player->MoveLeft();
+    {
+        float nx, ny;
+        player->PeekNextPosition(2, nx, ny);
+        if (!meteoriteManager.IsPositionBlocked(nx, ny))
+            player->MoveLeft();
         break;
+    }
 
     case sf::Keyboard::Right:
     case sf::Keyboard::D:
-        player->MoveRight();
+    {
+        float nx, ny;
+        player->PeekNextPosition(3, nx, ny);
+        if (!meteoriteManager.IsPositionBlocked(nx, ny))
+            player->MoveRight();
         break;
+    }
 
     default:
         break;
@@ -676,6 +724,24 @@ void CGAME::Update(float dt)
     // ===== ADDED: co che canh bao + da lan - tu Update() se khong lam gi
     // neu SetActive(false) (khong phai Ancient + Nightmare) =====
     rockManager.Update(dt, player);
+
+    // ===== ADDED: co che canh bao + thien thach - tu Update() se khong
+    // lam gi neu SetActive(false) (khong phai Hell + Nightmare) =====
+    meteoriteManager.Update(dt, player);
+
+    // ===== ADDED: player dung dung cho Meteorite roi trung luc no vua
+    // cham dat -> mat 1 tim, tach rieng voi CheckCollision() (vehicles/
+    // animals) vi day la su kien tuc thoi luc cham dat, khong phai
+    // overlap lien tuc moi frame =====
+    if (meteoriteManager.ConsumePlayerHit())
+    {
+        playerHP--;
+
+        if (playerHP <= 0)
+            OnDeath();
+        else
+            OnHit();
+    }
 
     // ===== ADDED (Bước 5): cap nhat den, roi dong bo trang thai
     // dung/chay vao tung xe TRUOC khi goi Update() cua xe =====
@@ -766,6 +832,10 @@ void CGAME::Draw()
     // ===== ADDED: ve canh bao / da lan LEN TREN player de nguoi choi
     // luon thay ro nguy hiem (khong lam gi neu dang tat) =====
     rockManager.Draw(mWindow);
+
+    // ===== ADDED: ve canh bao / thien thach LEN TREN player, cung logic
+    // nhu rockManager (khong lam gi neu dang tat) =====
+    meteoriteManager.Draw(mWindow);
 
     // HUD Score/Level/HP, goc tren-trai (doi xung icon Pause tren-phai)
     std::ostringstream ossScore;

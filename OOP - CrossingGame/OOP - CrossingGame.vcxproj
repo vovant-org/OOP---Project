@@ -182,6 +182,7 @@
     <ClCompile Include="MapSelection.cpp" />
     <ClCompile Include="MenuBackground.cpp" />
     <ClCompile Include="MenuManager.cpp" />
+    <ClCompile Include="MeteoriteManager.cpp" />
     <ClCompile Include="ModeSelection.cpp" />
     <ClCompile Include="PauseMenu.cpp" />
     <ClCompile Include="RollingRockManager.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="MenuBackground.h" />
     <ClInclude Include="MenuManager.h" />
+    <ClInclude Include="MeteoriteManager.h" />
     <ClInclude Include="ModeSelection.h" />
     <ClInclude Include="ObstacleHelper.h" />
     <ClInclude Include="PauseMenu.h" />

@@ -95,7 +95,7 @@ void RollingRockManager::PickColumns()
 {
     warningColumns.clear();
 
-    int count = 2 + (rand() % 3);   // 2..4
+    int count = 3 + (rand() % 4);   // 2..4
 
     float slotWidth = canvasW / COLUMN_SLOT_COUNT;
     std::vector<int> slots;
