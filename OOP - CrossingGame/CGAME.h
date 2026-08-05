@@ -57,6 +57,10 @@ private:
     bool isPaused;
     bool isWin;
 
+    // ===== ADDED: gioi han thoi gian theo do kho (Easy = khong gioi han).
+    // Het gio ma chua Win thi Game Over ngay - xem CGAME::Update() =====
+    float timeRemaining;
+
     // Save/Load
     std::string savePath;
 
@@ -64,6 +68,7 @@ private:
     sf::Text hudScoreText;
     sf::Text hudLevelText;
     sf::Text hudHPText;
+    sf::Text hudTimeText;   // ===== ADDED: chi ve neu HasTimeLimit() =====
 
     // Doi nhac nen theo map khi Init()
     AudioManager* audio = nullptr;
@@ -115,6 +120,11 @@ public:
     int GetLevel() const { return level; }
     int GetPlayerHP() const { return playerHP; }
     int GetPlayerMaxHP() const { return playerMaxHP; }
+
+    // ===== ADDED: HasTimeLimit()==false khi dang Easy (khong gioi han
+    // thoi gian) - main.cpp/HUD dua vao day de biet co hien dong ho khong =====
+    bool HasTimeLimit() const { return timeRemaining >= 0.f; }
+    float GetTimeRemaining() const { return timeRemaining; }
 
     // De main.cpp dong bo lai lua chon map/nhan vat sau khi Continue
     // (LoadGame), va biet duong dan file save

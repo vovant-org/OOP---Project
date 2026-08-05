@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>   // ===== ADDED (Bước 6) =====
 #include <sstream>   // ===== ADDED: build chuoi HUD =====
+#include <cmath>     // ===== ADDED: std::ceil cho dong ho HUD =====
 
 // ===== ADDED (Bước 3): các lớp obstacle cụ thể theo map =====
 #include "CBIKE.h"
@@ -29,6 +30,12 @@ namespace
     // trong main.cpp
     constexpr float CANVAS_W = 1280.f;
     constexpr float CANVAS_H = 720.f;
+
+    // ===== ADDED: cau hinh rieng cho HUD dong ho dem nguoc (Time) - chinh
+    // 2 gia tri nay de doi size chu / khoang cach tu mep tren, KHONG can
+    // tu tay chinh toa do X vi Draw() se tu can giua theo CANVAS_W =====
+    constexpr unsigned int HUD_TIME_FONT_SIZE = 35;  // size chu (so voi 22 cua Score/Level/HP)
+    constexpr float HUD_TIME_MARGIN_TOP = 14.f;      // khoang cach tu mep tren man hinh
 
     // Duong dan map, dung thu tu index giong MapSelection
     // (0=City 1=Ancient 2=Hell 3=Sky)
@@ -79,6 +86,13 @@ namespace
     // cang cao thi cooldown cang ngan (di lien tuc duoc)
     const float CHARACTER_MOVE_COOLDOWN[4] = { 0.15f, 0.25f, 0.10f, 0.20f };
 
+    // ===== ADDED: gioi han thoi gian (giay) theo difficultyMode
+    // (0=Easy 1=Hard 2=Nightmare). -1 = khong gioi han =====
+    const float TIME_LIMIT_BY_MODE[3] = { -1.f, 90.f, 90.f };
+
+    // ===== ADDED: so level can hoan thanh de Win, theo difficultyMode =====
+    const int WIN_LEVEL_BY_MODE[3] = { 3, 5, 6 };
+
     // ===== CHANGED (fix lane sai + đè vào hàng spawn): toa do Y gio la
     // TAM obstacle (vi origin da chuan hoa ve giua sprite), va lane cuoi
     // cung duoc keo len xa hon hang spawn cua nguoi choi (y = CANVAS_H-40 = 680)
@@ -86,7 +100,7 @@ namespace
     const float CITY_LANE_Y[] = { 125.f, 170.f, 255.f, 300.f, 385.f, 420.f, 510.f, 540.f };
     const float ANCIENT_LANE_Y[] = { 160.f, 280.f, 420.f, 550.f };
     const float HELL_LANE_Y[] = { 105.f, 137.f, 220.f, 270.f, 360.f, 400.f, 510.f, 550.f };
-    const float SKY_LANE_Y[] = { 125.f, 180.f, 255.f, 310.f, 385.f, 430.f, 520.f, 570.f };
+    const float SKY_LANE_Y[] = { 125.f, 180.f, 255.f, 310.f, 393.f, 433.f, 520.f, 570.f };
 
     // ===== ADDED (Bước 5): texture den giao thong rieng theo tung map =====
     const std::string LIGHT_PATHS[4] =
@@ -135,6 +149,7 @@ CGAME::CGAME(sf::RenderWindow& window)
     isGameOver(false),
     isPaused(false),
     isWin(false),
+    timeRemaining(-1.f),
     savePath("save.dat")
 {
 }
@@ -233,6 +248,9 @@ void CGAME::Init(int mapIndex, int characterIndex)
     isPaused = false;
     isWin = false;   // ===== ADDED =====
 
+    // ===== ADDED: gioi han thoi gian theo do kho (Easy = khong gioi han) =====
+    timeRemaining = TIME_LIMIT_BY_MODE[difficultyMode];
+
     //----------------------------------
     // ===== ADDED (Bước 3): spawn vehicles/animals theo currentMap =====
     //----------------------------------
@@ -254,8 +272,8 @@ void CGAME::Init(int mapIndex, int characterIndex)
     // cho MOI obstacle duoc spawn ben duoi - chi can wrap push_back bang
     // addVehicle()/addAnimal() thay vi goi truc tiep =====
     float speedDelta = 0.f;
-    if (difficultyMode == 0)       speedDelta = -70.f;  // Easy
-    else if (difficultyMode == 2)  speedDelta = 40.f;   // Nightmare
+    if (difficultyMode == 0)       speedDelta = -50.f;  // Easy
+    else if (difficultyMode == 2)  speedDelta = 150.f;   // Nightmare
 
     auto addVehicle = [&](CVEHICLE* v, TrafficLight* light)
         {
@@ -299,31 +317,31 @@ void CGAME::Init(int mapIndex, int characterIndex)
         }
 
         // Road 0 (y[0], y[1]) - khong den, luon chay
-        addVehicle(new CMOTOR(2000.f, y[0] + 2.f, 290.f, false), roadLight[0]);
-        addVehicle(new CMOTOR(2000.f, y[0], 370.f, false), roadLight[0]);
+        addVehicle(new CMOTOR(2000.f, y[0] + 2.f, 330.f, false), roadLight[0]);
+        addVehicle(new CMOTOR(2000.f, y[0], 450.f, false), roadLight[0]);
         if (difficultyMode != 0)
         {
-            addVehicle(new CBIKE(1100.f, y[1], 180.f, true), roadLight[0]);
-            addVehicle(new CTRUCK(1000.f, y[1], 280.f, true), roadLight[0]);
+            addVehicle(new CBIKE(1100.f, y[1], 250.f, true), roadLight[0]);
+            addVehicle(new CTRUCK(1000.f, y[1], 380.f, true), roadLight[0]);
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CBIKE(600.f, y[0], 260.f, true), roadLight[0]);
-            addVehicle(new CTRUCK(1600.f, y[1], 220.f, false), roadLight[0]);
+            addVehicle(new CBIKE(600.f, y[0], 200.f, true), roadLight[0]);
+            addVehicle(new CTRUCK(1600.f, y[1], 350.f, false), roadLight[0]);
         }
 
         // Road 1 (y[2], y[3]) - dieu khien boi den o vach 1
-        addVehicle(new CMOTOR(300.f, y[2], 320.f, true), roadLight[1]);
-        addVehicle(new CTRUCK(1000.f, y[2], 180.f, true), roadLight[1]);
+        addVehicle(new CMOTOR(300.f, y[2], 390.f, true), roadLight[1]);
+        addVehicle(new CTRUCK(1000.f, y[2], 280.f, true), roadLight[1]);
         if (difficultyMode != 0)
         {
-            addVehicle(new CMOTOR(300.f, y[3], 350.f, false), roadLight[1]);
-            addVehicle(new CTRUCK(1000.f, y[3], 240.f, false), roadLight[1]);
+            addVehicle(new CMOTOR(300.f, y[3], 390.f, false), roadLight[1]);
+            addVehicle(new CTRUCK(1000.f, y[3], 270.f, false), roadLight[1]);
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CMOTOR(700.f, y[2], 300.f, false), roadLight[1]);
-            addVehicle(new CBIKE(1500.f, y[3], 200.f, true), roadLight[1]);
+            addVehicle(new CMOTOR(700.f, y[2], 400.f, false), roadLight[1]);
+            addVehicle(new CBIKE(1500.f, y[3], 210.f, true), roadLight[1]);
         }
 
         // Road 2 (y[4], y[5]) - dieu khien boi den o vach 2
@@ -331,27 +349,27 @@ void CGAME::Init(int mapIndex, int characterIndex)
         addVehicle(new CMOTOR(800.f, y[4], 390.f, false), roadLight[2]);
         if (difficultyMode != 0)
         {
-            addVehicle(new CBIKE(150.f, y[5], 150.f, true), roadLight[2]);
-            addVehicle(new CMOTOR(800.f, y[5], 300.f, true), roadLight[2]);
+            addVehicle(new CBIKE(150.f, y[5], 200.f, true), roadLight[2]);
+            addVehicle(new CMOTOR(800.f, y[5], 390.f, true), roadLight[2]);
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CTRUCK(1400.f, y[4], 260.f, true), roadLight[2]);
-            addVehicle(new CBIKE(500.f, y[5], 220.f, false), roadLight[2]);
+            addVehicle(new CTRUCK(1400.f, y[4], 360.f, true), roadLight[2]);
+            addVehicle(new CBIKE(500.f, y[5], 260.f, false), roadLight[2]);
         }
 
         // Road 3 (y[6], y[7]) - dieu khien boi den o vach 3
-        addVehicle(new CTRUCK(400.f, y[6], 190.f, true), roadLight[3]);
-        addVehicle(new CTRUCK(400.f, y[6], 240.f, true), roadLight[3]);
+        addVehicle(new CTRUCK(400.f, y[6], 230.f, true), roadLight[3]);
+        addVehicle(new CTRUCK(400.f, y[6], 340.f, true), roadLight[3]);
         if (difficultyMode != 0)
         {
-            addVehicle(new CTRUCK(400.f, y[7], 275.f, false), roadLight[3]);
-            addVehicle(new CBIKE(1100.f, y[7] + 28.f, 210.f, false), roadLight[3]);
+            addVehicle(new CTRUCK(400.f, y[7], 345.f, false), roadLight[3]);
+            addVehicle(new CBIKE(1100.f, y[7] + 28.f, 260.f, false), roadLight[3]);
         }
         if (difficultyMode == 2)
         {
-            addVehicle(new CMOTOR(900.f, y[6], 330.f, false), roadLight[3]);
-            addVehicle(new CTRUCK(1700.f, y[7], 200.f, true), roadLight[3]);
+            addVehicle(new CMOTOR(900.f, y[6], 430.f, false), roadLight[3]);
+            addVehicle(new CTRUCK(1700.f, y[7], 300.f, true), roadLight[3]);
         }
         break;
     }
@@ -789,6 +807,19 @@ void CGAME::Update(float dt)
     if (player)
         player->Update(dt);
 
+    // ===== ADDED: het gio ma chua Win thi Game Over ngay (Easy khong co
+    // gioi han vi timeRemaining = -1, dieu kien duoi luon false) =====
+    if (timeRemaining >= 0.f)
+    {
+        timeRemaining -= dt;
+        if (timeRemaining <= 0.f)
+        {
+            timeRemaining = 0.f;
+            OnDeath();
+            return;
+        }
+    }
+
     // ===== ADDED: co che canh bao + da lan - tu Update() se khong lam gi
     // neu SetActive(false) (khong phai Ancient + Nightmare) =====
     rockManager.Update(dt, player);
@@ -903,6 +934,16 @@ void CGAME::SetFont(const sf::Font& font)
     hudHPText.setOutlineColor(sf::Color::Black);
     hudHPText.setOutlineThickness(2.f);
     hudHPText.setPosition(16.f, 70.f);
+
+    // ===== CHANGED: dong ho dem nguoc chuyen ra GIUA TREN man hinh - dung
+    // HUD_TIME_FONT_SIZE (co the chinh o dau file) thay vi 22 co dinh.
+    // Khong setPosition() o day nua vi Draw() se tu tinh lai origin/vi tri
+    // moi frame de LUON can giua theo be rong that cua chuoi "Time: mm:ss" =====
+    hudTimeText.setFont(font);
+    hudTimeText.setCharacterSize(HUD_TIME_FONT_SIZE);
+    hudTimeText.setFillColor(sf::Color(255, 220, 80));
+    hudTimeText.setOutlineColor(sf::Color::Black);
+    hudTimeText.setOutlineThickness(2.f);
 }
 
 void CGAME::Draw()
@@ -967,6 +1008,29 @@ void CGAME::Draw()
     mWindow.draw(hudScoreText);
     mWindow.draw(hudLevelText);
     mWindow.draw(hudHPText);
+
+    // ===== ADDED: chi ve dong ho neu do kho hien tai co gioi han thoi
+    // gian (Easy thi timeRemaining = -1, HasTimeLimit() tra ve false) =====
+    if (HasTimeLimit())
+    {
+        int totalSec = (int)std::ceil(timeRemaining);
+        int mm = totalSec / 60;
+        int ss = totalSec % 60;
+
+        std::ostringstream ossTime;
+        ossTime << mm << ":" << (ss < 10 ? "0" : "") << ss;
+        hudTimeText.setString(ossTime.str());
+
+        // ===== CHANGED: can giua ngang theo dung be rong that cua chuoi
+        // (vi "Time: 1:29" va "Time: 10:05" khong dai bang nhau) - set lai
+        // origin theo local bounds roi dat X = giua canvas, Y = margin tren.
+        // Lam moi frame de van dung ngay ca khi so giay/phut doi so chu so =====
+        sf::FloatRect tBounds = hudTimeText.getLocalBounds();
+        hudTimeText.setOrigin(tBounds.left + tBounds.width / 2.f, tBounds.top);
+        hudTimeText.setPosition(CANVAS_W / 2.f, HUD_TIME_MARGIN_TOP);
+
+        mWindow.draw(hudTimeText);
+    }
 }
 
 //==================================================
@@ -1037,13 +1101,13 @@ void CGAME::OnHit()
 
 void CGAME::OnLevelComplete()
 {
-    // ===== ADDED: qua du 3 man (level hien tai la man thu may nguoi choi
-    // vua hoan thanh) -> thang, dung lai khong tang level/reset player nua =====
-    const int WIN_AFTER_LEVEL = 3;
+    // ===== CHANGED: so level can hoan thanh gio khac nhau theo do kho
+    // (Easy 3, Hard 5, Nightmare 6) - xem WIN_LEVEL_BY_MODE =====
+    int winAfterLevel = WIN_LEVEL_BY_MODE[difficultyMode];
 
     score += 100;
 
-    if (level >= WIN_AFTER_LEVEL)
+    if (level >= winAfterLevel)
     {
         isWin = true;
         return;
