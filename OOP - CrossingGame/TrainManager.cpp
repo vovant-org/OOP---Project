@@ -1,6 +1,7 @@
 // TrainManager.cpp
 #include "TrainManager.h"
 #include "CPEOPLE.h"
+#include "AudioManager.h"
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
@@ -8,6 +9,10 @@
 
 namespace
 {
+    // ===== ADDED: ten dinh danh am thanh trong AudioManager =====
+    const std::string TRAIN_SIGN_SOUND_NAME = "train_sign";
+    const std::string TRAIN_RUN_SOUND_NAME = "train_run";
+
     constexpr float WARNING_DURATION = 2.f;
     constexpr float RUNNING_DURATION = 8.f;
     constexpr float COOLDOWN_DURATION = 8.f;
@@ -146,6 +151,33 @@ bool TrainManager::LoadTextures(const std::string& headPath, const std::string& 
     return ok;
 }
 
+// ===== ADDED: gan AudioManager dung chung =====
+void TrainManager::SetAudioManager(AudioManager* manager)
+{
+    audio = manager;
+}
+
+// ===== CHANGED: nap 2 am thanh vao AudioManager (yeu cau SetAudioManager()
+// da duoc goi truoc) thay vi tu giu buffer rieng =====
+bool TrainManager::LoadSounds(const std::string& signSoundPath, const std::string& trainSoundPath)
+{
+    if (!audio)
+    {
+        std::cout << "[TrainManager] Chua gan AudioManager, khong the nap am thanh\n";
+        return false;
+    }
+
+    bool ok = true;
+
+    if (!audio->loadSound(TRAIN_SIGN_SOUND_NAME, signSoundPath))
+        ok = false;
+
+    if (!audio->loadSound(TRAIN_RUN_SOUND_NAME, trainSoundPath))
+        ok = false;
+
+    return ok;
+}
+
 void TrainManager::SetActive(bool isActive)
 {
     active = isActive;
@@ -174,6 +206,13 @@ void TrainManager::Reset()
     trainHasHitPlayer = false;
     pendingPlayerHit = false;
 
+    // ===== CHANGED: cat ca 2 am tau qua AudioManager luc Reset() - truoc
+    // day chi stop TRAIN_RUN_SOUND_NAME, con TRAIN_SIGN_SOUND_NAME (coi
+    // bao) van la fire-and-forget nen doi map/choi lai giua chung Warning
+    // co the con nghe sot lai tieng coi cu =====
+    if (audio) audio->stopControlledSound(TRAIN_RUN_SOUND_NAME);
+    if (audio) audio->stopControlledSound(TRAIN_SIGN_SOUND_NAME);
+
     // Luu y: railHeight, railYOffset va trainSpeedMultiplier KHONG bi
     // reset o day, vi day la tuy chinh cua nguoi choi/nguoi lap trinh
     // (persist qua cac lan Init() lai map), khong phai trang thai luot
@@ -196,12 +235,23 @@ void TrainManager::StartWarning()
     phase = Phase::Warning;
     phaseTimer = 0.f;
     trainHasHitPlayer = false;
+
+    // ===== CHANGED: doi tu playSound() (fire-and-forget, phat het do dai
+    // file bat ke WARNING_DURATION la bao nhieu) sang playControlledSound()
+    // de co the chu dong stopControlledSound() dung luc TrainSign bien mat
+    // (StartRunning()) - truoc day file dai hon WARNING_DURATION se bi
+    // "keo dai them" sang ca luc tau da chay =====
+    if (audio) audio->playControlledSound(TRAIN_SIGN_SOUND_NAME, false);
 }
 
 void TrainManager::StartRunning()
 {
     phase = Phase::Running;
     phaseTimer = 0.f;
+
+    // ===== ADDED: TrainSign (va tieng coi cua no) bien mat dung luc nay -
+    // cat tieng coi truoc khi phat tieng tau chay, tranh ca 2 chong len nhau
+    if (audio) audio->stopControlledSound(TRAIN_SIGN_SOUND_NAME);
 
     // ===== CHANGED: dung chieu cao/rong cua CONTENT (da cat bo trong
     // suot thua) thay vi ca texture, de headW/bodyW phan anh dung kich
@@ -239,6 +289,11 @@ void TrainManager::StartRunning()
     runningDuration = (canvasW + trainLength) / std::fabs(trainSpeed);
 
     trainHasHitPlayer = false;
+
+    // ===== CHANGED: qua AudioManager (playControlledSound, loop=true) -
+    // dung 1 instance duy nhat cho "train_run", stopControlledSound() se
+    // cat dung instance nay khi Running ket thuc =====
+    if (audio) audio->playControlledSound(TRAIN_RUN_SOUND_NAME, true);
 }
 
 //==================================================
@@ -302,6 +357,9 @@ void TrainManager::Update(float dt, CPEOPLE* player)
             phase = Phase::Idle;
             cooldownTimer = COOLDOWN_DURATION;
             activeRoad = -1;
+
+            // ===== CHANGED: cat am tau qua AudioManager
+            if (audio) audio->stopControlledSound(TRAIN_RUN_SOUND_NAME);
         }
         break;
     }

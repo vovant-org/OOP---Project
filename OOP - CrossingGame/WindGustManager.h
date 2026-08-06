@@ -16,6 +16,7 @@
 #include <string>
 
 class CPEOPLE;
+class AudioManager;   // ===== ADDED: forward-declare, khong include AudioManager.h o day
 
 class WindGustManager
 {
@@ -34,6 +35,11 @@ private:
     sf::Texture windTexture1;
     sf::Texture windTexture2;
     sf::Texture signTexture;
+
+    // ===== CHANGED: khong tu giu sf::SoundBuffer/sf::Sound rieng nua -
+    // phat qua AudioManager (playControlledSound/stopControlledSound, vi
+    // can cat am dung luc ACTIVE_DURATION ket thuc) =====
+    AudioManager* audio = nullptr;
 
     int windWidth = 0, windHeight = 0;
     int signFrameWidth = 0, signFrameHeight = 0;
@@ -64,6 +70,14 @@ public:
 
     bool LoadTextures(const std::string& windPath1, const std::string& windPath2,
         const std::string& signPath);
+
+    // ===== ADDED: gan AudioManager dung chung cua game - PHAI goi TRUOC
+    // LoadSound() =====
+    void SetAudioManager(AudioManager* manager);
+
+    // ===== CHANGED: gio nap am thanh vao AudioManager thay vi tu giu
+    // buffer rieng - can goi SetAudioManager() truoc =====
+    bool LoadSound(const std::string& gustSoundPath);
 
     void SetActive(bool isActive);
     void Reset();   // goi khi CGAME::Init() mot map moi

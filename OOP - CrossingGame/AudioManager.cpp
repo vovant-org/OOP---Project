@@ -104,6 +104,37 @@ void AudioManager::playSound(const std::string& name)
     s.play();
 }
 
+// ===== ADDED: SFX "co dieu khien" - dung 1 instance sf::Sound duy nhat
+// cho moi `name` (tao luc goi lan dau, tai su dung cac lan sau), cho phep
+// loop va stop rieng - hop voi tieng gio/tieng tau chay dai/lien tuc =====
+void AudioManager::playControlledSound(const std::string& name, bool loop)
+{
+    auto it = soundBuffers.find(name);
+
+    if (it == soundBuffers.end())
+    {
+        std::cout << "[ERROR] AudioManager: sound not loaded: "
+            << name << "\n";
+        return;
+    }
+
+    // map::operator[] tao entry moi (mac dinh) neu chua co, hoac tra ve
+    // entry cu de restart dung instance do
+    sf::Sound& s = controlledSounds[name];
+    s.setBuffer(it->second);
+    s.setLoop(loop);
+    s.setVolume(static_cast<float>(soundVolume));
+    s.play();
+}
+
+void AudioManager::stopControlledSound(const std::string& name)
+{
+    auto it = controlledSounds.find(name);
+
+    if (it != controlledSounds.end())
+        it->second.stop();
+}
+
 void AudioManager::setSoundVolume(int volume)
 {
     if (volume < 0)
@@ -117,6 +148,13 @@ void AudioManager::setSoundVolume(int volume)
     // Cap nhat tuc thi cho ca cac sound dang phat (neu co)
     for (auto& s : activeSounds)
         s.setVolume(static_cast<float>(soundVolume));
+
+    // ===== ADDED: ap dung ca cho cac SFX "co dieu khien" (vd tieng gio/
+    // tau dang loop) - de keo thanh truot Sound trong SettingMenu tang/
+    // giam duoc NGAY LAP TUC ca voi am thanh dang phat, khong can doi den
+    // lan play() ke tiep =====
+    for (auto& kv : controlledSounds)
+        kv.second.setVolume(static_cast<float>(soundVolume));
 }
 
 int AudioManager::getSoundVolume() const

@@ -1,6 +1,7 @@
 // RollingRockManager.cpp
 #include "RollingRockManager.h"
 #include "CPEOPLE.h"
+#include "AudioManager.h"
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
@@ -8,6 +9,9 @@
 
 namespace
 {
+    // ===== ADDED: ten dinh danh am thanh trong AudioManager =====
+    const std::string ROLLING_ROCK_SOUND_NAME = "rolling_rock";
+
     constexpr float WARNING_DURATION = 2.f;
     constexpr float COOLDOWN_DURATION = 4.f;
 
@@ -73,6 +77,25 @@ bool RollingRockManager::LoadTextures(const std::string& rockPath,
     return ok;
 }
 
+// ===== ADDED: gan AudioManager dung chung =====
+void RollingRockManager::SetAudioManager(AudioManager* manager)
+{
+    audio = manager;
+}
+
+// ===== CHANGED: nap am thanh vao AudioManager (yeu cau SetAudioManager()
+// da duoc goi truoc) thay vi tu giu buffer rieng =====
+bool RollingRockManager::LoadSound(const std::string& rollSoundPath)
+{
+    if (!audio)
+    {
+        std::cout << "[RollingRockManager] Chua gan AudioManager, khong the nap am thanh\n";
+        return false;
+    }
+
+    return audio->loadSound(ROLLING_ROCK_SOUND_NAME, rollSoundPath);
+}
+
 void RollingRockManager::SetActive(bool isActive)
 {
     active = isActive;
@@ -85,6 +108,9 @@ void RollingRockManager::Reset()
     cooldownTimer = COOLDOWN_DURATION;
     warningColumns.clear();
     rocks.clear();
+
+    // Am thanh da lan la fire-and-forget (qua AudioManager::playSound),
+    // khong can/khong the stop rieng o day - se tu ket thuc binh thuong.
 }
 
 //==================================================
@@ -144,6 +170,8 @@ void RollingRockManager::StartRolling()
 
     phase = Phase::Rolling;
     phaseTimer = 0.f;
+
+    if (audio) audio->playSound(ROLLING_ROCK_SOUND_NAME);   // ===== CHANGED: qua AudioManager
 }
 
 //==================================================

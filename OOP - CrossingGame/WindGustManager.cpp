@@ -1,6 +1,7 @@
 // WindGustManager.cpp
 #include "WindGustManager.h"
 #include "CPEOPLE.h"
+#include "AudioManager.h"
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
@@ -8,6 +9,11 @@
 
 namespace
 {
+    // ===== ADDED: ten dinh danh am thanh trong AudioManager - dung
+    // playControlledSound/stopControlledSound (khong loop, nhung can stop
+    // duoc dung luc de khop voi ACTIVE_DURATION) =====
+    const std::string WIND_GUST_SOUND_NAME = "wind_gust";
+
     constexpr float WARNING_DURATION = 1.5f;
     constexpr float ACTIVE_DURATION = 1.8f;
     constexpr float IDLE_COOLDOWN = 6.f;
@@ -83,6 +89,25 @@ bool WindGustManager::LoadTextures(const std::string& windPath1,
     return ok;
 }
 
+// ===== ADDED: gan AudioManager dung chung =====
+void WindGustManager::SetAudioManager(AudioManager* manager)
+{
+    audio = manager;
+}
+
+// ===== CHANGED: nap am thanh vao AudioManager (yeu cau SetAudioManager()
+// da duoc goi truoc) thay vi tu giu buffer rieng =====
+bool WindGustManager::LoadSound(const std::string& gustSoundPath)
+{
+    if (!audio)
+    {
+        std::cout << "[WindGustManager] Chua gan AudioManager, khong the nap am thanh\n";
+        return false;
+    }
+
+    return audio->loadSound(WIND_GUST_SOUND_NAME, gustSoundPath);
+}
+
 void WindGustManager::SetActive(bool isActive)
 {
     active = isActive;
@@ -96,6 +121,8 @@ void WindGustManager::Reset()
     windFrame = 0;
     windFrameTimer = 0.f;
     gusts.clear();
+
+    if (audio) audio->stopControlledSound(WIND_GUST_SOUND_NAME);   // ===== CHANGED
 }
 
 //==================================================
@@ -153,6 +180,11 @@ void WindGustManager::StartActive()
     phaseTimer = 0.f;
     windFrame = 0;
     windFrameTimer = 0.f;
+
+    // ===== CHANGED: qua AudioManager (playControlledSound, khong loop -
+    // chi de co the stopControlledSound() cat dung luc neu file dai hon
+    // ACTIVE_DURATION) =====
+    if (audio) audio->playControlledSound(WIND_GUST_SOUND_NAME, false);
 }
 
 //==================================================
@@ -218,6 +250,9 @@ void WindGustManager::Update(float dt, CPEOPLE* player)
             phase = Phase::Idle;
             cooldownTimer = IDLE_COOLDOWN;
             gusts.clear();
+
+            // ===== CHANGED: cat am qua AudioManager neu file dai hon ACTIVE_DURATION
+            if (audio) audio->stopControlledSound(WIND_GUST_SOUND_NAME);
         }
         break;
     }

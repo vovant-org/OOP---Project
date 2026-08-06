@@ -977,6 +977,14 @@ void SettingMenu::setSoundVolume(int volume)
     soundVolume = volume;
 
     updateTexts();
+
+    // ===== ADDED: day gia tri xuong AudioManager dung chung - day la
+    // buoc con thieu truoc day khien keo Sound tren UI doi so nhung
+    // khong anh huong gi den SFX thuc te (kho hazard Nightmare, am bam
+    // nut "select",...) vi tat ca deu lay volume tu AudioManager::soundVolume,
+    // khong phai tu bien soundVolume rieng cua SettingMenu =====
+    if (audio)
+        audio->setSoundVolume(soundVolume);
 }
 
 void SettingMenu::setFullscreen(bool enable)

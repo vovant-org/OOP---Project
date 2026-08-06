@@ -11,6 +11,7 @@
 #include <string>
 
 class CPEOPLE;
+class AudioManager;   // ===== ADDED: chi can forward-declare, khong include AudioManager.h o day
 
 class MeteoriteManager
 {
@@ -35,6 +36,11 @@ private:
 
     sf::Texture meteoriteTexture;   // spritesheet doc, 5 frame
     sf::Texture signTexture;        // 1 anh tinh (mui ten canh bao)
+
+    // ===== CHANGED: khong tu giu sf::SoundBuffer/sf::Sound rieng nua -
+    // phat qua AudioManager (chung 1 keo Sound volume trong SettingMenu)
+    // de am luong SFX tang/giam theo dung slider "Sound" =====
+    AudioManager* audio = nullptr;
 
     int meteoriteFrameWidth = 0, meteoriteFrameHeight = 0;
     static constexpr int METEORITE_FRAME_COUNT = 5;
@@ -66,6 +72,16 @@ public:
     MeteoriteManager();
 
     bool LoadTextures(const std::string& meteoritePath, const std::string& signPath);
+
+    // ===== ADDED: gan AudioManager dung chung cua game - PHAI goi TRUOC
+    // LoadSound() (LoadSound se nap am thanh vao chinh AudioManager nay) =====
+    void SetAudioManager(AudioManager* manager);
+
+    // ===== CHANGED: gio nap am thanh vao AudioManager (qua SetAudioManager)
+    // thay vi tu giu buffer rieng - can goi SetAudioManager() truoc. Neu
+    // chua co AudioManager thi bao loi va tra ve false, Update() van chay
+    // binh thuong (chi la im lang luc cham dat) =====
+    bool LoadSound(const std::string& impactSoundPath);
 
     void SetActive(bool isActive);
     void Reset();   // goi khi CGAME::Init() mot map moi

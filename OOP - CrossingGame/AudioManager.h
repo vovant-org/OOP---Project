@@ -42,6 +42,15 @@ public:
 
     void playSound(const std::string& name);
 
+    // ===== ADDED: ban "co dieu khien" cua SFX - dung khi can LOOP va/hoac
+    // can STOP dung 1 instance cu the theo ten (vd tieng tau chay, tieng
+    // gio thoi keo dai) - khac voi playSound() (ban fire-and-forget, moi
+    // lan goi tao 1 instance moi trong activeSounds, khong loop duoc va
+    // khong the stop rieng tung cai). Goi lai playControlledSound() voi
+    // cung 1 name se restart dung instance do (khong tao them ban moi).
+    void playControlledSound(const std::string& name, bool loop = false);
+    void stopControlledSound(const std::string& name);
+
     void setSoundVolume(int volume); // 0-100
     int  getSoundVolume() const;
 
@@ -69,5 +78,13 @@ private:
 
     std::map<std::string, sf::SoundBuffer> soundBuffers;
     std::deque<sf::Sound> activeSounds;
+
+    // ===== ADDED: cac SFX "co dieu khien" (loop duoc/stop duoc rieng tung
+    // cai), khoa theo ten - khac activeSounds (vo danh, fire-and-forget).
+    // sf::Sound trong map khong bi "di doi" khi them entry moi (map giu
+    // reference/iterator on hop le tru khi entry do bi erase), nen an toan
+    // de AudioManager tu quan ly rieng.
+    std::map<std::string, sf::Sound> controlledSounds;
+
     int soundVolume = 100;
 };

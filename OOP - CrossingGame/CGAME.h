@@ -104,8 +104,10 @@ public:
     bool LoadGame(const std::string& path);
 
     // Static vi khong can 1 instance CGAME song - dung de ContinueMenu
-    // liet ke cac save co san ma khong phai load han
-    static const std::string& GetSavePathForMap(int mapIndex);
+    // liet ke cac save co san ma khong phai load han.
+    // ===== CHANGED: moi map GIO co 3 file save rieng theo difficultyMode
+    // (0=Easy 1=Hard 2=Nightmare), thay vi 1 file save chung cho ca map =====
+    static const std::string& GetSavePathForMap(int mapIndex, int mode);
     static bool PeekSaveInfo(const std::string& path,
         int& outMap, int& outCharacter, int& outLevel, int& outScore,
         int& outMode);
@@ -131,4 +133,4 @@ public:
     int GetCurrentMap() const { return currentMap; }
     int GetCharacterIndex() const { return characterIndex; }
     const std::string& GetSavePath() const { return savePath; }
-};
+};

@@ -6,8 +6,10 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <string>
 
 class CPEOPLE;
+class AudioManager;   // ===== ADDED: forward-declare, khong include AudioManager.h o day
 
 class RollingRockManager
 {
@@ -26,6 +28,10 @@ private:
 
     sf::Texture rockTexture;
     sf::Texture signTexture;
+
+    // ===== CHANGED: khong tu giu sf::SoundBuffer/sf::Sound rieng nua -
+    // phat qua AudioManager (chung 1 keo Sound volume trong SettingMenu) =====
+    AudioManager* audio = nullptr;
 
     int rockFrameWidth = 0, rockFrameHeight = 0;
     static constexpr int ROCK_FRAME_COUNT = 5;
@@ -53,6 +59,14 @@ public:
     RollingRockManager();
 
     bool LoadTextures(const std::string& rockPath, const std::string& signPath);
+
+    // ===== ADDED: gan AudioManager dung chung cua game - PHAI goi TRUOC
+    // LoadSound() =====
+    void SetAudioManager(AudioManager* manager);
+
+    // ===== CHANGED: gio nap am thanh vao AudioManager thay vi tu giu
+    // buffer rieng - can goi SetAudioManager() truoc =====
+    bool LoadSound(const std::string& rollSoundPath);
 
     void SetActive(bool isActive);
     void Reset();   // goi khi CGAME::Init() mot map moi

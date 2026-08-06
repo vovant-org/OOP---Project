@@ -361,6 +361,7 @@ int main()
     continueMenu.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
     continueMenu.setFont(font);
     continueMenu.setButtonTexture(buttonTexture, btnScaleX, btnScaleY);
+    continueMenu.setModeBoxTexture(settingBoxTexture);   // ===== ADDED: SilverBox cho header 3 mode =====
 
     //--------------------------------------------------
     // ===== ADDED: nut icon Pause, goc tren-phai man hinh, chi hien
@@ -400,7 +401,15 @@ int main()
     mainMenu.setAudioManager(&audio);
     charSelect.setAudioManager(&audio);
     mapSelect.setAudioManager(&audio);
-    modeSelect.setAudioManager(&audio);   // ===== ADDED =====    settingMenu.setAudioManager(&audio);
+    modeSelect.setAudioManager(&audio);     // ===== ADDED =====
+    settingMenu.setAudioManager(&audio);    // ===== FIXED: truoc day dong nay bi
+    // "lot" vao trong comment cua dong tren
+    // (// ===== ADDED ===== settingMenu...),
+    // nen KHONG BAO GIO duoc goi - SettingMenu::audio
+    // luon la nullptr, khien slider "Sound" chi
+    // doi so hien thi ma khong dieu khien duoc
+    // AudioManager thuc su (SFX hazard, nut
+    // "select",... deu khong nghe theo) =====
     pauseMenu.setAudioManager(&audio);      // ===== ADDED =====
     gameOverMenu.setAudioManager(&audio);   // ===== ADDED =====
     winMenu.setAudioManager(&audio);        // ===== ADDED =====
@@ -463,8 +472,21 @@ int main()
 
                 if (isFullscreen)
                 {
-                    window.create(sf::VideoMode::getDesktopMode(),
-                        "Crossing Game", sf::Style::Fullscreen);
+                    // ===== CHANGED: dung "windowed fullscreen" (cua so
+                    // khong vien, full kich thuoc desktop) thay vi
+                    // sf::Style::Fullscreen (exclusive). Ly do: exclusive
+                    // fullscreen CHI vao duoc neu VideoMode nam trong
+                    // sf::VideoMode::getFullscreenModes() - tren nhieu may
+                    // Windows co scaling man hinh khac 100% (thuong gap o
+                    // laptop/man hinh do phan giai cao), getDesktopMode()
+                    // KHONG nam trong danh sach do, nen SFML se AM THAM bo
+                    // qua yeu cau Fullscreen va tao lai cua so binh thuong
+                    // - day chinh la ly do F11 "khong co tac dung gi".
+                    // Windowed fullscreen khong phu thuoc danh sach video
+                    // mode nen luon hoat dong on dinh =====
+                    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+                    window.create(desktop, "Crossing Game", sf::Style::None);
+                    window.setPosition(sf::Vector2i(0, 0));
                 }
                 else
                 {
@@ -804,8 +826,9 @@ int main()
                 continueMenu.clearResult();
 
                 int mapIdx = continueMenu.getSelectedMapIndex();
+                int modeIdx = continueMenu.getSelectedMode();   // ===== ADDED =====
 
-                if (game.LoadGame(CGAME::GetSavePathForMap(mapIdx)))
+                if (game.LoadGame(CGAME::GetSavePathForMap(mapIdx, modeIdx)))
                 {
                     selectedMapIndex = game.GetCurrentMap();
                     selectedCharIndex = game.GetCharacterIndex();

@@ -47,14 +47,15 @@ namespace
         "Map/Sky_map.png"
     };
 
-    // ===== ADDED (Bước 6, sửa lại): moi map co file save rieng, khong
-    // con dung chung "save.dat" nua =====
-    const std::string SAVE_PATHS[4] =
+    // ===== CHANGED: moi map GIO co 3 file save rieng theo difficultyMode
+    // (0=Easy 1=Hard 2=Nightmare), khong con ghi de len nhau giua cac
+    // mode nua. SAVE_PATHS[map][mode] =====
+    const std::string SAVE_PATHS[4][3] =
     {
-        "Save/city.sav",
-        "Save/ancient.sav",
-        "Save/hell.sav",
-        "Save/sky.sav"
+        { "Save/city_easy.sav",     "Save/city_hard.sav",     "Save/city_nightmare.sav" },
+        { "Save/ancient_easy.sav",  "Save/ancient_hard.sav",  "Save/ancient_nightmare.sav" },
+        { "Save/hell_easy.sav",     "Save/hell_hard.sav",     "Save/hell_nightmare.sav" },
+        { "Save/sky_easy.sav",      "Save/sky_hard.sav",      "Save/sky_nightmare.sav" }
     };
 
     // ===== ADDED: nhac nen rieng cho tung map, phat thay cho nhac nen
@@ -88,7 +89,7 @@ namespace
 
     // ===== ADDED: gioi han thoi gian (giay) theo difficultyMode
     // (0=Easy 1=Hard 2=Nightmare). -1 = khong gioi han =====
-    const float TIME_LIMIT_BY_MODE[3] = { -1.f, 90.f, 90.f };
+    const float TIME_LIMIT_BY_MODE[3] = { -1.f, 90.f, 120.f };
 
     // ===== ADDED: so level can hoan thanh de Win, theo difficultyMode =====
     const int WIN_LEVEL_BY_MODE[3] = { 3, 5, 6 };
@@ -130,6 +131,15 @@ namespace
     const std::string TRAIN_BODY_TEXTURE_PATH = "Obstacles/ModernTrain_frame2.png";
     const std::string TRAIN_RAIL_TEXTURE_PATH = "Obstacles/Rail.png";
     const std::string TRAIN_SIGN_TEXTURE_PATH = "ui/Icon/TrainSign.png";
+
+    // ===== ADDED: am thanh rieng cho tung hazard Nightmare, 1 file/map
+    // (RollingRock=Ancient, Meteorite=Hell, Wind=Sky, Train=City - 2 file
+    // vi tau co coi bao rieng + tieng chay rieng) =====
+    const std::string ROCK_SOUND_PATH = "Sound/RollingRockSound.mp3";
+    const std::string METEORITE_SOUND_PATH = "Sound/MeteoriteSound.mp3";
+    const std::string WIND_SOUND_PATH = "Sound/WindGustSound.mp3";
+    const std::string TRAIN_SIGN_SOUND_PATH = "Sound/TrainSignSound.mp3";
+    const std::string TRAIN_SOUND_PATH = "Sound/TrainSound.mp3";
 }
 
 //==================================================
@@ -188,8 +198,14 @@ void CGAME::Init(int mapIndex, int characterIndex)
 
     currentMap = mapIndex;
 
-    // ===== ADDED (Bước 6, sửa lại): moi map luu vao file rieng =====
-    savePath = SAVE_PATHS[currentMap];
+    // ===== CHANGED: luu vao file rieng theo CA map LAN difficultyMode
+    // (difficultyMode phai duoc SetDifficultyMode()/LoadGame() gan truoc
+    // khi goi Init(), xem main.cpp va LoadGame() ben duoi) =====
+    {
+        int m = difficultyMode;
+        if (m < 0 || m > 2) m = 1;
+        savePath = SAVE_PATHS[currentMap][m];
+    }
 
     // ===== ADDED: doi nhac nen sang bai rieng cua map nay, thay cho
     // nhac nen MainMenu =====
@@ -626,6 +642,13 @@ void CGAME::Init(int mapIndex, int characterIndex)
             std::cout << "[CGAME] Cannot load rolling-rock textures\n";
         }
 
+        // ===== ADDED: am thanh da lan - khong lam gian doan gameplay neu
+        // load that bai, chi la im lang luc da lan =====
+        if (!rockManager.LoadSound(ROCK_SOUND_PATH))
+        {
+            std::cout << "[CGAME] Cannot load rolling-rock sound\n";
+        }
+
         rockManager.SetActive(true);
     }
 
@@ -645,6 +668,12 @@ void CGAME::Init(int mapIndex, int characterIndex)
         if (!meteoriteManager.LoadTextures(METEORITE_TEXTURE_PATH, METEORITE_SIGN_TEXTURE_PATH))
         {
             std::cout << "[CGAME] Cannot load meteorite textures\n";
+        }
+
+        // ===== ADDED: am thanh cham dat/no cua Meteorite =====
+        if (!meteoriteManager.LoadSound(METEORITE_SOUND_PATH))
+        {
+            std::cout << "[CGAME] Cannot load meteorite sound\n";
         }
 
         meteoriteManager.SetActive(true);
@@ -667,6 +696,12 @@ void CGAME::Init(int mapIndex, int characterIndex)
             std::cout << "[CGAME] Cannot load wind-gust textures\n";
         }
 
+        // ===== ADDED: am thanh gio thoi =====
+        if (!windGustManager.LoadSound(WIND_SOUND_PATH))
+        {
+            std::cout << "[CGAME] Cannot load wind-gust sound\n";
+        }
+
         windGustManager.SetActive(true);
     }
 
@@ -683,6 +718,12 @@ void CGAME::Init(int mapIndex, int characterIndex)
             TRAIN_RAIL_TEXTURE_PATH, TRAIN_SIGN_TEXTURE_PATH))
         {
             std::cout << "[CGAME] Cannot load train textures\n";
+        }
+
+        // ===== ADDED: am coi bao (Warning) + am tau chay lap (Running) =====
+        if (!trainManager.LoadSounds(TRAIN_SIGN_SOUND_PATH, TRAIN_SOUND_PATH))
+        {
+            std::cout << "[CGAME] Cannot load train sounds\n";
         }
 
         // City co 4 road (moi road = 2 lane trong CITY_LANE_Y) - tau hoa
@@ -909,6 +950,14 @@ void CGAME::Update(float dt)
 void CGAME::SetAudioManager(AudioManager* manager)
 {
     audio = manager;
+
+    // ===== ADDED: propagate cho 4 hazard manager de LoadSound()/LoadSounds()
+    // (goi trong Init()) co the nap am thanh vao dung AudioManager - can
+    // gan TRUOC khi Init() chay lan dau (main.cpp da lam dung thu tu nay) =====
+    rockManager.SetAudioManager(audio);
+    meteoriteManager.SetAudioManager(audio);
+    windGustManager.SetAudioManager(audio);
+    trainManager.SetAudioManager(audio);
 }
 
 // ===== ADDED: HUD font setup =====
@@ -1178,13 +1227,15 @@ bool CGAME::LoadGame(const std::string& path)
     return true;
 }
 
-// ===== ADDED (Bước 6, sửa lại) =====
-const std::string& CGAME::GetSavePathForMap(int mapIndex)
+// ===== CHANGED: them tham so mode - moi map/mode la 1 file save doc lap =====
+const std::string& CGAME::GetSavePathForMap(int mapIndex, int mode)
 {
     if (mapIndex < 0 || mapIndex > 3)
         mapIndex = 0;
+    if (mode < 0 || mode > 2)
+        mode = 1;
 
-    return SAVE_PATHS[mapIndex];
+    return SAVE_PATHS[mapIndex][mode];
 }
 
 bool CGAME::PeekSaveInfo(const std::string& path,
@@ -1200,4 +1251,4 @@ bool CGAME::PeekSaveInfo(const std::string& path,
         return false;
 
     return true;
-}
+}

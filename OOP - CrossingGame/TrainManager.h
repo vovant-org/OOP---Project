@@ -19,6 +19,7 @@
 #include <string>
 
 class CPEOPLE;
+class AudioManager;   // ===== ADDED: forward-declare, khong include AudioManager.h o day
 
 class TrainManager
 {
@@ -36,6 +37,18 @@ public:
     // signPath: bien bao TrainSign, nhap nhay trong luc canh bao.
     bool LoadTextures(const std::string& headPath, const std::string& bodyPath,
         const std::string& railPath, const std::string& signPath);
+
+    // ===== ADDED: gan AudioManager dung chung cua game - PHAI goi TRUOC
+    // LoadSounds() =====
+    void SetAudioManager(AudioManager* manager);
+
+    // ===== CHANGED: gio nap 2 am thanh vao AudioManager - ca signSoundPath
+    // (coi bao luc Warning) va trainSoundPath (tieng tau chay luc Running)
+    // deu phat qua playControlledSound() (co the stop rieng theo ten) -
+    // signSound dung stop dung luc StartRunning() (TrainSign bien mat),
+    // trainSound loop suot Running va stop khi tau chay xong/Reset(). Can
+    // goi SetAudioManager() truoc =====
+    bool LoadSounds(const std::string& signSoundPath, const std::string& trainSoundPath);
 
     void SetActive(bool isActive);
     bool IsActive() const { return active; }
@@ -163,6 +176,10 @@ private:
     sf::Texture bodyTexture;
     sf::Texture railTexture;
     sf::Texture signTexture;
+
+    // ===== CHANGED: khong tu giu sf::SoundBuffer/sf::Sound rieng nua -
+    // phat qua AudioManager (chung 1 keo Sound volume trong SettingMenu) =====
+    AudioManager* audio = nullptr;
 
     int headTexW = 0, headTexH = 0;
     int bodyTexW = 0, bodyTexH = 0;

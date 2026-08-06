@@ -1,6 +1,7 @@
 // MeteoriteManager.cpp
 #include "MeteoriteManager.h"
 #include "CPEOPLE.h"
+#include "AudioManager.h"
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
@@ -8,6 +9,10 @@
 
 namespace
 {
+    // ===== ADDED: ten dinh danh am thanh trong AudioManager (dung chung
+    // giua LoadSound() va Update()) =====
+    const std::string METEORITE_IMPACT_SOUND_NAME = "meteorite_impact";
+
     constexpr float WARNING_DURATION = 2.f;
     constexpr float IDLE_COOLDOWN = 5.f;    // cho 5s giua 2 lan spawn
 
@@ -87,6 +92,25 @@ bool MeteoriteManager::LoadTextures(const std::string& meteoritePath,
     return ok;
 }
 
+// ===== ADDED: gan AudioManager dung chung =====
+void MeteoriteManager::SetAudioManager(AudioManager* manager)
+{
+    audio = manager;
+}
+
+// ===== CHANGED: nap am thanh vao AudioManager (yeu cau SetAudioManager()
+// da duoc goi truoc) thay vi tu giu buffer rieng =====
+bool MeteoriteManager::LoadSound(const std::string& impactSoundPath)
+{
+    if (!audio)
+    {
+        std::cout << "[MeteoriteManager] Chua gan AudioManager, khong the nap am thanh\n";
+        return false;
+    }
+
+    return audio->loadSound(METEORITE_IMPACT_SOUND_NAME, impactSoundPath);
+}
+
 void MeteoriteManager::SetActive(bool isActive)
 {
     active = isActive;
@@ -100,6 +124,10 @@ void MeteoriteManager::Reset()
     warningSpots.clear();
     meteorites.clear();
     pendingHit = false;
+
+    // Am thanh cham dat la fire-and-forget (qua AudioManager::playSound),
+    // moi lan phat la 1 instance doc lap ngan nen khong can/khong the
+    // stop tung cai rieng o day - se tu ket thuc binh thuong.
 }
 
 //==================================================
@@ -241,6 +269,13 @@ void MeteoriteManager::Update(float dt, CPEOPLE* player)
                     m.state = MetState::Impact;
                     m.stateTimer = 0.f;
                     m.frame = 3;   // frame thu 4 (impact, hien thi ngan)
+
+                    // ===== CHANGED: phat qua AudioManager (fire-and-forget)
+                    // thay vi tu goi sf::Sound rieng - moi lan cham dat la
+                    // 1 instance doc lap nen nhieu Meteorite cham dat gan
+                    // nhau van nghe day du, khong bi cham am nhau nua, va
+                    // am luong tu dong theo dung slider Sound =====
+                    if (audio) audio->playSound(METEORITE_IMPACT_SOUND_NAME);
                 }
                 break;
             }
