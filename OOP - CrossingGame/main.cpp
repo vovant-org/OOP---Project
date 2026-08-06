@@ -42,6 +42,7 @@ const std::string PAUSE_ICON_PATH = "ui/Icon/Pause.png";   // ===== ADDED =====
 
 const std::string BGM_PATH = "Sound/MainMenu_backgroundmusic.mp3";
 const std::string SFX_SELECT_PATH = "Sound/SelectSound.mp3";
+const std::string SFX_COLLIDE_PATH = "Sound/CollideSound.mp3";   // ===== ADDED =====
 
 //==================================================
 // Helper: load chung tài nguyên
@@ -388,6 +389,10 @@ int main()
         return -1;
 
     if (!audio.loadSound("select", SFX_SELECT_PATH))
+        return -1;
+
+    // ===== ADDED: SFX phat khi player va cham (mat HP), xem CGAME::Update() =====
+    if (!audio.loadSound("collide", SFX_COLLIDE_PATH))
         return -1;
 
     audio.setMusicVolume(settingMenu.getMusicVolume());

@@ -877,6 +877,10 @@ void CGAME::Update(float dt)
     {
         playerHP--;
 
+        // ===== ADDED: SFX va cham =====
+        if (audio)
+            audio->playSound("collide");
+
         if (playerHP <= 0)
             OnDeath();
         else
@@ -900,6 +904,10 @@ void CGAME::Update(float dt)
     if (trainManager.ConsumePlayerHit())
     {
         playerHP -= 2;
+
+        // ===== ADDED: SFX va cham =====
+        if (audio)
+            audio->playSound("collide");
 
         if (playerHP <= 0)
             OnDeath();
@@ -934,6 +942,10 @@ void CGAME::Update(float dt)
     if (CheckCollision())
     {
         playerHP--;
+
+        // ===== ADDED: SFX va cham =====
+        if (audio)
+            audio->playSound("collide");
 
         if (playerHP <= 0)
             OnDeath();
@@ -1251,4 +1263,4 @@ bool CGAME::PeekSaveInfo(const std::string& path,
         return false;
 
     return true;
-}
+}
