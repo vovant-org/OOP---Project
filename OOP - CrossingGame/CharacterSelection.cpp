@@ -292,11 +292,11 @@ void CharacterSelection::updatePreview()
 
     // Sprite sheet: 4 cols x 5 rows
     // Row 0=down(front), 1=left, 2=right, 3=up(back), 4=die
-    // Dùng row 0 để preview (nhìn thẳng vào người chơi)
+    // ===== CHANGED: dung row 1 de preview (thay vi row 0) =====
     frameW = tex.getSize().x / 4;
     frameH = tex.getSize().y / 5;
 
-    sp.setTextureRect(sf::IntRect(0, 0, frameW, frameH));
+    sp.setTextureRect(sf::IntRect(0, frameH, frameW, frameH));
     sp.setOrigin((float)frameW / 2.f, (float)frameH / 2.f);
 
     // Scale vừa 60% preview box
@@ -368,7 +368,7 @@ void CharacterSelection::updateStatsText()
     statHPText.setFillColor(sf::Color(200, 220, 255));
     statHPText.setPosition(lx, ty + dy * 2.f);
 
-   
+
 }
 
 //==================================================
@@ -458,7 +458,7 @@ void CharacterSelection::update(float dt)
 
         auto& sp = charSprites[selectedIndex];
         sp.setTextureRect(sf::IntRect(
-            previewFrame * frameW, 0,   // row 0 = walk down/front
+            previewFrame * frameW, frameH,   // ===== CHANGED: row 1 =====
             frameW, frameH));
     }
 }
