@@ -37,7 +37,7 @@ enum class LeaderboardMenuResult
 // Khung ngoai dung GoldenBox (9-slice ca 4 canh), moi dong xep hang dung
 // SilverBox (3-slice ngang, giong ContinueMenu). Moi dong gom: avatar
 // (dau nhan vat, khung mau theo do kho) - ten nhan vat - diem - level -
-// mode. Danh sach cuon duoc (chuot lan/phim Up-Down) khi noi dung vuot
+// map - mode. Danh sach cuon duoc (chuot lan/phim Up-Down) khi noi dung vuot
 // qua chieu cao khung.
 //==================================================
 
@@ -91,6 +91,7 @@ private:
         sf::Text nameText;
         sf::Text scoreText;
         sf::Text levelText;
+        sf::Text mapText;
         sf::Text modeText;
         float y = 0.f;
     };

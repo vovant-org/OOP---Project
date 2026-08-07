@@ -159,6 +159,7 @@ CGAME::CGAME(sf::RenderWindow& window)
     isGameOver(false),
     isPaused(false),
     isWin(false),
+    winTargetLevel(0),   // se duoc Init() gan lai ngay khi vao game
     timeRemaining(-1.f),
     savePath("save.dat")
 {
@@ -263,6 +264,11 @@ void CGAME::Init(int mapIndex, int characterIndex)
     isGameOver = false;
     isPaused = false;
     isWin = false;   // ===== ADDED =====
+
+    // ===== CHANGED: gia tri mac dinh (Adventure - bat dau tu level 1).
+    // Nightmare - Custom se duoc SetStartingLevel()/ReapplyCustomNightmare()
+    // GHI DE lai gia tri nay SAU Init(), xem 2 ham do =====
+    winTargetLevel = WIN_LEVEL_BY_MODE[difficultyMode];
 
     // ===== ADDED: gioi han thoi gian theo do kho (Easy = khong gioi han) =====
     timeRemaining = TIME_LIMIT_BY_MODE[difficultyMode];
@@ -746,6 +752,45 @@ void CGAME::Init(int mapIndex, int characterIndex)
 }
 
 //==================================================
+// ===== CHANGED: KHONG con set level bat dau nua. So nguoi choi nhap o
+// Custom gio la "level muon vuot qua de Win" (winTargetLevel) - gameplay
+// van bat dau tu level 1 nhu Adventure, tang dan +1 tung level, va se
+// Win ngay khi vuot qua dung level da nhap (level >= winTargetLevel,
+// xem OnLevelComplete()). PHAI goi SAU Init() vi Init() da tinh san
+// winTargetLevel mac dinh theo WIN_LEVEL_BY_MODE, ham nay se GHI DE lai
+// bang gia tri nguoi choi tu nhap. Score khong doi (van bat dau 0), +100
+// moi qua level nhu binh thuong =====
+//==================================================
+
+void CGAME::SetStartingLevel(int targetLevel)
+{
+    if (targetLevel < 1) targetLevel = 1;
+    if (targetLevel > 999) targetLevel = 999;
+
+    // ===== CHANGED: day la MOC THANG, khong phai level bat dau - level
+    // van giu nguyen = 1 (da duoc Init() gan), chi ghi de winTargetLevel =====
+    winTargetLevel = targetLevel;
+
+    // ===== ADDED: Nightmare - Custom thi khong gioi han thoi gian nua
+    // (nguoi choi tu chon so level muon vuot qua nen bo qua dong ho dem
+    // nguoc). Ham nay chi duoc goi khi ModeSelection::isCustomNightmare()
+    // ==true (xem main.cpp), nen tat timeRemaining o day la du, khong
+    // anh huong Easy/Hard/Nightmare-Adventure =====
+    timeRemaining = -1.f;
+}
+
+// ===== ADDED: goi lai SAU MOI LAN Init() (Retry/Restart/PlayAgain) de
+// khoi phuc dung trang thai Nightmare-Custom da chon tu dau (level van
+// bat dau tu 1, chi khoi phuc lai moc thang), tranh bi Init() tra ve
+// moc thang mac dinh cua Adventure. Neu isCustom==false thi khong lam
+// gi them (Init() tu no da dung cho Easy/Hard/Nightmare-Adventure roi) =====
+void CGAME::ReapplyCustomNightmare(bool isCustom, int targetLevel)
+{
+    if (isCustom)
+        SetStartingLevel(targetLevel);
+}
+
+//==================================================
 // HandleInput — Bước 2
 //==================================================
 
@@ -1162,13 +1207,13 @@ void CGAME::OnHit()
 
 void CGAME::OnLevelComplete()
 {
-    // ===== CHANGED: so level can hoan thanh gio khac nhau theo do kho
-    // (Easy 3, Hard 5, Nightmare 6) - xem WIN_LEVEL_BY_MODE =====
-    int winAfterLevel = WIN_LEVEL_BY_MODE[difficultyMode];
-
+    // ===== CHANGED: dung winTargetLevel (da tinh san trong Init()/
+    // SetStartingLevel()) thay vi tinh lai nguong tuyet doi tu
+    // WIN_LEVEL_BY_MODE o day - dam bao Nightmare-Custom van phai vuot
+    // dung so luong level nhu Adventure, khong bi thang ngay lap tuc =====
     score += 100;
 
-    if (level >= winAfterLevel)
+    if (level >= winTargetLevel)
     {
         isWin = true;
         return;

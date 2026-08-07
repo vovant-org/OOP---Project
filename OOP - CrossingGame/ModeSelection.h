@@ -24,6 +24,20 @@ enum class ModeSelectionResult
 };
 
 //==================================================
+// Trang thai con CHI danh cho Nightmare - sau khi chon Nightmare o luoi
+// chinh, hien them buoc chon "Adventure" (choi du lieu co san) hoac
+// "Custom" (tu nhap Level muon vuot qua de THANG, 1..999, van bat dau
+// choi tu level 1 nhu Adventure, moi qua 1 level +100 diem)
+//==================================================
+
+enum class NightmareSubStep
+{
+    Grid = 0,     // dang o luoi chinh (Easy/Hard/Nightmare)
+    ChooseType,   // da chon Nightmare, dang chon Adventure/Custom
+    EnterLevel    // da chon Custom, dang nhap Level
+};
+
+//==================================================
 // Dữ liệu từng mode
 //==================================================
 
@@ -58,6 +72,37 @@ private:
     std::array<sf::RectangleShape, MODE_COUNT> highlightBorders;
 
     int selectedIndex = 0;
+
+    //--------------------------------------------------
+    // ===== ADDED: luong con rieng cho Nightmare (Adventure/Custom) =====
+    //--------------------------------------------------
+
+    NightmareSubStep nightmareStep = NightmareSubStep::Grid;
+
+    // 0 = Adventure, 1 = Custom - dang duoc highlight trong buoc ChooseType
+    int nightmareTypeIndex = 0;
+
+    bool customNightmare = false;    // true neu nguoi choi chon Custom
+    int  customStartLevel = 1;       // ===== CHANGED: gio la LEVEL MUON VUOT QUA DE WIN
+                                      // (da validate 1..999) - level choi van bat dau tu 1
+    std::string customLevelInput;    // buffer dang go, chi chua chu so, toi da 3 ky tu
+
+    Button adventureButton;
+    Button customButton;
+    Button confirmButton;    // dung o buoc EnterLevel, thay cho playButton
+
+    sf::Text nightmareChoiceTitle;   // tieu de buoc ChooseType
+    sf::Text customPromptText;       // "Nhap Level (1 - 999):"
+    sf::Text customInputText;        // hien so nguoi choi dang go (co con tro nhap)
+    sf::Text customErrorText;        // thong bao loi khi nhap sai, rong neu khong loi
+
+    void selectNightmareTypePrev();
+    void selectNightmareTypeNext();
+    void updateNightmareTypeHighlight();
+    void goBackStep();               // Escape/BACK: lui 1 buoc tuy nightmareStep
+    void tryConfirmCustomLevel();    // validate + xac nhan buoc EnterLevel
+    void applyStepLayout();          // dat lai vi tri nut/text theo nightmareStep hien tai
+    void updateCustomInputDisplay(); // ve lai customInputText tu customLevelInput
 
     //--------------------------------------------------
     // Buttons
@@ -118,6 +163,20 @@ public:
 
     // 0 = Easy, 1 = Hard, 2 = Nightmare
     int getSelectedMode() const;
+
+    // ===== ADDED: chi co y nghia khi getSelectedMode()==2 (Nightmare) =====
+    // true  -> nguoi choi chon "Custom": VAN bat dau choi tu level 1 nhu
+    //          Adventure, nhung se THANG ngay khi vuot qua getCustomStartLevel()
+    //          (CGAME::SetStartingLevel() dung gia tri nay lam moc thang)
+    // false -> nguoi choi chon "Adventure": choi du lieu co san nhu binh thuong
+    bool isCustomNightmare() const;
+    int  getCustomStartLevel() const;   // ten ham giu nguyen de tuong thich,
+                                         // nhung gia tri tra ve la MOC THANG
+
+    // Goi ham nay MOI LAN mo lai man ModeSelection (vd sau khi quay lai
+    // tu MapSelection) de dam bao luon bat dau lai tu luoi chinh, khong
+    // con giu trang thai ChooseType/EnterLevel cua lan truoc
+    void resetNightmareFlow();
 
     void processEvent(const sf::Event& event,
         const sf::RenderWindow& window) override;

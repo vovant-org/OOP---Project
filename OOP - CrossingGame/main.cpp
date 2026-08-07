@@ -186,6 +186,15 @@ int main()
     int selectedMapIndex = 0;
     int selectedMode = 0;   // ===== ADDED: 0=Easy 1=Hard 2=Nightmare (chua dung toi) =====
 
+    // ===== ADDED: "nho" lai nguoi choi co dang choi Nightmare-Custom hay
+    // khong + LEVEL MUON VUOT QUA DE THANG ho da nhap (level choi van luon
+    // bat dau tu 1), de Retry/Restart/PlayAgain (goi lai game.Init()) co
+    // the khoi phuc dung trang thai nay thay vi tuot ve Adventure. Duoc
+    // gan khi chon xong ModeSelect, va duoc reset (Continue) tu chinh
+    // CGAME sau khi LoadGame() =====
+    bool customNightmareActive = false;
+    int  customNightmareTargetLevel = 1;
+
     // ===== ADDED: SettingMenu co the duoc mo tu MainMenu HOAC tu
     // PauseMenu -> can biet quay ve dau khi bam Back =====
     AppState settingsReturnState = AppState::MainMenu;
@@ -716,6 +725,7 @@ int main()
 
                 // ===== CHANGED: qua ModeSelect truoc, chua vao Playing ngay =====
                 modeSelect.clearResult();
+                modeSelect.resetNightmareFlow();   // ===== ADDED: luon bat dau lai tu luoi chinh =====
                 menuManager.setState(AppState::ModeSelect);
                 break;
 
@@ -735,12 +745,33 @@ int main()
             case ModeSelectionResult::Selected:
                 selectedMode = modeSelect.getSelectedMode();   // 0=Easy,1=Hard,2=Nightmare
                 std::cout << "[INFO] Mode selected: " << selectedMode << "\n";
-                modeSelect.clearResult();
+
+                // ===== ADDED: luu lai type (Adventure/Custom) + level muon
+                // vuot qua de thang, de Retry/Restart/PlayAgain sau nay
+                // khoi phuc dung, xem cac case Restart/Retry/PlayAgain ben duoi =====
+                customNightmareActive = (selectedMode == 2 && modeSelect.isCustomNightmare());
+                customNightmareTargetLevel = modeSelect.getCustomStartLevel();
 
                 // ===== CHANGED: mode gio da anh huong toc do/so luong
                 // obstacle + so den giao thong, xem CGAME::Init() =====
                 game.SetDifficultyMode(selectedMode);
                 game.Init(selectedMapIndex, selectedCharIndex);
+
+                // ===== CHANGED: Nightmare - Custom, nguoi choi tu nhap
+                // Level MUON VUOT QUA DE THANG (1..999) - level choi VAN
+                // BAT DAU TU 1 nhu Adventure (Init() da lo), tang dan +1
+                // tung level, Win ngay khi vuot qua dung level da nhap.
+                // Phai goi SAU Init() vi Init() da tinh san moc thang mac
+                // dinh, ham nay se ghi de lai. Score van bat dau tu 0,
+                // +100 moi qua level nhu binh thuong (xem CGAME::OnLevelComplete()) =====
+                if (customNightmareActive)
+                {
+                    game.SetStartingLevel(customNightmareTargetLevel);
+                    std::cout << "[INFO] Nightmare Custom - win target level: "
+                        << customNightmareTargetLevel << "\n";
+                }
+
+                modeSelect.clearResult();
                 menuManager.setState(AppState::Playing);
                 break;
 
@@ -783,6 +814,9 @@ int main()
             case PauseMenuResult::Restart:
                 pauseMenu.clearResult();
                 game.Init(selectedMapIndex, selectedCharIndex);
+                // ===== ADDED: giu nguyen type Nightmare-Custom (neu co)
+                // thay vi tuot ve Adventure sau khi Init() reset level=1 =====
+                game.ReapplyCustomNightmare(customNightmareActive, customNightmareTargetLevel);
                 menuManager.setState(AppState::Playing);
                 break;
 
@@ -817,6 +851,9 @@ int main()
             case GameOverMenuResult::Retry:
                 gameOverMenu.clearResult();
                 game.Init(selectedMapIndex, selectedCharIndex);
+                // ===== ADDED: giu nguyen type Nightmare-Custom (neu co)
+                // thay vi tuot ve Adventure sau khi Init() reset level=1 =====
+                game.ReapplyCustomNightmare(customNightmareActive, customNightmareTargetLevel);
                 menuManager.setState(AppState::Playing);
                 break;
 
@@ -842,6 +879,9 @@ int main()
             case WinMenuResult::PlayAgain:
                 winMenu.clearResult();
                 game.Init(selectedMapIndex, selectedCharIndex);
+                // ===== ADDED: giu nguyen type Nightmare-Custom (neu co)
+                // thay vi tuot ve Adventure sau khi Init() reset level=1 =====
+                game.ReapplyCustomNightmare(customNightmareActive, customNightmareTargetLevel);
                 menuManager.setState(AppState::Playing);
                 break;
 
@@ -876,6 +916,16 @@ int main()
                     selectedMapIndex = game.GetCurrentMap();
                     selectedCharIndex = game.GetCharacterIndex();
                     selectedMode = game.GetDifficultyMode();   // ===== ADDED =====
+
+                    // ===== ADDED: file save hien khong luu lai thong tin
+                    // "Custom - level muon vuot qua de thang", nen sau
+                    // Continue coi nhu Adventure (winTargetLevel da duoc
+                    // LoadGame()/Init() tinh dung theo WIN_LEVEL_BY_MODE).
+                    // Neu ban muon Retry SAU KHI Continue van giu dung
+                    // Custom, can luu them gia tri nay vao file save
+                    // (ngoai pham vi sua loi lan nay) =====
+                    customNightmareActive = false;
+
                     menuManager.setState(AppState::Playing);
                 }
                 else

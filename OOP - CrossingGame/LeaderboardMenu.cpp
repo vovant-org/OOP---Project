@@ -15,6 +15,11 @@ namespace
     // thu tu main.cpp dang goi loadCharacterTexture()
     const char* CHAR_NAMES[4] = { "Chicken", "Knight", "Dog", "Luffy" };
 
+    // Thu tu PHAI khop voi currentMap trong CGAME.h (0=City 1=Ancient
+    // 2=Hell 3=Sky), cung la thu tu tham so "map" dang duyet trong
+    // LeaderboardMenu::refresh()
+    const char* MAP_NAMES[4] = { "City", "Ancient", "Hell", "Sky" };
+
     const char* MODE_NAMES[3] = { "EASY", "HARD", "NIGHTMARE" };
     const sf::Color MODE_COLORS[3] =
     {
@@ -46,9 +51,10 @@ namespace
     constexpr float AVATAR_CROP_RATIO = 0.68f; // % frameH lay lam vung vuong "phan tren" cua nhan vat
 
     constexpr float NAME_X = AVATAR_PAD + AVATAR_SIZE + 14.f;   // can trai
-    constexpr float SCORE_CX_RATIO = 0.54f;
-    constexpr float LEVEL_CX_RATIO = 0.72f;
-    constexpr float MODE_CX_RATIO = 0.89f;
+    constexpr float SCORE_CX_RATIO = 0.48f;
+    constexpr float LEVEL_CX_RATIO = 0.62f;
+    constexpr float MAP_CX_RATIO = 0.77f;
+    constexpr float MODE_CX_RATIO = 0.92f;
 
     constexpr float BACK_GAP = 20.f;
 
@@ -346,6 +352,7 @@ void LeaderboardMenu::rebuildRows()
     float rowW = listRect.width;
     float scoreCX = rowW * SCORE_CX_RATIO;
     float levelCX = rowW * LEVEL_CX_RATIO;
+    float mapCX = rowW * MAP_CX_RATIO;
     float modeCX = rowW * MODE_CX_RATIO;
 
     float y = 0.f;
@@ -418,7 +425,8 @@ void LeaderboardMenu::rebuildRows()
         //--- Diem ---
         rv.scoreText.setFont(*font);
         rv.scoreText.setCharacterSize(18);
-        rv.scoreText.setFillColor(sf::Color(220, 220, 220));
+        rv.scoreText.setStyle(sf::Text::Bold);
+        rv.scoreText.setFillColor(sf::Color(255, 220, 80));
         {
             std::ostringstream oss;
             oss << e.score << "pts";
@@ -429,13 +437,23 @@ void LeaderboardMenu::rebuildRows()
         //--- Level ---
         rv.levelText.setFont(*font);
         rv.levelText.setCharacterSize(18);
-        rv.levelText.setFillColor(sf::Color(220, 220, 220));
+        rv.levelText.setStyle(sf::Text::Bold);
+        rv.levelText.setFillColor(sf::Color(255, 220, 80));
         {
             std::ostringstream oss;
             oss << "Lv" << e.level;
             rv.levelText.setString(oss.str());
         }
         centerText(rv.levelText, levelCX, y + ROW_H / 2.f);
+
+        //--- Map ---
+        rv.mapText.setFont(*font);
+        rv.mapText.setCharacterSize(18);
+        rv.mapText.setStyle(sf::Text::Bold);
+        rv.mapText.setFillColor(sf::Color(255, 220, 80));
+        rv.mapText.setString(
+            (e.map >= 0 && e.map < MAP_COUNT) ? MAP_NAMES[e.map] : "?");
+        centerText(rv.mapText, mapCX, y + ROW_H / 2.f);
 
         //--- Mode ---
         rv.modeText.setFont(*font);
@@ -663,6 +681,7 @@ void LeaderboardMenu::draw(sf::RenderWindow& window) const
             window.draw(rv.nameText);
             window.draw(rv.scoreText);
             window.draw(rv.levelText);
+            window.draw(rv.mapText);
             window.draw(rv.modeText);
         }
 
