@@ -177,6 +177,7 @@
     <ClCompile Include="CTRUCK.cpp" />
     <ClCompile Include="CVEHICLE.cpp" />
     <ClCompile Include="GameOverMenu.cpp" />
+    <ClCompile Include="LeaderboardMenu.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MapSelection.cpp" />

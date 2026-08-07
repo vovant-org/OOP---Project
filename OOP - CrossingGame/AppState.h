@@ -18,6 +18,7 @@ enum class AppState
     Settings,
     Playing,
     ContinueSelect,   // ===== ADDED: chọn map nào để Continue =====
+    Leaderboard,      // ===== ADDED: bang diem cao 4 map x 3 do kho =====
     Pause,      // ===== ADDED: pause overlay khi dang Playing =====
     GameOver,   // ===== ADDED: overlay khi CGAME::IsGameOver() =====
     Win,        // ===== ADDED: overlay khi CGAME::IsWin() =====

@@ -17,6 +17,7 @@
 #include "WinMenu.h"        // ===== ADDED =====
 #include "ContinueMenu.h"   // ===== ADDED =====
 #include "ModeSelection.h"  // ===== ADDED =====
+#include "LeaderboardMenu.h"   // ===== ADDED =====
 
 //==================================================
 // Hằng số
@@ -39,6 +40,12 @@ const std::string SETTING_TIMES_PATH = "ui/Icon/Times.png";
 const std::string SETTING_BACK_PATH = "ui/Logo/BACK.png";
 const std::string SETTING_TITLE_PATH = "ui/Logo/SETTING.png";
 const std::string PAUSE_ICON_PATH = "ui/Icon/Pause.png";   // ===== ADDED =====
+
+// ===== ADDED: khung avatar mau theo do kho, dung cho LeaderboardMenu -
+// sua duong dan neu file thuc te nam o thu muc khac =====
+const std::string EASY_AVATAR_PATH = "ui/button/EasyAvatar.png";
+const std::string HARD_AVATAR_PATH = "ui/button/HardAvatar.png";
+const std::string NIGHTMARE_AVATAR_PATH = "ui/button/NightmareAvatar.png";
 
 const std::string BGM_PATH = "Sound/MainMenu_backgroundmusic.mp3";
 const std::string SFX_SELECT_PATH = "Sound/SelectSound.mp3";
@@ -364,6 +371,27 @@ int main()
     continueMenu.setButtonTexture(buttonTexture, btnScaleX, btnScaleY);
     continueMenu.setModeBoxTexture(settingBoxTexture);   // ===== ADDED: SilverBox cho header 3 mode =====
 
+    // ===== ADDED: LeaderboardMenu - bang diem 4 map x 3 do kho, doc lai
+    // chinh 12 file save (khong luu file rieng) =====
+    LeaderboardMenu leaderboardMenu;
+    leaderboardMenu.setWindowSize((float)WIN_W, (float)WIN_H);
+    leaderboardMenu.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
+    leaderboardMenu.setFont(font);
+    leaderboardMenu.setButtonTexture(buttonTexture, btnScaleX, btnScaleY);
+    leaderboardMenu.setPanelTexture(settingPanelTexture);   // GoldenBox - khung ngoai
+    leaderboardMenu.setRowBoxTexture(settingBoxTexture);    // SilverBox - nen tung dong xep hang
+
+    // Khung avatar mau theo do kho (Easy=xanh/Hard=do/Nightmare=tim)
+    leaderboardMenu.loadModeFrameTexture(0, EASY_AVATAR_PATH);
+    leaderboardMenu.loadModeFrameTexture(1, HARD_AVATAR_PATH);
+    leaderboardMenu.loadModeFrameTexture(2, NIGHTMARE_AVATAR_PATH);
+
+    // Sprite sheet nhan vat (dung chung file voi CharacterSelection ben tren)
+    leaderboardMenu.loadCharacterTexture(0, "Character/Chicken_character.png");
+    leaderboardMenu.loadCharacterTexture(1, "Character/Knight_character.png");
+    leaderboardMenu.loadCharacterTexture(2, "Character/Dog_character.png");
+    leaderboardMenu.loadCharacterTexture(3, "Character/Luffy_character.png");
+
     //--------------------------------------------------
     // ===== ADDED: nut icon Pause, goc tren-phai man hinh, chi hien
     // va bam duoc khi dang o state Playing =====
@@ -419,6 +447,7 @@ int main()
     gameOverMenu.setAudioManager(&audio);   // ===== ADDED =====
     winMenu.setAudioManager(&audio);        // ===== ADDED =====
     continueMenu.setAudioManager(&audio);   // ===== ADDED =====
+    leaderboardMenu.setAudioManager(&audio);   // ===== ADDED =====
     game.SetAudioManager(&audio);           // ===== ADDED: nhac nen theo map =====
 
     //--------------------------------------------------
@@ -445,6 +474,7 @@ int main()
     menuManager.registerMenu(AppState::GameOver, &gameOverMenu); // ===== ADDED =====
     menuManager.registerMenu(AppState::Win, &winMenu);           // ===== ADDED =====
     menuManager.registerMenu(AppState::ContinueSelect, &continueMenu); // ===== ADDED =====
+    menuManager.registerMenu(AppState::Leaderboard, &leaderboardMenu); // ===== ADDED =====
     // AppState::Playing / Exit: chưa có Menu tương ứng (CGAME chưa xong) -
     // cứ để trống, MenuManager tự bỏ qua processEvent/update/draw cho các
     // state này (xem getCurrentMenu() trả nullptr).
@@ -625,6 +655,14 @@ int main()
                 continueMenu.refresh();
                 continueMenu.clearResult();
                 menuManager.setState(AppState::ContinueSelect);
+                break;
+
+            case MainMenuResult::Leaderboard:   // ===== ADDED =====
+                mainMenu.clearResult();
+
+                leaderboardMenu.refresh();
+                leaderboardMenu.clearResult();
+                menuManager.setState(AppState::Leaderboard);
                 break;
 
             case MainMenuResult::Settings:
@@ -852,6 +890,20 @@ int main()
 
             case ContinueMenuResult::Back:
                 continueMenu.clearResult();
+                menuManager.setState(AppState::MainMenu);
+                break;
+
+            default: break;
+            }
+            break;
+
+            //========================
+        case AppState::Leaderboard:   // ===== ADDED =====
+            //========================
+            switch (leaderboardMenu.getResult())
+            {
+            case LeaderboardMenuResult::Back:
+                leaderboardMenu.clearResult();
                 menuManager.setState(AppState::MainMenu);
                 break;
 
