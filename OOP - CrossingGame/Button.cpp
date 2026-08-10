@@ -24,6 +24,14 @@ void Button::centerText()
     );
 }
 
+// ===== ADDED: chup lai bounds NGAY LUC NAY (dang o normalScale, chua bi
+// hover/press phong to) - dung rieng cho hit-test, khong lien quan gi
+// den animation ve sau =====
+void Button::updateBaseBounds()
+{
+    baseBounds = sprite.getGlobalBounds();
+}
+
 //==================================================
 // Texture
 //==================================================
@@ -32,6 +40,7 @@ void Button::setTexture(const sf::Texture& texture)
 {
     sprite.setTexture(texture);
     centerText();
+    updateBaseBounds();   // ===== ADDED =====
 }
 
 //==================================================
@@ -42,6 +51,7 @@ void Button::setPosition(float x, float y)
 {
     sprite.setPosition(x, y);
     centerText();
+    updateBaseBounds();   // ===== ADDED =====
 }
 
 void Button::setScale(float scaleX, float scaleY)
@@ -51,6 +61,7 @@ void Button::setScale(float scaleX, float scaleY)
     sprite.setScale(scaleX, scaleY);
 
     centerText();
+    updateBaseBounds();   // ===== ADDED =====
 }
 
 //==================================================
@@ -120,7 +131,11 @@ bool Button::isFocused() const
 
 bool Button::contains(sf::Vector2f mousePos) const
 {
-    return sprite.getGlobalBounds().contains(mousePos);
+    // ===== CHANGED: dung baseBounds (co dinh, khong bi hover/press phong
+    // to) thay vi sprite.getGlobalBounds() (thay doi lien tuc theo
+    // animation) - vung click/hover gio luon dung bang kich thuoc that
+    // cua button luc binh thuong, khong con lan sang nut ke ben khi hover =====
+    return baseBounds.contains(mousePos);
 }
 
 bool Button::isPressed() const

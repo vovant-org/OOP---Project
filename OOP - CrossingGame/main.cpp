@@ -117,6 +117,14 @@ int main()
     // theo view này, nên khi đổi kích thước cửa sổ / bật fullscreen,
     // ta chỉ cần letterbox view chứ không cần sửa toạ độ UI ở đâu khác.
     bool isFullscreen = false;
+
+    // ===== ADDED: kich thuoc cua so THUC TE khi dang windowed (khac voi
+    // WIN_W/WIN_H - do la canvas logic CO DINH 1280x720 dung de tinh toa
+    // do UI, khong doi). Cap nhat moi khi nguoi choi doi RES trong Setting
+    // (xem settingMenu.setOnResolutionChanged() ben duoi) va duoc dung lai
+    // luc thoat fullscreen (F11) de quay ve dung kich thuoc da chon =====
+    sf::Vector2u windowedResolution(WIN_W, WIN_H);
+
     sf::View gameView(sf::FloatRect(0.f, 0.f, (float)WIN_W, (float)WIN_H));
     applyLetterboxView(window, gameView);
 
@@ -440,6 +448,8 @@ int main()
             audio.setMusicVolume(volume);
         });
 
+
+
     mainMenu.setAudioManager(&audio);
     charSelect.setAudioManager(&audio);
     mapSelect.setAudioManager(&audio);
@@ -490,6 +500,72 @@ int main()
 
     menuManager.setState(AppState::MainMenu);
 
+    // ===== ADDED: logic bat/tat fullscreen dung CHUNG cho ca phim F11 lan
+    // cong tac F.S trong Setting - tranh lap lai 2 noi (truoc day F11 tu
+    // viet rieng, gio ca 2 cung goi ham nay). "windowed fullscreen" (Style::
+    // None, full kich thuoc desktop) thay vi Style::Fullscreen - xem giai
+    // thich chi tiet trong nhanh if() ben duoi =====
+    auto applyFullscreenState = [&](bool enable)
+        {
+            isFullscreen = enable;
+
+            if (isFullscreen)
+            {
+                // "windowed fullscreen" (cua so khong vien, full kich
+                // thuoc desktop) thay vi sf::Style::Fullscreen (exclusive).
+                // Ly do: exclusive fullscreen CHI vao duoc neu VideoMode
+                // nam trong sf::VideoMode::getFullscreenModes() - tren
+                // nhieu may Windows co scaling man hinh khac 100% (thuong
+                // gap o laptop/man hinh do phan giai cao), getDesktopMode()
+                // KHONG nam trong danh sach do, nen SFML se AM THAM bo qua
+                // yeu cau Fullscreen va tao lai cua so binh thuong - day
+                // chinh la ly do F11 "khong co tac dung gi". Windowed
+                // fullscreen khong phu thuoc danh sach video mode nen luon
+                // hoat dong on dinh.
+                sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+                window.create(desktop, "Crossing Game", sf::Style::None);
+                window.setPosition(sf::Vector2i(0, 0));
+            }
+            else
+            {
+                // Quay ve dung RES da chon trong Setting (khong hard-code
+                // WIN_W x WIN_H nua)
+                window.create(sf::VideoMode(windowedResolution.x, windowedResolution.y),
+                    "Crossing Game", sf::Style::Close);
+            }
+
+            window.setFramerateLimit(60);
+            menuManager.reapplyView();
+        };
+
+    // ===== ADDED: cong tac F.S trong Setting goi dung ham tren, va dong bo
+    // lai "isFullscreen" cua main.cpp theo dung trang thai vua chon =====
+    settingMenu.setOnFullscreenChanged([&](bool enable)
+        {
+            applyFullscreenState(enable);
+        });
+
+    // ===== ADDED: RES trong Setting gio thuc su doi kich thuoc cua so.
+    // Dat SAU khi menuManager da khai bao/dang ky xong (can goi
+    // menuManager.reapplyView() trong callback) - truoc day dat truoc do
+    // gay loi bien "menuManager" chua duoc khai bao.
+    // Neu dang windowed-fullscreen (F11) thi chi GHI NHO lua chon nay,
+    // ap dung thuc su khi nguoi choi thoat fullscreen - doi kich thuoc
+    // cua so ngay luc dang fullscreen se pha vo trang thai fullscreen
+    // ma khong co ly do gi (F.S da co cong tac rieng) =====
+    settingMenu.setOnResolutionChanged([&](sf::Vector2u res)
+        {
+            windowedResolution = res;
+
+            if (!isFullscreen)
+            {
+                window.create(sf::VideoMode(res.x, res.y),
+                    "Crossing Game", sf::Style::Close);
+                window.setFramerateLimit(60);
+                menuManager.reapplyView();
+            }
+        });
+
     //--------------------------------------------------
     // Game loop
     //--------------------------------------------------
@@ -512,33 +588,13 @@ int main()
             if (event.type == sf::Event::KeyPressed &&
                 event.key.code == sf::Keyboard::F11)
             {
-                isFullscreen = !isFullscreen;
+                applyFullscreenState(!isFullscreen);
 
-                if (isFullscreen)
-                {
-                    // ===== CHANGED: dung "windowed fullscreen" (cua so
-                    // khong vien, full kich thuoc desktop) thay vi
-                    // sf::Style::Fullscreen (exclusive). Ly do: exclusive
-                    // fullscreen CHI vao duoc neu VideoMode nam trong
-                    // sf::VideoMode::getFullscreenModes() - tren nhieu may
-                    // Windows co scaling man hinh khac 100% (thuong gap o
-                    // laptop/man hinh do phan giai cao), getDesktopMode()
-                    // KHONG nam trong danh sach do, nen SFML se AM THAM bo
-                    // qua yeu cau Fullscreen va tao lai cua so binh thuong
-                    // - day chinh la ly do F11 "khong co tac dung gi".
-                    // Windowed fullscreen khong phu thuoc danh sach video
-                    // mode nen luon hoat dong on dinh =====
-                    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-                    window.create(desktop, "Crossing Game", sf::Style::None);
-                    window.setPosition(sf::Vector2i(0, 0));
-                }
-                else
-                {
-                    window.create(sf::VideoMode(WIN_W, WIN_H),
-                        "Crossing Game", sf::Style::Close);
-                }
-                window.setFramerateLimit(60);
-                menuManager.reapplyView();    // ===== CHANGED =====
+                // ===== ADDED: dong bo lai cong tac F.S trong Setting cho
+                // khop - setFullscreen() KHONG bao onFullscreenChanged nen
+                // khong bi goi lai applyFullscreenState() lan 2 =====
+                settingMenu.setFullscreen(isFullscreen);
+
                 continue; // window vừa được tạo lại, event cũ không còn hợp lệ
             }
 

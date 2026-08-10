@@ -33,9 +33,9 @@ namespace
 
     constexpr float PANEL_TEX_SIZE = 1254.f;
 
-    // ===== CHANGED: mở rộng panel theo chiều ngang, giữ nguyên chiều cao =====
+    // ===== CHANGED: giảm chiều cao panel sau khi bỏ hàng FPS (950 -> 840) =====
     constexpr float PANEL_WIDTH = 950.f;
-    constexpr float PANEL_HEIGHT = 950.f;
+    constexpr float PANEL_HEIGHT = 840.f;
 
     constexpr float PANEL_SCALE_X = PANEL_WIDTH / PANEL_TEX_SIZE;
     constexpr float PANEL_SCALE_Y = PANEL_HEIGHT / PANEL_TEX_SIZE;
@@ -78,8 +78,8 @@ namespace
     constexpr float MUSIC_ROW_Y = 310.f;
     constexpr float SOUND_ROW_Y = 420.f;
     constexpr float FULLSCREEN_ROW_Y = 530.f;
-    constexpr float FPS_ROW_Y = 640.f;
-    constexpr float RESOLUTION_ROW_Y = 750.f;
+    // ===== CHANGED: RES đôn lên chiếm chỗ hàng FPS cũ (đã bỏ) =====
+    constexpr float RESOLUTION_ROW_Y = 640.f;
 
     //----------------------------------
     // Plus / Minus Icons (1254 x 1254)
@@ -203,14 +203,8 @@ namespace
         BACK_BUTTON_WIDTH / BACK_TEX_WIDTH;
 
     constexpr float BACK_BUTTON_X = CENTER_X - BACK_BUTTON_WIDTH / 2.f;
-    constexpr float BACK_BUTTON_Y = 930.f;
-
-    //----------------------------------
-    // FPS Steps
-    //----------------------------------
-
-    constexpr int FPS_STEPS[] = { 30, 60, 120, 240 };
-    constexpr int FPS_STEP_COUNT = 4;
+    // ===== CHANGED: đôn lên tương ứng với panel thấp hơn (930 -> 820) =====
+    constexpr float BACK_BUTTON_Y = 820.f;
 
     //----------------------------------
     // Helper: center a text on a point
@@ -264,9 +258,6 @@ void SettingMenu::setValueBoxTexture(const sf::Texture& texture)
     soundBox.setTexture(texture, true);
     soundBox.setScale(BOX_SCALE_X, BOX_SCALE_Y);
 
-    fpsBox.setTexture(texture, true);
-    fpsBox.setScale(BOX_SCALE_X, BOX_SCALE_Y);
-
     resolutionBox.setTexture(texture, true);
     resolutionBox.setScale(RES_BOX_SCALE_X, RES_BOX_SCALE_Y);
 
@@ -275,7 +266,6 @@ void SettingMenu::setValueBoxTexture(const sf::Texture& texture)
     setLabelBoxTexture(musicLabelBox, texture);
     setLabelBoxTexture(soundLabelBox, texture);
     setLabelBoxTexture(fullscreenLabelBox, texture);
-    setLabelBoxTexture(fpsLabelBox, texture);
     setLabelBoxTexture(resolutionLabelBox, texture);
 }
 
@@ -286,9 +276,6 @@ void SettingMenu::setPlusTexture(const sf::Texture& texture)
 
     soundPlusSprite.setTexture(texture, true);
     soundPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
-
-    fpsPlusSprite.setTexture(texture, true);
-    fpsPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     resolutionPlusSprite.setTexture(texture, true);
     resolutionPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
@@ -301,9 +288,6 @@ void SettingMenu::setMinusTexture(const sf::Texture& texture)
 
     soundMinusSprite.setTexture(texture, true);
     soundMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
-
-    fpsMinusSprite.setTexture(texture, true);
-    fpsMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     resolutionMinusSprite.setTexture(texture, true);
     resolutionMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
@@ -353,12 +337,10 @@ void SettingMenu::setFont(const sf::Font& newFont)
     musicLabel.setFont(font);
     soundLabel.setFont(font);
     fullscreenLabel.setFont(font);
-    fpsLabel.setFont(font);
     resolutionLabel.setFont(font);
 
     musicValueText.setFont(font);
     soundValueText.setFont(font);
-    fpsValueText.setFont(font);
     resolutionWidthText.setFont(font);
     resolutionHeightText.setFont(font);
 
@@ -447,9 +429,6 @@ void SettingMenu::initializeObjects()
     fullscreenLabel.setString("F.S");
     fullscreenLabel.setCharacterSize(LABEL_CHAR_SIZE);
 
-    fpsLabel.setString("FPS");
-    fpsLabel.setCharacterSize(LABEL_CHAR_SIZE);
-
     resolutionLabel.setString("RES");
     resolutionLabel.setCharacterSize(LABEL_CHAR_SIZE);
 
@@ -467,7 +446,6 @@ void SettingMenu::initializeObjects()
     setLabelBoxPosition(musicLabelBox, LABEL_BOX_X, MUSIC_ROW_Y);
     setLabelBoxPosition(soundLabelBox, LABEL_BOX_X, SOUND_ROW_Y);
     setLabelBoxPosition(fullscreenLabelBox, LABEL_BOX_X, FULLSCREEN_ROW_Y);
-    setLabelBoxPosition(fpsLabelBox, LABEL_BOX_X, FPS_ROW_Y);
     setLabelBoxPosition(resolutionLabelBox, LABEL_BOX_X, RESOLUTION_ROW_Y);
 
     // Label text được căn giữa bên trong label box tương ứng.
@@ -485,10 +463,6 @@ void SettingMenu::initializeObjects()
         LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f + LABEL_TEXT_X_OFFSET,
         FULLSCREEN_ROW_Y + LABEL_BOX_HEIGHT / 2.f + LABEL_TEXT_Y_OFFSET);
 
-    centerTextOnPoint(fpsLabel,
-        LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f + LABEL_TEXT_X_OFFSET,
-        FPS_ROW_Y + LABEL_BOX_HEIGHT / 2.f + LABEL_TEXT_Y_OFFSET);
-
     centerTextOnPoint(resolutionLabel,
         LABEL_BOX_X + LABEL_BOX_WIDTH / 2.f + LABEL_TEXT_X_OFFSET,
         RESOLUTION_ROW_Y + LABEL_BOX_HEIGHT / 2.f + LABEL_TEXT_Y_OFFSET);
@@ -502,9 +476,6 @@ void SettingMenu::initializeObjects()
 
     soundBox.setPosition(BOX_X, SOUND_ROW_Y);
     soundBox.setScale(BOX_SCALE_X, BOX_SCALE_Y);
-
-    fpsBox.setPosition(BOX_X, FPS_ROW_Y);
-    fpsBox.setScale(BOX_SCALE_X, BOX_SCALE_Y);
 
     resolutionBox.setPosition(RES_BOX_X, RESOLUTION_ROW_Y);
     resolutionBox.setScale(RES_BOX_SCALE_X, RES_BOX_SCALE_Y);
@@ -528,14 +499,6 @@ void SettingMenu::initializeObjects()
     soundPlusSprite.setPosition(
         BOX_X + BOX_WIDTH + ICON_GAP, SOUND_ROW_Y + ICON_Y_OFFSET);
     soundPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
-
-    fpsMinusSprite.setPosition(
-        BOX_X - ICON_GAP - ICON_SIZE, FPS_ROW_Y + ICON_Y_OFFSET);
-    fpsMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
-
-    fpsPlusSprite.setPosition(
-        BOX_X + BOX_WIDTH + ICON_GAP, FPS_ROW_Y + ICON_Y_OFFSET);
-    fpsPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
 
     resolutionMinusSprite.setPosition(
         RES_BOX_X - ICON_GAP - ICON_SIZE, RESOLUTION_ROW_Y + ICON_Y_OFFSET);
@@ -572,13 +535,10 @@ void SettingMenu::initializeObjects()
     soundValueText.setString("100");
     soundValueText.setCharacterSize(VALUE_CHAR_SIZE);
 
-    fpsValueText.setString("60");
-    fpsValueText.setCharacterSize(VALUE_CHAR_SIZE);
-
-    resolutionWidthText.setString("1920");
+    resolutionWidthText.setString("1280");
     resolutionWidthText.setCharacterSize(VALUE_CHAR_SIZE);
 
-    resolutionHeightText.setString("1080");
+    resolutionHeightText.setString("720");
     resolutionHeightText.setCharacterSize(VALUE_CHAR_SIZE);
 
     //----------------------------------
@@ -612,15 +572,6 @@ void SettingMenu::updateTexts()
     centerTextOnPoint(soundValueText,
         BOX_X + BOX_WIDTH / 2.f,
         SOUND_ROW_Y + BOX_HEIGHT / 2.f);
-
-    //----------------------------------
-    // FPS
-    //----------------------------------
-
-    fpsValueText.setString(std::to_string(fpsLimit));
-    centerTextOnPoint(fpsValueText,
-        BOX_X + BOX_WIDTH / 2.f,
-        FPS_ROW_Y + BOX_HEIGHT / 2.f);
 
     //----------------------------------
     // Resolution
@@ -723,47 +674,14 @@ void SettingMenu::processEvent(const sf::Event& event,
     else if (isMouseOver(fullscreenSprite, window))
     {
         setFullscreen(!fullscreen);
-    }
 
-    //-----------------------------
-    // FPS
-    //-----------------------------
-
-    else if (isMouseOver(fpsPlusSprite, window))
-    {
-        int currentIndex = 0;
-
-        for (int i = 0; i < FPS_STEP_COUNT; i++)
-        {
-            if (FPS_STEPS[i] == fpsLimit)
-            {
-                currentIndex = i;
-                break;
-            }
-        }
-
-        if (currentIndex < FPS_STEP_COUNT - 1)
-            currentIndex++;
-
-        setFPSLimit(FPS_STEPS[currentIndex]);
-    }
-    else if (isMouseOver(fpsMinusSprite, window))
-    {
-        int currentIndex = 0;
-
-        for (int i = 0; i < FPS_STEP_COUNT; i++)
-        {
-            if (FPS_STEPS[i] == fpsLimit)
-            {
-                currentIndex = i;
-                break;
-            }
-        }
-
-        if (currentIndex > 0)
-            currentIndex--;
-
-        setFPSLimit(FPS_STEPS[currentIndex]);
+        // ===== ADDED: chi bao main.cpp bat/tat fullscreen THAT SU khi
+        // nguoi choi tu tay bam vao cong tac - setFullscreen() ban than
+        // no KHONG bao callback, de main.cpp co the goi lai setFullscreen()
+        // (dong bo hien thi sau khi F11 duoc bam) ma khong bi lap vo han/
+        // tao lai cua so thua =====
+        if (onFullscreenChanged)
+            onFullscreenChanged(fullscreen);
     }
 
     //-----------------------------
@@ -829,7 +747,6 @@ void SettingMenu::draw(sf::RenderWindow& window) const
     drawLabelBox(window, musicLabelBox);
     drawLabelBox(window, soundLabelBox);
     drawLabelBox(window, fullscreenLabelBox);
-    drawLabelBox(window, fpsLabelBox);
     drawLabelBox(window, resolutionLabelBox);
 
     //-----------------------------
@@ -839,7 +756,6 @@ void SettingMenu::draw(sf::RenderWindow& window) const
     window.draw(musicLabel);
     window.draw(soundLabel);
     window.draw(fullscreenLabel);
-    window.draw(fpsLabel);
     window.draw(resolutionLabel);
 
     //-----------------------------
@@ -848,7 +764,6 @@ void SettingMenu::draw(sf::RenderWindow& window) const
 
     window.draw(musicBox);
     window.draw(soundBox);
-    window.draw(fpsBox);
     window.draw(resolutionBox);
 
     //-----------------------------
@@ -857,7 +772,6 @@ void SettingMenu::draw(sf::RenderWindow& window) const
 
     window.draw(musicPlusSprite);
     window.draw(soundPlusSprite);
-    window.draw(fpsPlusSprite);
     window.draw(resolutionPlusSprite);
 
     //-----------------------------
@@ -866,7 +780,6 @@ void SettingMenu::draw(sf::RenderWindow& window) const
 
     window.draw(musicMinusSprite);
     window.draw(soundMinusSprite);
-    window.draw(fpsMinusSprite);
     window.draw(resolutionMinusSprite);
 
     //-----------------------------
@@ -887,7 +800,6 @@ void SettingMenu::draw(sf::RenderWindow& window) const
 
     window.draw(musicValueText);
     window.draw(soundValueText);
-    window.draw(fpsValueText);
     window.draw(resolutionWidthText);
     window.draw(resolutionHeightText);
 
@@ -929,11 +841,6 @@ int SettingMenu::getSoundVolume() const
 bool SettingMenu::isFullscreen() const
 {
     return fullscreen;
-}
-
-int SettingMenu::getFPSLimit() const
-{
-    return fpsLimit;
 }
 
 sf::Vector2u SettingMenu::getResolution() const
@@ -994,17 +901,16 @@ void SettingMenu::setFullscreen(bool enable)
     updateTexts();
 }
 
-void SettingMenu::setFPSLimit(int fps)
+// ===== ADDED =====
+void SettingMenu::setOnFullscreenChanged(std::function<void(bool)> callback)
 {
-    if (fps < FPS_STEPS[0])
-        fps = FPS_STEPS[0];
+    onFullscreenChanged = std::move(callback);
+}
 
-    if (fps > FPS_STEPS[FPS_STEP_COUNT - 1])
-        fps = FPS_STEPS[FPS_STEP_COUNT - 1];
-
-    fpsLimit = fps;
-
-    updateTexts();
+// ===== ADDED =====
+void SettingMenu::setOnResolutionChanged(std::function<void(sf::Vector2u)> callback)
+{
+    onResolutionChanged = std::move(callback);
 }
 
 void SettingMenu::setResolution(int index)
@@ -1019,4 +925,10 @@ void SettingMenu::setResolution(int index)
     resolutionIndex = index;
 
     updateTexts();
+
+    // ===== ADDED: bao main.cpp de thuc su doi kich thuoc cua so - truoc
+    // day setResolution() chi doi CON SO hien thi (resolutionWidthText/
+    // resolutionHeightText), khong lam gi voi cua so that ca =====
+    if (onResolutionChanged)
+        onResolutionChanged(resolutions[resolutionIndex]);
 }

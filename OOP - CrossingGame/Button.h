@@ -22,6 +22,14 @@ private:
     // Luôn căn giữa chữ trên button
     void centerText();
 
+    // ===== ADDED: vung click/hover CO DINH, tinh lai moi khi setTexture/
+    // setPosition/setScale() - KHONG doi theo animation phong to luc hover
+    // (truoc day contains() dung thang sprite.getGlobalBounds(), nen khi
+    // hover phong to sprite ma khong co origin o giua, no chi phinh ve
+    // phia duoi-phai va lan sang vung click cua nut ben duoi/ben canh) =====
+    sf::FloatRect baseBounds;
+    void updateBaseBounds();
+
     // Scale animation
     sf::Vector2f normalScale;
 

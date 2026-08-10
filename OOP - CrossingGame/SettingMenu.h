@@ -43,7 +43,6 @@ private:
 
     sf::Sprite musicBox;
     sf::Sprite soundBox;
-    sf::Sprite fpsBox;
     sf::Sprite resolutionBox;
 
     //----------------------------------
@@ -62,7 +61,6 @@ private:
     LabelBoxSprite musicLabelBox;
     LabelBoxSprite soundLabelBox;
     LabelBoxSprite fullscreenLabelBox;
-    LabelBoxSprite fpsLabelBox;
     LabelBoxSprite resolutionLabelBox;
 
     //----------------------------------
@@ -74,9 +72,6 @@ private:
 
     sf::Sprite soundMinusSprite;
     sf::Sprite soundPlusSprite;
-
-    sf::Sprite fpsMinusSprite;
-    sf::Sprite fpsPlusSprite;
 
     sf::Sprite resolutionMinusSprite;
     sf::Sprite resolutionPlusSprite;
@@ -113,7 +108,6 @@ private:
     sf::Text musicLabel;
     sf::Text soundLabel;
     sf::Text fullscreenLabel;
-    sf::Text fpsLabel;
     sf::Text resolutionLabel;
 
     //----------------------------------
@@ -122,8 +116,6 @@ private:
 
     sf::Text musicValueText;
     sf::Text soundValueText;
-
-    sf::Text fpsValueText;
 
     sf::Text resolutionWidthText;
     sf::Text resolutionHeightText;
@@ -139,19 +131,28 @@ private:
 
     bool fullscreen = false;
 
-    int fpsLimit = 60;
+    // ===== ADDED: bao main.cpp biet de thuc su bat/tat fullscreen -
+    // xem setOnFullscreenChanged() =====
+    std::function<void(bool)> onFullscreenChanged;
 
-    static constexpr int RESOLUTION_COUNT = 4;
+    // ===== ADDED: bao main.cpp biet de doi lai kich thuoc cua so that su
+    // (window.create) - xem setOnResolutionChanged() =====
+    std::function<void(sf::Vector2u)> onResolutionChanged;
+
+    static constexpr int RESOLUTION_COUNT = 3;
 
     sf::Vector2u resolutions[RESOLUTION_COUNT] =
     {
         {1280, 720},
         {1600, 900},
-        {1920,1080},
-        {2560,1440}
+        {1920,1080}
     };
 
-    int resolutionIndex = 2;
+    // ===== CHANGED: mac dinh khop voi kich thuoc cua so LUC KHOI DONG
+    // (WIN_W x WIN_H = 1280x720 trong main.cpp) - truoc day RES chi la
+    // hien thi (khong lam gi ca) nen le pha nay khong ro rang; gio RES
+    // da doi kich thuoc cua so that su nen can dong bo dung ngay tu dau =====
+    int resolutionIndex = 0;
 
     AudioManager* audio = nullptr;
 
@@ -248,8 +249,6 @@ public:
 
     bool isFullscreen() const;
 
-    int getFPSLimit() const;
-
     sf::Vector2u getResolution() const;
 
     //----------------------------------
@@ -264,7 +263,14 @@ public:
 
     void setFullscreen(bool enable);
 
-    void setFPSLimit(int fps);
+    // ===== ADDED: goi callback moi khi F.S doi (chi luc nguoi choi bam
+    // vao cong tac trong Setting - xem processEvent()), main.cpp dung de
+    // thuc su bat/tat fullscreen (dung lai dung logic F11) =====
+    void setOnFullscreenChanged(std::function<void(bool)> callback);
+
+    // ===== ADDED: goi callback moi khi RES doi (qua setResolution()),
+    // main.cpp dung de thuc su window.create() lai voi kich thuoc moi =====
+    void setOnResolutionChanged(std::function<void(sf::Vector2u)> callback);
 
     void setResolution(int index);
 };
