@@ -22,5 +22,6 @@ enum class AppState
     Pause,      // ===== ADDED: pause overlay khi dang Playing =====
     GameOver,   // ===== ADDED: overlay khi CGAME::IsGameOver() =====
     Win,        // ===== ADDED: overlay khi CGAME::IsWin() =====
+    About,      // ===== ADDED: man hinh gioi thieu game =====
     Exit
-};
+};

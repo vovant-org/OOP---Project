@@ -18,6 +18,7 @@
 #include "ContinueMenu.h"   // ===== ADDED =====
 #include "ModeSelection.h"  // ===== ADDED =====
 #include "LeaderboardMenu.h"   // ===== ADDED =====
+#include "AboutMenu.h"          // ===== ADDED =====
 
 //==================================================
 // Hằng số
@@ -40,6 +41,10 @@ const std::string SETTING_TIMES_PATH = "ui/Icon/Times.png";
 const std::string SETTING_BACK_PATH = "ui/Logo/BACK.png";
 const std::string SETTING_TITLE_PATH = "ui/Logo/SETTING.png";
 const std::string PAUSE_ICON_PATH = "ui/Icon/Pause.png";   // ===== ADDED =====
+
+// ===== ADDED: card thu gon/mo rong o man hinh About =====
+const std::string ABOUT_CARD_BOX_PATH = "ui/Button/ThinSliverBox.png";
+const std::string ABOUT_CARD_ARROW_PATH = "ui/Icon/DownArrow.png";
 
 // ===== ADDED: khung avatar mau theo do kho, dung cho LeaderboardMenu -
 // sua duong dan neu file thuc te nam o thu muc khac =====
@@ -182,6 +187,11 @@ int main()
     sf::Texture pauseIconTexture;
     if (!loadTexture(pauseIconTexture, PAUSE_ICON_PATH))
         return -1;
+
+    // ===== ADDED: nen card + nut mui ten thu gon/mo rong o man hinh About =====
+    sf::Texture aboutCardBoxTexture, aboutCardArrowTexture;
+    if (!loadTexture(aboutCardBoxTexture, ABOUT_CARD_BOX_PATH))     return -1;
+    if (!loadTexture(aboutCardArrowTexture, ABOUT_CARD_ARROW_PATH)) return -1;
 
     std::cout << "[INFO] Nhan F11 de bat/tat toan man hinh\n";
 
@@ -409,6 +419,16 @@ int main()
     leaderboardMenu.loadCharacterTexture(2, "Character/Dog_character.png");
     leaderboardMenu.loadCharacterTexture(3, "Character/Luffy_character.png");
 
+    // ===== ADDED: AboutMenu - man hinh gioi thieu game =====
+    AboutMenu aboutMenu;
+    aboutMenu.setWindowSize((float)WIN_W, (float)WIN_H);
+    aboutMenu.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
+    aboutMenu.setFont(font);
+    aboutMenu.setButtonTexture(buttonTexture, btnScaleX, btnScaleY);
+    aboutMenu.setPanelTexture(settingPanelTexture);   // GoldenBox - khung ngoai
+    aboutMenu.setSectionBoxTexture(aboutCardBoxTexture); // ThinSliverBox - nen tung card
+    aboutMenu.setArrowTexture(aboutCardArrowTexture);    // DownArrow - nut thu gon/mo rong tung card
+
     //--------------------------------------------------
     // ===== ADDED: nut icon Pause, goc tren-phai man hinh, chi hien
     // va bam duoc khi dang o state Playing =====
@@ -467,6 +487,7 @@ int main()
     winMenu.setAudioManager(&audio);        // ===== ADDED =====
     continueMenu.setAudioManager(&audio);   // ===== ADDED =====
     leaderboardMenu.setAudioManager(&audio);   // ===== ADDED =====
+    aboutMenu.setAudioManager(&audio);         // ===== ADDED =====
     game.SetAudioManager(&audio);           // ===== ADDED: nhac nen theo map =====
 
     //--------------------------------------------------
@@ -494,6 +515,7 @@ int main()
     menuManager.registerMenu(AppState::Win, &winMenu);           // ===== ADDED =====
     menuManager.registerMenu(AppState::ContinueSelect, &continueMenu); // ===== ADDED =====
     menuManager.registerMenu(AppState::Leaderboard, &leaderboardMenu); // ===== ADDED =====
+    menuManager.registerMenu(AppState::About, &aboutMenu);             // ===== ADDED =====
     // AppState::Playing / Exit: chưa có Menu tương ứng (CGAME chưa xong) -
     // cứ để trống, MenuManager tự bỏ qua processEvent/update/draw cho các
     // state này (xem getCurrentMenu() trả nullptr).
@@ -728,6 +750,12 @@ int main()
                 leaderboardMenu.refresh();
                 leaderboardMenu.clearResult();
                 menuManager.setState(AppState::Leaderboard);
+                break;
+
+            case MainMenuResult::About:   // ===== ADDED =====
+                mainMenu.clearResult();
+                aboutMenu.clearResult();
+                menuManager.setState(AppState::About);
                 break;
 
             case MainMenuResult::Settings:
@@ -1010,6 +1038,20 @@ int main()
             {
             case LeaderboardMenuResult::Back:
                 leaderboardMenu.clearResult();
+                menuManager.setState(AppState::MainMenu);
+                break;
+
+            default: break;
+            }
+            break;
+
+            //========================
+        case AppState::About:   // ===== ADDED =====
+            //========================
+            switch (aboutMenu.getResult())
+            {
+            case AboutMenuResult::Back:
+                aboutMenu.clearResult();
                 menuManager.setState(AppState::MainMenu);
                 break;
 
