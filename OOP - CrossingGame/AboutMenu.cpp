@@ -14,7 +14,9 @@ namespace
     constexpr float PANEL_PAD_TOP = 90.f;    // chua title
     constexpr float PANEL_PAD_BOTTOM = 20.f;
 
-    constexpr float CARD_PAD_X = 24.f;
+    // ===== CHANGED: tang nhe le trai trong card (24 -> 34) de chu khong
+    // qua sat vien trai =====
+    constexpr float CARD_PAD_X = 34.f;
     constexpr float CARD_PAD_TOP = 16.f;
     constexpr float CARD_PAD_BOTTOM = 16.f;
     constexpr float HEADER_BODY_GAP = 8.f;
@@ -239,6 +241,8 @@ void AboutMenu::setFont(const sf::Font& f)
         sections[i].body.setFont(f);
         sections[i].body.setString(SECTION_BODIES[i]);
         sections[i].body.setCharacterSize(17);
+        // ===== CHANGED: body chu dam hon (truoc day chi header moi Bold) =====
+        sections[i].body.setStyle(sf::Text::Bold);
         sections[i].body.setFillColor(sf::Color(220, 220, 220));
         sections[i].body.setLineSpacing(1.3f);
     }
