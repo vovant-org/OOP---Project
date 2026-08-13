@@ -71,6 +71,7 @@ private:
 
     // Save/Load
     std::string savePath;
+    std::string playerName; // optional player name stored in save
 
     // HUD (Score/Level/HP trong luc Playing)
     sf::Text hudScoreText;
@@ -128,6 +129,22 @@ public:
 
     void SaveGame(const std::string& path);
     bool LoadGame(const std::string& path);
+
+    // New API: save slots (0..3)
+    static const std::string& GetSavePathForSlot(int slot);
+    // Peek full save data
+    struct SaveData
+    {
+        bool exists = false;
+        int characterIndex = 0;
+        std::string playerName;
+        int mapIndex = 0;
+        int score = 0;
+        int difficultyMode = 1;
+        int level = 1;
+        std::string saveTime;
+    };
+    static bool PeekSaveData(const std::string& path, SaveData& out);
 
     // Static vi khong can 1 instance CGAME song - dung de ContinueMenu
     // liet ke cac save co san ma khong phai load han.

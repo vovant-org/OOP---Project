@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <array>
 #include <string>
 
 #include "Menu.h"
@@ -28,8 +29,7 @@ enum class ContinueMenuResult
 class ContinueMenu : public Menu
 {
 private:
-
-    static const int MODE_COUNT = 3;
+    static const int SLOT_COUNT = 4;
 
     MenuBackground background;
 
@@ -43,26 +43,37 @@ private:
     float btnRenderW = 240.f, btnRenderH = 100.f;   // kich thuoc thuc te sau scale, dung de can giua
 
     const sf::Texture* modeBoxTexture = nullptr;    // SilverBox - lam nen cho 3 header mode
+    const sf::Texture* slotBoxTexture = nullptr;    // Save slot background
 
-    // Moi mode (cot) co 1 danh sach nut save rieng - so luong thay doi
-    // tuy theo mode do co bao nhieu map da luu
-    std::vector<Button> saveButtons[MODE_COUNT];
-    std::vector<int> saveButtonMapIndex[MODE_COUNT];   // map index tuong ung tung nut, cung cot
-
-    sf::Text modeLabelText[MODE_COUNT];
-    sf::Text modeEmptyHint[MODE_COUNT];   // "Chua co save" khi cot rong
+    // Slots (vertical list)
+    std::vector<Button> slotButtons; // size = SLOT_COUNT
+    // cached save data for each slot
+    // forward declare CGAME::SaveData by opaque pointer to avoid include cycle
+    // we'll include CGAME in cpp
+    // store minimal info in local struct
+    struct SlotInfo
+    {
+        bool exists = false;
+        int characterIndex = 0;
+        std::string playerName;
+        int mapIndex = 0;
+        int score = 0;
+        int difficultyMode = 1;
+        int level = 1;
+        std::string saveTime;
+    };
+    std::array<SlotInfo, SLOT_COUNT> slotInfo;
+    std::array<sf::Texture, 4> charTextures;
+    bool charTexturesLoaded = false;
 
     Button backButton;
 
-    // Vi tri dang chon: cot (mode) + hang (index trong saveButtons[col]),
-    // hoac onBack = true neu dang chon nut Back
-    int selectedCol = 0;
-    int selectedRow = 0;
+    // Vi tri dang chon: index cua slot (0..SLOT_COUNT-1) hoac onBack=true
+    int selectedIndex = 0;
     bool onBack = false;
 
     ContinueMenuResult result = ContinueMenuResult::None;
-    int selectedMapIndex = -1;
-    int selectedModeIndex = -1;   // ===== ADDED: mode cua save vua chon =====
+    int selectedSlotIndex = -1;
 
     AudioManager* audio = nullptr;
 
@@ -71,7 +82,7 @@ private:
 
     void updateFocus();
     void moveHorizontal(int dir);   // -1 = trai, +1 = phai (doi cot)
-    void moveVertical(int dir);     // -1 = len,  +1 = xuong (doi hang / Back)
+    void moveVertical(int dir);     // -1 = len,  +1 = xuong (doi slot / Back)
     void activateSelected();
 
     int totalButtons() const;
@@ -92,14 +103,13 @@ public:
     void setFont(const sf::Font& f);
     void setButtonTexture(const sf::Texture& tex, float scaleX, float scaleY);
     void setModeBoxTexture(const sf::Texture& tex);   // ===== ADDED: SilverBox cho header =====
+    void setSlotTexture(const sf::Texture& tex);
 
     // Quet lai toan bo 12 file save (4 map x 3 mode, thong qua
     // CGAME::PeekSaveInfo), dung goi moi lan chuan bi hien menu nay
     // (VD: ngay truoc khi setState)
     void refresh();
-
-    int getSelectedMapIndex() const { return selectedMapIndex; }
-    int getSelectedMode() const { return selectedModeIndex; }   // ===== ADDED =====
+    int getSelectedSlotIndex() const { return selectedSlotIndex; }
 
     //----------------------------------
     // Menu

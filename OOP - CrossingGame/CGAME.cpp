@@ -58,6 +58,15 @@ namespace
         { "Save/sky_easy.sav",      "Save/sky_hard.sav",      "Save/sky_nightmare.sav" }
     };
 
+    // New: 4 save slots (one per slot index 0..3)
+    const std::string SAVE_SLOT_PATHS[4] =
+    {
+        "Save/save1.sav",
+        "Save/save2.sav",
+        "Save/save3.sav",
+        "Save/save4.sav"
+    };
+
     // ===== ADDED: nhac nen rieng cho tung map, phat thay cho nhac nen
     // MainMenu ngay khi Init() (vao Playing) =====
     const std::string MAP_MUSIC_PATHS[4] =
@@ -161,7 +170,8 @@ CGAME::CGAME(sf::RenderWindow& window)
     isWin(false),
     winTargetLevel(0),   // se duoc Init() gan lai ngay khi vao game
     timeRemaining(-1.f),
-    savePath("save.dat")
+    savePath("save.dat"),
+    playerName("")
 {
 }
 
@@ -1247,12 +1257,35 @@ void CGAME::SaveGame(const std::string& path)
         return;
     }
 
-    // Format don gian: moi gia tri 1 dong, theo thu tu co dinh
-    out << currentMap << "\n"
+    // New format: each field on its own line
+    // playerName
+    // characterIndex
+    // mapIndex
+    // score
+    // difficultyMode
+    // level
+    // saveTime (DD/MM/YYYY HH:MM:SS)
+
+    // Get current time
+    std::time_t t = std::time(nullptr);
+    char buf[64] = {0};
+    std::tm tm;
+#if defined(_MSC_VER)
+    localtime_s(&tm, &t);
+#else
+    std::tm* ptm = std::localtime(&t);
+    if (ptm) tm = *ptm;
+#endif
+    if (std::strftime(buf, sizeof(buf), "%d/%m/%Y %H:%M:%S", &tm) == 0)
+        buf[0] = '\0';
+
+    out << playerName << "\n"
         << characterIndex << "\n"
-        << level << "\n"
+        << currentMap << "\n"
         << score << "\n"
-        << difficultyMode << "\n";   // ===== ADDED =====
+        << difficultyMode << "\n"
+        << level << "\n"
+        << buf << "\n";
 }
 
 bool CGAME::LoadGame(const std::string& path)
@@ -1265,21 +1298,42 @@ bool CGAME::LoadGame(const std::string& path)
         return false;
     }
 
-    int savedMap = 0, savedCharacter = 0, savedLevel = 1, savedScore = 0, savedMode = 1;
+    std::string line;
+    // playerName
+    if (!std::getline(in, line)) return false;
+    playerName = line;
 
-    if (!(in >> savedMap >> savedCharacter >> savedLevel >> savedScore >> savedMode))
-    {
-        std::cout << "[CGAME] Save file is corrupted: " << path << "\n";
-        return false;
-    }
+    // characterIndex
+    if (!std::getline(in, line)) return false;
+    int savedCharacter = std::stoi(line);
 
-    // Dung lai Init() de load dung map/nhan vat/spawn obstacle nhu binh
-    // thuong, roi ghi de level/score bang gia tri da luu
-    difficultyMode = savedMode;   // ===== ADDED: khoi phuc dung do kho da chon =====
+    // mapIndex
+    if (!std::getline(in, line)) return false;
+    int savedMap = std::stoi(line);
+
+    // score
+    if (!std::getline(in, line)) return false;
+    int savedScore = std::stoi(line);
+
+    // difficultyMode
+    if (!std::getline(in, line)) return false;
+    int savedMode = std::stoi(line);
+
+    // level
+    if (!std::getline(in, line)) return false;
+    int savedLevel = std::stoi(line);
+
+    // saveTime (ignored here)
+    std::string savedTime;
+    std::getline(in, savedTime);
+
+    // Apply loaded data
+    difficultyMode = savedMode;
     Init(savedMap, savedCharacter);
 
     level = savedLevel;
     score = savedScore;
+    savePath = path;
 
     return true;
 }
@@ -1294,18 +1348,70 @@ const std::string& CGAME::GetSavePathForMap(int mapIndex, int mode)
 
     return SAVE_PATHS[mapIndex][mode];
 }
+// New: get save path for slot index
+const std::string& CGAME::GetSavePathForSlot(int slot)
+{
+    if (slot < 0 || slot > 3) slot = 0;
+    return SAVE_SLOT_PATHS[slot];
+}
 
 bool CGAME::PeekSaveInfo(const std::string& path,
     int& outMap, int& outCharacter, int& outLevel, int& outScore,
     int& outMode)
 {
+    // Backwards compatible: read new format and fill ints
     std::ifstream in(path);
+    if (!in.is_open()) return false;
 
-    if (!in.is_open())
-        return false;
+    std::string line;
+    // playerName
+    if (!std::getline(in, line)) return false;
+    // characterIndex
+    if (!std::getline(in, line)) return false;
+    outCharacter = std::stoi(line);
+    // mapIndex
+    if (!std::getline(in, line)) return false;
+    outMap = std::stoi(line);
+    // score
+    if (!std::getline(in, line)) return false;
+    outScore = std::stoi(line);
+    // difficultyMode
+    if (!std::getline(in, line)) return false;
+    outMode = std::stoi(line);
+    // level
+    if (!std::getline(in, line)) return false;
+    outLevel = std::stoi(line);
 
-    if (!(in >> outMap >> outCharacter >> outLevel >> outScore >> outMode))
-        return false;
+    return true;
+}
 
+bool CGAME::PeekSaveData(const std::string& path, SaveData& out)
+{
+    std::ifstream in(path);
+    if (!in.is_open()) return false;
+
+    std::string line;
+    if (!std::getline(in, line)) return false;
+    out.playerName = line;
+
+    if (!std::getline(in, line)) return false;
+    out.characterIndex = std::stoi(line);
+
+    if (!std::getline(in, line)) return false;
+    out.mapIndex = std::stoi(line);
+
+    if (!std::getline(in, line)) return false;
+    out.score = std::stoi(line);
+
+    if (!std::getline(in, line)) return false;
+    out.difficultyMode = std::stoi(line);
+
+    if (!std::getline(in, line)) return false;
+    out.level = std::stoi(line);
+
+    if (!std::getline(in, line)) line = "";
+    out.saveTime = line;
+
+    out.exists = true;
     return true;
 }

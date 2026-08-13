@@ -167,6 +167,7 @@ int main()
     }
 
     sf::Texture settingPanelTexture, settingBoxTexture;
+    sf::Texture saveSlotTexture;
     sf::Texture settingPlusTexture, settingMinusTexture;
     sf::Texture settingSwitchOnTexture, settingSwitchOffTexture;
     sf::Texture settingTimesTexture;
@@ -175,6 +176,7 @@ int main()
 
     if (!loadTexture(settingPanelTexture, SETTING_PANEL_PATH))     return -1;
     if (!loadTexture(settingBoxTexture, SETTING_BOX_PATH))         return -1;
+    if (!loadTexture(saveSlotTexture, "ui/Save/Save_Slot.png"))   return -1;
     if (!loadTexture(settingPlusTexture, SETTING_PLUS_PATH))       return -1;
     if (!loadTexture(settingMinusTexture, SETTING_MINUS_PATH))     return -1;
     if (!loadTexture(settingSwitchOnTexture, SETTING_SWITCH_ON_PATH))  return -1;
@@ -396,7 +398,8 @@ int main()
     continueMenu.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
     continueMenu.setFont(font);
     continueMenu.setButtonTexture(buttonTexture, btnScaleX, btnScaleY);
-    continueMenu.setModeBoxTexture(settingBoxTexture);   // ===== ADDED: SilverBox cho header 3 mode =====
+    continueMenu.setModeBoxTexture(settingBoxTexture);   // legacy
+    continueMenu.setSlotTexture(saveSlotTexture);        // use dedicated save slot image
 
     // ===== ADDED: LeaderboardMenu - bang diem 4 map x 3 do kho, doc lai
     // chinh 12 file save (khong luu file rieng) =====
@@ -992,30 +995,20 @@ int main()
             {
                 continueMenu.clearResult();
 
-                int mapIdx = continueMenu.getSelectedMapIndex();
-                int modeIdx = continueMenu.getSelectedMode();   // ===== ADDED =====
+                int slot = continueMenu.getSelectedSlotIndex();
 
-                if (game.LoadGame(CGAME::GetSavePathForMap(mapIdx, modeIdx)))
+                if (game.LoadGame(CGAME::GetSavePathForSlot(slot)))
                 {
                     selectedMapIndex = game.GetCurrentMap();
                     selectedCharIndex = game.GetCharacterIndex();
-                    selectedMode = game.GetDifficultyMode();   // ===== ADDED =====
+                    selectedMode = game.GetDifficultyMode();
 
-                    // ===== ADDED: file save hien khong luu lai thong tin
-                    // "Custom - level muon vuot qua de thang", nen sau
-                    // Continue coi nhu Adventure (winTargetLevel da duoc
-                    // LoadGame()/Init() tinh dung theo WIN_LEVEL_BY_MODE).
-                    // Neu ban muon Retry SAU KHI Continue van giu dung
-                    // Custom, can luu them gia tri nay vao file save
-                    // (ngoai pham vi sua loi lan nay) =====
                     customNightmareActive = false;
 
                     menuManager.setState(AppState::Playing);
                 }
                 else
                 {
-                    // Không nên xảy ra (continueMenu chỉ hiện map đã
-                    // confirm có save qua refresh()), nhưng phòng hờ
                     std::cout << "[WARN] Continue: save bị mất giữa chừng\n";
                     menuManager.setState(AppState::MainMenu);
                 }

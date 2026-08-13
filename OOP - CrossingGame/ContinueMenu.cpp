@@ -5,39 +5,28 @@
 
 #include <sstream>
 #include <algorithm>
+#include <ctime>
 
 namespace
 {
     const char* MAP_NAMES[4] = { "CITY", "ANCIENT", "HELL", "SKY" };
-
-    // ===== ADDED: 3 cot tuong ung 3 difficultyMode (0=Easy 1=Hard 2=Nightmare) =====
     const char* MODE_NAMES[3] = { "EASY", "HARD", "NIGHTMARE" };
-    const sf::Color MODE_COLORS[3] =
-    {
-        sf::Color(120, 220, 120),   // Easy - xanh la
-        sf::Color(230, 90, 90),     // Hard - do
-        sf::Color(190, 120, 240)    // Nightmare - tim
-    };
 
-    // Bo cuc 3 cot header + danh sach save ben duoi
-    constexpr float HEADER_W = 260.f;
-    constexpr float HEADER_H = 76.f;
-    constexpr float HEADER_Y_RATIO = 0.20f;   // % chieu cao man hinh
-    constexpr float COL_SPACING = 320.f;      // khoang cach tam giua 2 cot lien ke
-    constexpr float LIST_GAP = 24.f;          // khoang cach header -> nut save dau tien
-    constexpr float ROW_SPACING = 66.f;       // khoang cach giua 2 nut save
-    constexpr float BACK_Y_RATIO = 0.85f;
+    // Layout
+    constexpr float SLOT_W_FRAC = 0.82f;
+    constexpr float SLOT_H = 120.f;
+    constexpr float SLOT_GAP = 20.f;
+    constexpr float START_Y = 120.f;
+    constexpr float CHAR_IMG_SIZE = 96.f;
 
-    // ===== ADDED: 3-slice ngang cho SilverBox - tranh meo hinh o 2 dau
-    // khi keo dan chieu rong (phan giua la vung phang, keo dan an toan) =====
-    // Vung noi dung thuc su (khong tinh) trong SilverBox.png/button_normal.png
-    const sf::IntRect SILVERBOX_CONTENT(79, 285, 1381, 416);
-    constexpr float CAP_FRAC = 0.27f;   // % be rong 2 dau (goc + oc vit) khong bi keo dan
+    // 3-slice content for silver/golden box (match AboutMenu / Leaderboard)
+    const sf::IntRect SILVERBOX_CONTENT(86, 323, 1374, 366);
+    constexpr float SILVER_CAP_FRAC = 0.27f;
 
-    void drawThreeSlice(sf::RenderWindow& window, const sf::Texture& tex,
+    void drawThreeSliceLocal(sf::RenderWindow& window, const sf::Texture& tex,
         const sf::IntRect& content, float x, float y, float w, float h)
     {
-        int capPx = static_cast<int>(content.width * CAP_FRAC);
+        int capPx = static_cast<int>(content.width * SILVER_CAP_FRAC);
         if (capPx * 2 > content.width)
             capPx = content.width / 2;
 
@@ -92,26 +81,6 @@ void ContinueMenu::centerTextFull(sf::Text& t, float cx, float cy)
     t.setPosition(cx, cy);
 }
 
-float ContinueMenu::columnCenterX(int mode) const
-{
-    return W / 2.f + static_cast<float>(mode - 1) * COL_SPACING;
-}
-
-sf::FloatRect ContinueMenu::headerRect(int mode) const
-{
-    float x = columnCenterX(mode) - HEADER_W / 2.f;
-    float y = H * HEADER_Y_RATIO;
-    return sf::FloatRect(x, y, HEADER_W, HEADER_H);
-}
-
-int ContinueMenu::totalButtons() const
-{
-    int total = 0;
-    for (int c = 0; c < MODE_COUNT; ++c)
-        total += static_cast<int>(saveButtons[c].size());
-    return total;
-}
-
 //==================================================
 // Constructor
 //==================================================
@@ -161,18 +130,7 @@ void ContinueMenu::setFont(const sf::Font& f)
     backButton.setFont(f);
     backButton.setText("BACK");
     backButton.setCharacterSize(26);
-
-    for (int m = 0; m < MODE_COUNT; ++m)
-    {
-        modeLabelText[m].setFont(f);
-        modeLabelText[m].setCharacterSize(24);
-        modeLabelText[m].setStyle(sf::Text::Bold);
-
-        modeEmptyHint[m].setFont(f);
-        modeEmptyHint[m].setCharacterSize(16);
-        modeEmptyHint[m].setFillColor(sf::Color(170, 170, 170));
-        modeEmptyHint[m].setString("Chua co save");
-    }
+    // No per-mode labels in slot-based continue menu
 }
 
 void ContinueMenu::setButtonTexture(const sf::Texture& tex, float scaleX, float scaleY)
@@ -192,86 +150,84 @@ void ContinueMenu::setModeBoxTexture(const sf::Texture& tex)
     modeBoxTexture = &tex;
 }
 
+void ContinueMenu::setSlotTexture(const sf::Texture& tex)
+{
+    slotBoxTexture = &tex;
+}
+
 //==================================================
-// Refresh - quet lai 4 map x 3 mode = 12 file save
+// Refresh - read 4 save slots
 //==================================================
 
 void ContinueMenu::refresh()
 {
-    for (int c = 0; c < MODE_COUNT; ++c)
+    // load character textures once
+    if (!charTexturesLoaded)
     {
-        saveButtons[c].clear();
-        saveButtonMapIndex[c].clear();
+        const std::string paths[4] = {
+            "Character/Chicken_character.png",
+            "Character/Knight_character.png",
+            "Character/Dog_character.png",
+            "Character/Luffy_character.png"
+        };
+        for (int i = 0; i < 4; ++i)
+        {
+            charTextures[i].loadFromFile(paths[i]);
+        }
+        charTexturesLoaded = true;
     }
 
-    for (int mode = 0; mode < MODE_COUNT; ++mode)
+    slotButtons.clear();
+    slotButtons.resize(SLOT_COUNT);
+
+    float slotW = W * SLOT_W_FRAC;
+    float x = W / 2.f - slotW / 2.f;
+    float y = START_Y;
+
+    for (int i = 0; i < SLOT_COUNT; ++i)
     {
-        sf::FloatRect r = headerRect(mode);
-
-        // Label header cua mode
-        modeLabelText[mode].setString(MODE_NAMES[mode]);
-        modeLabelText[mode].setFillColor(MODE_COLORS[mode]);
-        centerTextFull(modeLabelText[mode], r.left + r.width / 2.f, r.top + r.height / 2.f);
-
-        float y = r.top + r.height + LIST_GAP;
-
-        for (int m = 0; m < 4; ++m)
+        CGAME::SaveData sd;
+        std::string path = CGAME::GetSavePathForSlot(i);
+        if (CGAME::PeekSaveData(path, sd))
         {
-            int outMap = 0, outChar = 0, outLevel = 1, outScore = 0, outMode = 1;
-
-            if (!CGAME::PeekSaveInfo(CGAME::GetSavePathForMap(m, mode),
-                outMap, outChar, outLevel, outScore, outMode))
-                continue;
-
-            Button btn;
-
-            if (buttonTexture)
-            {
-                btn.setTexture(*buttonTexture);
-                btn.setScale(btnScaleX, btnScaleY);
-            }
-
-            if (font)
-                btn.setFont(*font);
-
-            std::ostringstream oss;
-            oss << MAP_NAMES[m] << "  Lv" << outLevel << "  " << outScore << "pts";
-            btn.setText(oss.str());
-            btn.setCharacterSize(18);
-            btn.setPosition(r.left + r.width / 2.f - btnRenderW / 2.f, y);
-            btn.setFocused(false);
-
-            saveButtons[mode].push_back(btn);
-            saveButtonMapIndex[mode].push_back(m);
-
-            y += ROW_SPACING;
+            slotInfo[i].exists = true;
+            slotInfo[i].characterIndex = sd.characterIndex;
+            slotInfo[i].playerName = sd.playerName;
+            slotInfo[i].mapIndex = sd.mapIndex;
+            slotInfo[i].score = sd.score;
+            slotInfo[i].difficultyMode = sd.difficultyMode;
+            slotInfo[i].level = sd.level;
+            slotInfo[i].saveTime = sd.saveTime;
+        }
+        else
+        {
+            slotInfo[i] = SlotInfo();
         }
 
-        // Hint nho khi mode nay chua co save nao
-        centerText(modeEmptyHint[mode], r.left + r.width / 2.f, r.top + r.height + LIST_GAP);
-    }
-
-    backButton.setPosition(W / 2.f - btnRenderW / 2.f, H * BACK_Y_RATIO);
-
-    // Chon o dau tien co san (cot dau tien khong rong), khong thi Back
-    selectedCol = 0;
-    selectedRow = 0;
-    onBack = true;
-
-    for (int c = 0; c < MODE_COUNT; ++c)
-    {
-        if (!saveButtons[c].empty())
+        Button btn;
+        if (buttonTexture)
         {
-            selectedCol = c;
-            selectedRow = 0;
-            onBack = false;
-            break;
+            btn.setTexture(*buttonTexture);
+            btn.setScale(btnScaleX, btnScaleY);
         }
+        if (font) btn.setFont(*font);
+
+        btn.setCharacterSize(18);
+        btn.setPosition(x, y);
+        btn.setFocused(false);
+        slotButtons[i] = btn;
+
+        y += SLOT_H + SLOT_GAP;
     }
 
+    // back button
+    backButton.setPosition(W / 2.f - btnRenderW / 2.f, H - 80.f);
+
+    // select first slot by default
+    selectedIndex = 0;
+    onBack = false;
+    selectedSlotIndex = -1;
     result = ContinueMenuResult::None;
-    selectedMapIndex = -1;
-    selectedModeIndex = -1;
 
     updateFocus();
 }
@@ -282,17 +238,14 @@ void ContinueMenu::refresh()
 
 void ContinueMenu::updateFocus()
 {
-    for (int c = 0; c < MODE_COUNT; ++c)
-        for (auto& b : saveButtons[c])
-            b.setFocused(false);
+    for (auto& b : slotButtons)
+        b.setFocused(false);
 
     backButton.setFocused(false);
 
-    if (!onBack &&
-        selectedCol >= 0 && selectedCol < MODE_COUNT &&
-        selectedRow >= 0 && selectedRow < static_cast<int>(saveButtons[selectedCol].size()))
+    if (!onBack && selectedIndex >= 0 && selectedIndex < static_cast<int>(slotButtons.size()))
     {
-        saveButtons[selectedCol][selectedRow].setFocused(true);
+        slotButtons[selectedIndex].setFocused(true);
     }
     else
     {
@@ -300,64 +253,30 @@ void ContinueMenu::updateFocus()
     }
 }
 
-void ContinueMenu::moveHorizontal(int dir)
-{
-    if (onBack || totalButtons() == 0)
-        return;
-
-    int col = selectedCol;
-
-    for (int i = 0; i < MODE_COUNT; ++i)
-    {
-        col = (col + dir + MODE_COUNT) % MODE_COUNT;
-
-        if (!saveButtons[col].empty())
-        {
-            selectedCol = col;
-            selectedRow = std::min(selectedRow,
-                static_cast<int>(saveButtons[col].size()) - 1);
-            updateFocus();
-            return;
-        }
-    }
-}
-
 void ContinueMenu::moveVertical(int dir)
 {
-    if (totalButtons() == 0)
-    {
-        onBack = true;
-        updateFocus();
-        return;
-    }
-
     if (onBack)
     {
-        // Tim mot cot co save de nhay vao (uu tien cot dang nho, roi
-        // quet sang cac cot khac)
-        int col = selectedCol;
-        if (col < 0 || col >= MODE_COUNT || saveButtons[col].empty())
-        {
-            for (int c = 0; c < MODE_COUNT; ++c)
-            {
-                if (!saveButtons[c].empty()) { col = c; break; }
-            }
-        }
-
-        selectedCol = col;
-        selectedRow = (dir < 0)
-            ? static_cast<int>(saveButtons[col].size()) - 1
-            : 0;
+        // move from back to last slot (or first)
+        selectedIndex = (dir < 0) ? static_cast<int>(slotButtons.size()) - 1 : 0;
         onBack = false;
     }
     else
     {
-        int rows = static_cast<int>(saveButtons[selectedCol].size());
-        selectedRow += dir;
-
-        if (selectedRow < 0 || selectedRow >= rows)
+        selectedIndex += dir;
+        if (selectedIndex < 0)
+        {
             onBack = true;
+        }
+        else if (selectedIndex >= static_cast<int>(slotButtons.size()))
+        {
+            onBack = true;
+        }
     }
+
+    // clamp
+    if (selectedIndex < 0) selectedIndex = 0;
+    if (selectedIndex >= static_cast<int>(slotButtons.size())) selectedIndex = static_cast<int>(slotButtons.size()) - 1;
 
     updateFocus();
 }
@@ -367,27 +286,17 @@ void ContinueMenu::activateSelected()
     if (onBack)
     {
         backButton.press();
-
-        if (audio)
-            audio->playSound("select");
-
+        if (audio) audio->playSound("select");
         result = ContinueMenuResult::Back;
         return;
     }
 
-    if (selectedCol < 0 || selectedCol >= MODE_COUNT)
+    if (selectedIndex < 0 || selectedIndex >= static_cast<int>(slotButtons.size()))
         return;
 
-    if (selectedRow < 0 || selectedRow >= static_cast<int>(saveButtons[selectedCol].size()))
-        return;
-
-    saveButtons[selectedCol][selectedRow].press();
-
-    if (audio)
-        audio->playSound("select");
-
-    selectedMapIndex = saveButtonMapIndex[selectedCol][selectedRow];
-    selectedModeIndex = selectedCol;
+    slotButtons[selectedIndex].press();
+    if (audio) audio->playSound("select");
+    selectedSlotIndex = selectedIndex;
     result = ContinueMenuResult::Selected;
 }
 
@@ -420,19 +329,13 @@ void ContinueMenu::processEvent(const sf::Event& event,
     {
         switch (event.key.code)
         {
-        case sf::Keyboard::Left:
-            moveHorizontal(-1);
-            break;
-
-        case sf::Keyboard::Right:
-            moveHorizontal(1);
-            break;
-
         case sf::Keyboard::Up:
+        case sf::Keyboard::W:
             moveVertical(-1);
             break;
 
         case sf::Keyboard::Down:
+        case sf::Keyboard::S:
             moveVertical(1);
             break;
 
@@ -452,12 +355,9 @@ void ContinueMenu::processEvent(const sf::Event& event,
     }
 
     //-----------------------------
-    // Mouse
     //-----------------------------
-
-    for (int c = 0; c < MODE_COUNT; ++c)
-        for (auto& b : saveButtons[c])
-            b.processEvent(event, window);
+    for (auto& b : slotButtons)
+        b.processEvent(event, window);
 
     backButton.processEvent(event, window);
 
@@ -467,18 +367,14 @@ void ContinueMenu::processEvent(const sf::Event& event,
         sf::Vector2f mp = window.mapPixelToCoords(
             { event.mouseButton.x, event.mouseButton.y });
 
-        for (int c = 0; c < MODE_COUNT; ++c)
+        for (std::size_t i = 0; i < slotButtons.size(); ++i)
         {
-            for (std::size_t i = 0; i < saveButtons[c].size(); i++)
+            if (slotButtons[i].contains(mp))
             {
-                if (saveButtons[c][i].contains(mp))
-                {
-                    selectedCol = c;
-                    selectedRow = static_cast<int>(i);
-                    onBack = false;
-                    activateSelected();
-                    return;
-                }
+                selectedIndex = static_cast<int>(i);
+                onBack = false;
+                activateSelected();
+                return;
             }
         }
 
@@ -493,47 +389,128 @@ void ContinueMenu::processEvent(const sf::Event& event,
 void ContinueMenu::update(float dt)
 {
     (void)dt;
-
-    for (int c = 0; c < MODE_COUNT; ++c)
-        for (auto& b : saveButtons[c])
-            b.update();
-
+    for (auto& b : slotButtons) b.update();
     backButton.update();
 }
 
 void ContinueMenu::draw(sf::RenderWindow& window) const
 {
     background.draw(window);
-
     window.draw(titleText);
 
-    bool anySave = (totalButtons() > 0);
+    float slotW = W * SLOT_W_FRAC;
+    float x = W / 2.f - slotW / 2.f;
+    float y = START_Y;
 
-    for (int c = 0; c < MODE_COUNT; ++c)
+    for (int i = 0; i < SLOT_COUNT; ++i)
     {
-        // Header (SilverBox 3-slice) + nhan mode
-        if (modeBoxTexture)
+        // draw slot background using three-slice to preserve corners
+        if (slotBoxTexture)
         {
-            sf::FloatRect r = headerRect(c);
-            drawThreeSlice(window, *modeBoxTexture, SILVERBOX_CONTENT,
-                r.left, r.top, r.width, r.height);
+            drawThreeSliceLocal(window, *slotBoxTexture, SILVERBOX_CONTENT, x, y, slotW, SLOT_H);
         }
-
-        window.draw(modeLabelText[c]);
-
-        if (saveButtons[c].empty())
+        else if (buttonTexture)
         {
-            window.draw(modeEmptyHint[c]);
+            sf::Sprite s;
+            s.setTexture(*buttonTexture);
+            float sx = slotW / btnRenderW;
+            float sy = SLOT_H / btnRenderH;
+            s.setScale(sx, sy);
+            s.setPosition(x, y);
+            window.draw(s);
         }
         else
         {
-            for (const auto& b : saveButtons[c])
-                b.draw(window);
+            sf::RectangleShape rect({ slotW, SLOT_H });
+            rect.setPosition(x, y);
+            rect.setFillColor(sf::Color(40,40,40));
+            window.draw(rect);
         }
-    }
 
-    if (!anySave)
-        window.draw(hintText);
+        // draw character image
+        if (slotInfo[i].exists && slotInfo[i].characterIndex >= 0 && slotInfo[i].characterIndex < 4)
+        {
+            sf::Sprite cs;
+            cs.setTexture(charTextures[slotInfo[i].characterIndex]);
+            float scale = CHAR_IMG_SIZE / static_cast<float>(charTextures[slotInfo[i].characterIndex].getSize().y);
+            cs.setScale(scale, scale);
+            cs.setPosition(x + 12.f, y + (SLOT_H - CHAR_IMG_SIZE) / 2.f);
+            window.draw(cs);
+        }
+
+        // draw texts
+        if (font)
+        {
+            sf::Text nameText;
+            nameText.setFont(*font);
+            nameText.setCharacterSize(22);
+            nameText.setFillColor(sf::Color::White);
+            if (slotInfo[i].exists && !slotInfo[i].playerName.empty())
+                nameText.setString(slotInfo[i].playerName);
+            else if (!slotInfo[i].exists)
+                nameText.setString("EMPTY SLOT");
+            else
+                nameText.setString(" ");
+
+            nameText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 8.f);
+            window.draw(nameText);
+
+            if (slotInfo[i].exists)
+            {
+                sf::Text infoText;
+                infoText.setFont(*font);
+                infoText.setCharacterSize(18);
+                infoText.setFillColor(sf::Color(200,200,200));
+
+                std::ostringstream oss;
+                int mi = slotInfo[i].mapIndex;
+                std::string mname = (mi>=0 && mi<4)? MAP_NAMES[mi] : "UNKNOWN";
+                oss << "MAP: " << mname;
+                infoText.setString(oss.str());
+                infoText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 36.f);
+                window.draw(infoText);
+
+                oss.str(""); oss.clear();
+                oss << "MODE: " << MODE_NAMES[slotInfo[i].difficultyMode];
+                infoText.setString(oss.str());
+                infoText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 58.f);
+                window.draw(infoText);
+
+                oss.str(""); oss.clear();
+                oss << "LEVEL: " << slotInfo[i].level;
+                infoText.setString(oss.str());
+                infoText.setPosition(x + CHAR_IMG_SIZE + 260.f, y + 36.f);
+                window.draw(infoText);
+
+                oss.str(""); oss.clear();
+                oss << "SCORE: " << slotInfo[i].score;
+                infoText.setString(oss.str());
+                infoText.setPosition(x + CHAR_IMG_SIZE + 260.f, y + 58.f);
+                window.draw(infoText);
+
+                sf::Text timeText;
+                timeText.setFont(*font);
+                timeText.setCharacterSize(16);
+                timeText.setFillColor(sf::Color(170,170,170));
+                timeText.setString(slotInfo[i].saveTime);
+                timeText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 82.f);
+                window.draw(timeText);
+            }
+
+            // draw selection highlight
+            if (!onBack && i == selectedIndex)
+            {
+                sf::RectangleShape frame({ slotW, SLOT_H });
+                frame.setPosition(x, y);
+                frame.setFillColor(sf::Color::Transparent);
+                frame.setOutlineColor(sf::Color(255, 220, 80));
+                frame.setOutlineThickness(3.f);
+                window.draw(frame);
+            }
+        }
+
+        y += SLOT_H + SLOT_GAP;
+    }
 
     backButton.draw(window);
 }

@@ -281,6 +281,7 @@
     <Image Include="ui\Logo\CrossingGame_Logo.png" />
     <Image Include="ui\Logo\SETTING.png" />
     <Image Include="ui\Menu_Map\MenuMap.png" />
+    <Image Include="ui\Save\Save_Slot.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Sound\Ancientmap_backgroundmusic.mp3" />

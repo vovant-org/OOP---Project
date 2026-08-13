@@ -73,6 +73,9 @@
     <Filter Include="Source Files\AdvancedFunction">
       <UniqueIdentifier>{b9ebb735-f647-46ee-bfc8-e7fcbe341776}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\ui\Save">
+      <UniqueIdentifier>{f19d9f66-6ddc-44e4-8dd5-5974c17568e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CANIMAL.cpp">
@@ -456,6 +459,9 @@
     </Image>
     <Image Include="ui\Logo\SETTING.png">
       <Filter>Resource Files\ui\Logo</Filter>
+    </Image>
+    <Image Include="ui\Save\Save_Slot.png">
+      <Filter>Resource Files\ui\Save</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
