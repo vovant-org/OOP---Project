@@ -16,7 +16,8 @@ namespace
     constexpr float SLOT_W_FRAC = 0.82f;
     constexpr float SLOT_H = 120.f;
     constexpr float SLOT_GAP = 20.f;
-    constexpr float START_Y = 120.f;
+    constexpr float START_Y = 120.f;        // dinh vung danh sach (duoi title)
+    constexpr float BOTTOM_RESERVED = 110.f; // khoang chua nut Back + le duoi
     constexpr float CHAR_IMG_SIZE = 96.f;
 
     // 3-slice content for silver/golden box (match AboutMenu / Leaderboard)
@@ -130,7 +131,6 @@ void ContinueMenu::setFont(const sf::Font& f)
     backButton.setFont(f);
     backButton.setText("BACK");
     backButton.setCharacterSize(26);
-    // No per-mode labels in slot-based continue menu
 }
 
 void ContinueMenu::setButtonTexture(const sf::Texture& tex, float scaleX, float scaleY)
@@ -156,7 +156,7 @@ void ContinueMenu::setSlotTexture(const sf::Texture& tex)
 }
 
 //==================================================
-// Refresh - read 4 save slots
+// Refresh - quet dong toan bo Save/
 //==================================================
 
 void ContinueMenu::refresh()
@@ -177,32 +177,33 @@ void ContinueMenu::refresh()
         charTexturesLoaded = true;
     }
 
+    // ===== CHANGED (Giai doan 2): danh sach DONG thay vi 4 slot co dinh =====
+    std::vector<CGAME::SaveData> saves = CGAME::ListAllSaves();
+
     slotButtons.clear();
-    slotButtons.resize(SLOT_COUNT);
+    slotInfo.clear();
+    slotButtons.resize(saves.size());
+    slotInfo.resize(saves.size());
 
     float slotW = W * SLOT_W_FRAC;
     float x = W / 2.f - slotW / 2.f;
-    float y = START_Y;
 
-    for (int i = 0; i < SLOT_COUNT; ++i)
+    for (std::size_t i = 0; i < saves.size(); ++i)
     {
-        CGAME::SaveData sd;
-        std::string path = CGAME::GetSavePathForSlot(i);
-        if (CGAME::PeekSaveData(path, sd))
-        {
-            slotInfo[i].exists = true;
-            slotInfo[i].characterIndex = sd.characterIndex;
-            slotInfo[i].playerName = sd.playerName;
-            slotInfo[i].mapIndex = sd.mapIndex;
-            slotInfo[i].score = sd.score;
-            slotInfo[i].difficultyMode = sd.difficultyMode;
-            slotInfo[i].level = sd.level;
-            slotInfo[i].saveTime = sd.saveTime;
-        }
-        else
-        {
-            slotInfo[i] = SlotInfo();
-        }
+        const CGAME::SaveData& sd = saves[i];
+
+        slotInfo[i].exists = sd.exists;
+        slotInfo[i].isValid = sd.isValid;
+        slotInfo[i].filePath = sd.filePath;
+        slotInfo[i].fileSizeBytes = sd.fileSizeBytes;
+        slotInfo[i].lastWriteTimeUnix = sd.lastWriteTimeUnix;
+        slotInfo[i].characterIndex = sd.characterIndex;
+        slotInfo[i].playerName = sd.playerName;
+        slotInfo[i].mapIndex = sd.mapIndex;
+        slotInfo[i].score = sd.score;
+        slotInfo[i].difficultyMode = sd.difficultyMode;
+        slotInfo[i].level = sd.level;
+        slotInfo[i].saveTime = sd.saveTime;
 
         Button btn;
         if (buttonTexture)
@@ -213,23 +214,139 @@ void ContinueMenu::refresh()
         if (font) btn.setFont(*font);
 
         btn.setCharacterSize(18);
+
+        // ===== CHANGED (Giai doan 2): toa do Y la toa do NOI DUNG cuc bo
+        // (local, bat dau tu 0 cho hang dau tien), KHONG con cong them
+        // START_Y va KHONG tru scrollOffset o day nua - viec dat dung vi
+        // tri thuc te tren man hinh (bao gom ca cuon) do sf::View rieng
+        // trong computeListView() dam nhan luc draw()/xu ly click =====
+        float y = static_cast<float>(i) * (SLOT_H + SLOT_GAP);
         btn.setPosition(x, y);
         btn.setFocused(false);
         slotButtons[i] = btn;
-
-        y += SLOT_H + SLOT_GAP;
     }
 
-    // back button
+    // back button (nam NGOAI vung cuon, toa do man hinh binh thuong)
     backButton.setPosition(W / 2.f - btnRenderW / 2.f, H - 80.f);
 
-    // select first slot by default
+    // ===== CHANGED: neu khong co save nao, focus thang vao Back de
+    // tranh selectedIndex tro vao danh sach rong =====
     selectedIndex = 0;
-    onBack = false;
-    selectedSlotIndex = -1;
+    onBack = slotButtons.empty();
+    selectedRowIndex = -1;
     result = ContinueMenuResult::None;
+    scrollOffset = 0.f;   // ===== ADDED: reset vi tri cuon moi lan mo lai menu =====
 
     updateFocus();
+}
+
+//==================================================
+// Layout / Scroll helpers (Giai doan 2)
+//==================================================
+
+sf::FloatRect ContinueMenu::listAreaDesign() const
+{
+    float top = START_Y;
+    float bottom = H - BOTTOM_RESERVED;
+    float height = bottom - top;
+    if (height < 0.f) height = 0.f;
+    return sf::FloatRect(0.f, top, W, height);
+}
+
+sf::View ContinueMenu::computeListView(const sf::RenderWindow& window) const
+{
+    sf::FloatRect area = listAreaDesign();
+
+    // View HIEN TAI cua window co the da bi letterbox (xem
+    // applyLetterboxView() trong main.cpp) - list view phai la 1 view
+    // "con" nam long trong dung viewport cua view do, khong phai toan
+    // bo window, de van hien dung vi tri khi fullscreen/ti le man hinh
+    // khac 16:9.
+    sf::View parentView = window.getView();
+    sf::FloatRect parentVp = parentView.getViewport();
+
+    float topFrac = (H > 0.f) ? (area.top / H) : 0.f;
+    float heightFrac = (H > 0.f) ? (area.height / H) : 0.f;
+
+    sf::FloatRect subViewport(
+        parentVp.left,
+        parentVp.top + parentVp.height * topFrac,
+        parentVp.width,
+        parentVp.height * heightFrac
+    );
+
+    sf::View listView;
+    listView.setViewport(subViewport);
+    listView.setSize(area.width, area.height);
+    // Nhin vao toa do NOI DUNG cuc bo (bat dau tu 0), dich xuong theo
+    // scrollOffset - day la diem mau chot tao hieu ung cuon
+    listView.setCenter(area.width / 2.f, area.height / 2.f + scrollOffset);
+
+    return listView;
+}
+
+float ContinueMenu::contentHeight() const
+{
+    if (slotInfo.empty()) return 0.f;
+    return static_cast<float>(slotInfo.size()) * (SLOT_H + SLOT_GAP) - SLOT_GAP;
+}
+
+float ContinueMenu::maxScrollOffset() const
+{
+    float overflow = contentHeight() - listAreaDesign().height;
+    return (overflow > 0.f) ? overflow : 0.f;
+}
+
+void ContinueMenu::clampScroll()
+{
+    float maxS = maxScrollOffset();
+    if (scrollOffset < 0.f) scrollOffset = 0.f;
+    if (scrollOffset > maxS) scrollOffset = maxS;
+}
+
+void ContinueMenu::ensureRowVisible(int index)
+{
+    if (index < 0 || index >= static_cast<int>(slotInfo.size())) return;
+
+    sf::FloatRect area = listAreaDesign();
+    float rowTop = static_cast<float>(index) * (SLOT_H + SLOT_GAP);
+    float rowBottom = rowTop + SLOT_H;
+
+    if (rowTop < scrollOffset)
+        scrollOffset = rowTop;
+    else if (rowBottom > scrollOffset + area.height)
+        scrollOffset = rowBottom - area.height;
+
+    clampScroll();
+}
+
+void ContinueMenu::drawScrollbar(sf::RenderWindow& window) const
+{
+    float maxS = maxScrollOffset();
+    if (maxS <= 0.f) return;   // noi dung vua khung nhin, khong can thanh cuon
+
+    sf::FloatRect area = listAreaDesign();
+
+    constexpr float TRACK_W = 6.f;
+    float trackX = W - 22.f;
+
+    sf::RectangleShape track({ TRACK_W, area.height });
+    track.setPosition(trackX, area.top);
+    track.setFillColor(sf::Color(255, 255, 255, 40));
+    window.draw(track);
+
+    float ch = contentHeight();
+    float thumbHFrac = (ch > 0.f) ? (area.height / ch) : 1.f;
+    if (thumbHFrac > 1.f) thumbHFrac = 1.f;
+    if (thumbHFrac < 0.08f) thumbHFrac = 0.08f;   // toi thieu de van con nhin thay/keo duoc
+
+    float thumbH = area.height * thumbHFrac;
+    float thumbY = area.top + (scrollOffset / maxS) * (area.height - thumbH);
+
+    sf::RectangleShape thumb({ TRACK_W, thumbH });
+    thumb.setPosition(trackX, thumbY);
+    thumb.setFillColor(sf::Color(255, 220, 80, 200));
+    window.draw(thumb);
 }
 
 //==================================================
@@ -255,6 +372,15 @@ void ContinueMenu::updateFocus()
 
 void ContinueMenu::moveVertical(int dir)
 {
+    // ===== ADDED (Giai doan 2): danh sach rong -> luon o Back, khong co
+    // gi de duyet, tranh slotButtons.size()-1 tran so (size_t) =====
+    if (slotButtons.empty())
+    {
+        onBack = true;
+        updateFocus();
+        return;
+    }
+
     if (onBack)
     {
         // move from back to last slot (or first)
@@ -278,12 +404,17 @@ void ContinueMenu::moveVertical(int dir)
     if (selectedIndex < 0) selectedIndex = 0;
     if (selectedIndex >= static_cast<int>(slotButtons.size())) selectedIndex = static_cast<int>(slotButtons.size()) - 1;
 
+    // ===== ADDED (Giai doan 2): tu dong cuon de hang dang chon luon
+    // nam trong khung nhin khi di chuyen bang ban phim =====
+    if (!onBack)
+        ensureRowVisible(selectedIndex);
+
     updateFocus();
 }
 
 void ContinueMenu::activateSelected()
 {
-    if (onBack)
+    if (onBack || slotButtons.empty())
     {
         backButton.press();
         if (audio) audio->playSound("select");
@@ -294,9 +425,15 @@ void ContinueMenu::activateSelected()
     if (selectedIndex < 0 || selectedIndex >= static_cast<int>(slotButtons.size()))
         return;
 
+    // ===== ADDED (Giai doan 2): khong cho Load 1 file save bi hong
+    // (isValid=false) - viec cho phep Delete file hong se lam o Giai
+    // doan 4 (nut Delete rieng tung dong) =====
+    if (!slotInfo[selectedIndex].isValid)
+        return;
+
     slotButtons[selectedIndex].press();
     if (audio) audio->playSound("select");
-    selectedSlotIndex = selectedIndex;
+    selectedRowIndex = selectedIndex;
     result = ContinueMenuResult::Selected;
 }
 
@@ -312,6 +449,13 @@ ContinueMenuResult ContinueMenu::getResult() const
 void ContinueMenu::clearResult()
 {
     result = ContinueMenuResult::None;
+}
+
+std::string ContinueMenu::getSelectedSavePath() const
+{
+    if (selectedRowIndex < 0 || selectedRowIndex >= static_cast<int>(slotInfo.size()))
+        return std::string();
+    return slotInfo[selectedRowIndex].filePath;
 }
 
 //==================================================
@@ -355,33 +499,57 @@ void ContinueMenu::processEvent(const sf::Event& event,
     }
 
     //-----------------------------
+    // Chuot lan (scroll)
     //-----------------------------
-    for (auto& b : slotButtons)
-        b.processEvent(event, window);
+    if (event.type == sf::Event::MouseWheelScrolled)
+    {
+        // delta duong = lan len -> cuon LEN (giam scrollOffset)
+        scrollOffset -= event.mouseWheelScroll.delta * (SLOT_H + SLOT_GAP) * 0.5f;
+        clampScroll();
+    }
 
+    //-----------------------------
+    // Hover cho tung hang trong danh sach: PHAI dung view rieng co scroll
+    // (computeListView), KHONG the goi slotButtons[i].processEvent(event,
+    // window) nhu truoc vi ham do tu map chuot theo view HIEN TAI cua
+    // window (view mac dinh, khong biet gi ve scrollOffset) -> se sai vi
+    // tri hover moi khi da cuon xuong. Dung overload moi cua Button nhan
+    // thang toa do da map san.
+    //-----------------------------
+    sf::View listView = computeListView(window);
+    sf::Vector2f mouseListPos =
+        window.mapPixelToCoords(sf::Mouse::getPosition(window), listView);
+
+    for (auto& b : slotButtons)
+        b.processEvent(event, mouseListPos); // processed in list view coordinates
+
+    // Back button nam NGOAI vung cuon -> van dung overload cu (view mac dinh)
     backButton.processEvent(event, window);
 
     if (event.type == sf::Event::MouseButtonReleased &&
         event.mouseButton.button == sf::Mouse::Left)
     {
-        sf::Vector2f mp = window.mapPixelToCoords(
+        sf::Vector2f mpDefault = window.mapPixelToCoords(
             { event.mouseButton.x, event.mouseButton.y });
 
+        if (backButton.contains(mpDefault))
+        {
+            onBack = true;
+            activateSelected();
+            return;
+        }
+
+        // Cac hang save: tai su dung mouseListPos da tinh o tren (chuot
+        // chua kip di chuyen giua luc bam va luc tha trong cung 1 event)
         for (std::size_t i = 0; i < slotButtons.size(); ++i)
         {
-            if (slotButtons[i].contains(mp))
+            if (slotButtons[i].contains(mouseListPos))
             {
                 selectedIndex = static_cast<int>(i);
                 onBack = false;
                 activateSelected();
                 return;
             }
-        }
-
-        if (backButton.contains(mp))
-        {
-            onBack = true;
-            activateSelected();
         }
     }
 }
@@ -398,12 +566,30 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
     background.draw(window);
     window.draw(titleText);
 
+    if (slotInfo.empty())
+    {
+        window.draw(hintText);
+        backButton.draw(window);
+        return;
+    }
+
+    // ===== ADDED (Giai doan 2): chuyen sang view rieng chi bao phu vung
+    // danh sach (listAreaDesign()), da dich theo scrollOffset - moi thu
+    // ve BEN TRONG khoi nay se tu dong bi CAT (clip) dung ranh gioi vung
+    // hien thi va cuon dung vi tri, khong can code clip thu cong =====
+    sf::View savedView = window.getView();
+    sf::View listView = computeListView(window);
+    window.setView(listView);
+
     float slotW = W * SLOT_W_FRAC;
     float x = W / 2.f - slotW / 2.f;
-    float y = START_Y;
 
-    for (int i = 0; i < SLOT_COUNT; ++i)
+    for (std::size_t i = 0; i < slotInfo.size(); ++i)
     {
+        // ===== CHANGED: toa do Y la toa do NOI DUNG cuc bo (khong con
+        // START_Y), khop voi cach slotButtons duoc dat trong refresh() =====
+        float y = static_cast<float>(i) * (SLOT_H + SLOT_GAP);
+
         // draw slot background using three-slice to preserve corners
         if (slotBoxTexture)
         {
@@ -423,12 +609,12 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
         {
             sf::RectangleShape rect({ slotW, SLOT_H });
             rect.setPosition(x, y);
-            rect.setFillColor(sf::Color(40,40,40));
+            rect.setFillColor(sf::Color(40, 40, 40));
             window.draw(rect);
         }
 
-        // draw character image
-        if (slotInfo[i].exists && slotInfo[i].characterIndex >= 0 && slotInfo[i].characterIndex < 4)
+        // draw character image (chi khi doc du lieu thanh cong)
+        if (slotInfo[i].isValid && slotInfo[i].characterIndex >= 0 && slotInfo[i].characterIndex < 4)
         {
             sf::Sprite cs;
             cs.setTexture(charTextures[slotInfo[i].characterIndex]);
@@ -445,33 +631,38 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
             nameText.setFont(*font);
             nameText.setCharacterSize(22);
             nameText.setFillColor(sf::Color::White);
-            if (slotInfo[i].exists && !slotInfo[i].playerName.empty())
+
+            // ===== CHANGED (Giai doan 2): dung isValid thay vi exists -
+            // exists gio luon true (file co that tren dia), isValid moi
+            // phan anh dung viec parse noi dung co thanh cong hay khong =====
+            if (slotInfo[i].isValid && !slotInfo[i].playerName.empty())
                 nameText.setString(slotInfo[i].playerName);
-            else if (!slotInfo[i].exists)
-                nameText.setString("EMPTY SLOT");
+            else if (!slotInfo[i].isValid)
+                nameText.setString("INVALID SAVE");
             else
                 nameText.setString(" ");
 
             nameText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 8.f);
             window.draw(nameText);
 
-            if (slotInfo[i].exists)
+            if (slotInfo[i].isValid)
             {
                 sf::Text infoText;
                 infoText.setFont(*font);
                 infoText.setCharacterSize(18);
-                infoText.setFillColor(sf::Color(200,200,200));
+                infoText.setFillColor(sf::Color(200, 200, 200));
 
                 std::ostringstream oss;
                 int mi = slotInfo[i].mapIndex;
-                std::string mname = (mi>=0 && mi<4)? MAP_NAMES[mi] : "UNKNOWN";
+                std::string mname = (mi >= 0 && mi < 4) ? MAP_NAMES[mi] : "UNKNOWN";
                 oss << "MAP: " << mname;
                 infoText.setString(oss.str());
                 infoText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 36.f);
                 window.draw(infoText);
 
                 oss.str(""); oss.clear();
-                oss << "MODE: " << MODE_NAMES[slotInfo[i].difficultyMode];
+                int md = slotInfo[i].difficultyMode;
+                oss << "MODE: " << ((md >= 0 && md < 3) ? MODE_NAMES[md] : "UNKNOWN");
                 infoText.setString(oss.str());
                 infoText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 58.f);
                 window.draw(infoText);
@@ -491,14 +682,14 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
                 sf::Text timeText;
                 timeText.setFont(*font);
                 timeText.setCharacterSize(16);
-                timeText.setFillColor(sf::Color(170,170,170));
+                timeText.setFillColor(sf::Color(170, 170, 170));
                 timeText.setString(slotInfo[i].saveTime);
                 timeText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 82.f);
                 window.draw(timeText);
             }
 
             // draw selection highlight
-            if (!onBack && i == selectedIndex)
+            if (!onBack && i == static_cast<std::size_t>(selectedIndex))
             {
                 sf::RectangleShape frame({ slotW, SLOT_H });
                 frame.setPosition(x, y);
@@ -508,9 +699,14 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
                 window.draw(frame);
             }
         }
-
-        y += SLOT_H + SLOT_GAP;
     }
+
+    // ===== ADDED (Giai doan 2): tra view ve nhu cu TRUOC KHI ve scrollbar
+    // va Back button - 2 thu nay nam NGOAI vung cuon, phai o toa do man
+    // hinh binh thuong =====
+    window.setView(savedView);
+
+    drawScrollbar(window);
 
     backButton.draw(window);
 }

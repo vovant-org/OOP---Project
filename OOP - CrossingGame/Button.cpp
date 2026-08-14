@@ -9,6 +9,36 @@ Button::Button()
     text.setFillColor(normalColor);
 }
 
+void Button::processEvent(const sf::Event& event,
+    const sf::Vector2f& mousePos)
+{
+    if (!enabled)
+        return;
+
+    if (pressAnimating)
+    {
+        if (pressClock.getElapsedTime() >= pressDuration)
+        {
+            pressed = false;
+            pressAnimating = false;
+        }
+    }
+
+    hovered = contains(mousePos);
+
+    if (event.type == sf::Event::MouseButtonPressed &&
+        event.mouseButton.button == sf::Mouse::Left)
+    {
+        pressed = hovered;
+    }
+
+    if (event.type == sf::Event::MouseButtonReleased &&
+        event.mouseButton.button == sf::Mouse::Left)
+    {
+        pressed = false;
+    }
+}
+
 //==================================================
 // Private
 //==================================================

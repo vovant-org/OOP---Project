@@ -995,9 +995,15 @@ int main()
             {
                 continueMenu.clearResult();
 
-                int slot = continueMenu.getSelectedSlotIndex();
+                // ===== CHANGED (Giai doan 2 - Continue Menu redesign):
+                // danh sach save gio la DONG (quet toan bo thu muc Save/
+                // qua CGAME::ListAllSaves()), khong con la 4 slot co dinh
+                // save1..save4.sav nua - nen dung duong dan THAT cua file
+                // duoc chon (getSelectedSavePath()) thay vi suy ra qua
+                // GetSavePathForSlot(slot index) =====
+                std::string savePath = continueMenu.getSelectedSavePath();
 
-                if (game.LoadGame(CGAME::GetSavePathForSlot(slot)))
+                if (!savePath.empty() && game.LoadGame(savePath))
                 {
                     selectedMapIndex = game.GetCurrentMap();
                     selectedCharIndex = game.GetCharacterIndex();

@@ -135,16 +135,52 @@ public:
     // Peek full save data
     struct SaveData
     {
-        bool exists = false;
+        bool exists = false;    // file .sav co ton tai tren dia hay khong
+        // ===== ADDED (Giai doan 1 - Continue Menu redesign): danh dau
+        // file co doc/parse thanh cong DU 6 truong bat buoc hay khong.
+        // exists=true nhung isValid=false nghia la file bi hong/thieu
+        // du lieu (VD file .sav cu dinh dang khac) - dung de UI hien
+        // "Invalid" giong cach Thrive hien save loi thay vi an di =====
+        bool isValid = false;
+
+        // ===== ADDED: metadata cap file, phuc vu Continue Menu kieu
+        // danh sach dong (thumbnail/kich thuoc/thoi gian sua doi) =====
+        std::string filePath;              // duong dan day du toi file .sav
+        long long   fileSizeBytes = 0;      // dung luong file, dung cho "Space used"
+        long long   lastWriteTimeUnix = 0;  // thoi diem sua doi cuoi (epoch giay), dung de sap xep "moi nhat len dau"
+
         int characterIndex = 0;
         std::string playerName;
         int mapIndex = 0;
         int score = 0;
         int difficultyMode = 1;
         int level = 1;
-        std::string saveTime;
+        std::string saveTime;               // chuoi thoi gian luu trong noi dung file (co the trong neu file hong)
     };
     static bool PeekSaveData(const std::string& path, SaveData& out);
+
+    // ===== ADDED (Giai doan 1 - Continue Menu redesign) =====
+    // Quet toan bo thu muc Save/ va tra ve TAT CA file .sav tim thay
+    // (khong con gioi han 4 slot co dinh nua). Moi phan tu duoc dien
+    // day du filePath/fileSizeBytes/lastWriteTimeUnix; neu file hong
+    // thi exists=true, isValid=false (cac truong con lai giu mac dinh)
+    // thay vi bi bo qua - dung de Continue Menu (giai doan sau) hien
+    // dong "Invalid" giong Thrive thay vi lam bien mat save loi.
+    // Ket qua duoc sap xep theo lastWriteTimeUnix GIAM DAN (file moi
+    // sua doi gan day nhat len dau danh sach).
+    static std::vector<SaveData> ListAllSaves();
+
+    // Xoa 1 file save theo duong dan day du (VD lay tu SaveData::filePath).
+    // Tra ve true neu xoa thanh cong. Dung cho nut "Delete"/"Delete
+    // Selected"/"Clean Up Old Saves" o giai doan sau.
+    static bool DeleteSave(const std::string& path);
+
+    // Dung luong 1 file save (bytes). Tra ve 0 neu khong doc duoc.
+    static long long GetSaveFileSize(const std::string& path);
+
+    // Tong dung luong TAT CA file save trong thu muc Save/ (bytes).
+    // Dung cho dong "Space used" o thanh trang thai duoi Continue Menu.
+    static long long GetTotalSaveSpaceUsed();
 
     // Static vi khong can 1 instance CGAME song - dung de ContinueMenu
     // liet ke cac save co san ma khong phai load han.

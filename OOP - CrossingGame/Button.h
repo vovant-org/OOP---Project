@@ -77,6 +77,10 @@ public:
     // Update
     void processEvent(const sf::Event& event,
         const sf::RenderWindow& window);
+    // Overload when caller supplies mouse position already mapped to
+    // the coordinate space used for hit testing (useful for custom views)
+    void processEvent(const sf::Event& event,
+        const sf::Vector2f& mousePos);
 
     void update();
 

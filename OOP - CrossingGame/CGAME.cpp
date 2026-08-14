@@ -4,6 +4,9 @@
 #include <fstream>   // ===== ADDED (Bước 6) =====
 #include <sstream>   // ===== ADDED: build chuoi HUD =====
 #include <cmath>     // ===== ADDED: std::ceil cho dong ho HUD =====
+#include <filesystem> // ===== ADDED (Giai doan 1 - Continue Menu redesign): quet/xoa file save dong =====
+#include <chrono>     // ===== ADDED: chuyen doi thoi gian sua doi file =====
+#include <algorithm>  // ===== ADDED: std::sort ListAllSaves() =====
 
 // ===== ADDED (Bước 3): các lớp obstacle cụ thể theo map =====
 #include "CBIKE.h"
@@ -66,6 +69,27 @@ namespace
         "Save/save3.sav",
         "Save/save4.sav"
     };
+
+    // ===== ADDED (Giai doan 1 - Continue Menu redesign): thu muc chua
+    // TAT CA file save, dung cho ListAllSaves()/DeleteSave() quet dong
+    // thay vi gioi han 4 slot co dinh nhu SAVE_SLOT_PATHS o tren =====
+    const std::string SAVE_DIR = "Save";
+
+    // Chuyen std::filesystem::file_time_type -> time_t (epoch giay).
+    // Tach rieng thanh ham de PeekSaveData() khong bi vo neu clock_cast
+    // nem ngoai le tren mot so trien khai STL cu.
+    long long FileTimeToUnix(const std::filesystem::file_time_type& ftime)
+    {
+        try
+        {
+            auto sctp = std::chrono::clock_cast<std::chrono::system_clock>(ftime);
+            return static_cast<long long>(std::chrono::system_clock::to_time_t(sctp));
+        }
+        catch (...)
+        {
+            return 0;
+        }
+    }
 
     // ===== ADDED: nhac nen rieng cho tung map, phat thay cho nhac nen
     // MainMenu ngay khi Init() (vao Playing) =====
@@ -1268,7 +1292,7 @@ void CGAME::SaveGame(const std::string& path)
 
     // Get current time
     std::time_t t = std::time(nullptr);
-    char buf[64] = {0};
+    char buf[64] = { 0 };
     std::tm tm;
 #if defined(_MSC_VER)
     localtime_s(&tm, &t);
@@ -1387,6 +1411,32 @@ bool CGAME::PeekSaveInfo(const std::string& path,
 
 bool CGAME::PeekSaveData(const std::string& path, SaveData& out)
 {
+    // ===== CHANGED (Giai doan 1 - Continue Menu redesign) =====
+    // Reset ve mac dinh truoc, sau do LUON dien filePath/fileSizeBytes/
+    // lastWriteTimeUnix mien la file ton tai tren dia - ke ca khi noi
+    // dung ben trong bi hong/thieu dong. Nho vay ListAllSaves() (ben
+    // duoi) van liet ke duoc ca cac save loi (giong dong "c" - Version:
+    // Invalid trong anh mau Thrive) thay vi lam chung bien mat khoi
+    // danh sach. Hop dong tra ve (bool) cua ham nay GIU NGUYEN nhu cu:
+    // false neu khong mo duoc file HOAC parse thieu/loi truong bat
+    // buoc - de khong lam vo cac noi dang goi ham nay (ContinueMenu
+    // hien tai dang dua vao gia tri tra ve nay).
+    out = SaveData();
+    out.filePath = path;
+
+    std::error_code ec;
+    if (std::filesystem::exists(path, ec) && !ec)
+    {
+        out.exists = true;
+
+        auto sz = std::filesystem::file_size(path, ec);
+        out.fileSizeBytes = ec ? 0 : static_cast<long long>(sz);
+
+        ec.clear();
+        auto ftime = std::filesystem::last_write_time(path, ec);
+        out.lastWriteTimeUnix = ec ? 0 : FileTimeToUnix(ftime);
+    }
+
     std::ifstream in(path);
     if (!in.is_open()) return false;
 
@@ -1395,23 +1445,95 @@ bool CGAME::PeekSaveData(const std::string& path, SaveData& out)
     out.playerName = line;
 
     if (!std::getline(in, line)) return false;
-    out.characterIndex = std::stoi(line);
+    try { out.characterIndex = std::stoi(line); }
+    catch (...) { return false; }
 
     if (!std::getline(in, line)) return false;
-    out.mapIndex = std::stoi(line);
+    try { out.mapIndex = std::stoi(line); }
+    catch (...) { return false; }
 
     if (!std::getline(in, line)) return false;
-    out.score = std::stoi(line);
+    try { out.score = std::stoi(line); }
+    catch (...) { return false; }
 
     if (!std::getline(in, line)) return false;
-    out.difficultyMode = std::stoi(line);
+    try { out.difficultyMode = std::stoi(line); }
+    catch (...) { return false; }
 
     if (!std::getline(in, line)) return false;
-    out.level = std::stoi(line);
+    try { out.level = std::stoi(line); }
+    catch (...) { return false; }
 
     if (!std::getline(in, line)) line = "";
     out.saveTime = line;
 
-    out.exists = true;
+    out.isValid = true;
     return true;
+}
+
+// ===== ADDED (Giai doan 1 - Continue Menu redesign) =====
+std::vector<CGAME::SaveData> CGAME::ListAllSaves()
+{
+    namespace fs = std::filesystem;
+    std::vector<SaveData> result;
+
+    std::error_code ec;
+    if (!fs::exists(SAVE_DIR, ec) || ec || !fs::is_directory(SAVE_DIR, ec) || ec)
+        return result;   // chua co thu muc Save/ -> danh sach rong, khong loi
+
+    for (const auto& entry : fs::directory_iterator(SAVE_DIR, ec))
+    {
+        if (ec) break;
+        if (!entry.is_regular_file()) continue;
+        if (entry.path().extension() != ".sav") continue;
+
+        // Chuan hoa dau '\\' -> '/' de dong nhat voi cac duong dan
+        // dang dung "Save/xxx.sav" o phan con lai cua code
+        std::string path = entry.path().string();
+        for (auto& c : path) if (c == '\\') c = '/';
+
+        SaveData sd;
+        PeekSaveData(path, sd);   // bo qua gia tri tra ve: du hong hay
+        // khong, sd van co filePath/size/mtime
+        // huu ich (xem isValid de biet noi
+        // dung co doc duoc day du hay khong)
+        result.push_back(std::move(sd));
+    }
+
+    // File sua doi gan day nhat len dau, giong cach Thrive sap xep
+    std::sort(result.begin(), result.end(),
+        [](const SaveData& a, const SaveData& b)
+        {
+            return a.lastWriteTimeUnix > b.lastWriteTimeUnix;
+        });
+
+    return result;
+}
+
+bool CGAME::DeleteSave(const std::string& path)
+{
+    std::error_code ec;
+    bool removed = std::filesystem::remove(path, ec);
+    if (ec)
+    {
+        std::cout << "[CGAME] Cannot delete save: " << path << " (" << ec.message() << ")\n";
+        return false;
+    }
+    return removed;
+}
+
+long long CGAME::GetSaveFileSize(const std::string& path)
+{
+    std::error_code ec;
+    auto sz = std::filesystem::file_size(path, ec);
+    if (ec) return 0;
+    return static_cast<long long>(sz);
+}
+
+long long CGAME::GetTotalSaveSpaceUsed()
+{
+    long long total = 0;
+    for (const auto& sd : ListAllSaves())
+        total += sd.fileSizeBytes;
+    return total;
 }
