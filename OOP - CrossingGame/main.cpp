@@ -165,7 +165,7 @@ int main()
         std::cout << "[ERROR] Cannot load font\n";
         return -1;
     }
-
+        
     sf::Texture settingPanelTexture, settingBoxTexture;
     sf::Texture saveSlotTexture;
     sf::Texture settingPlusTexture, settingMinusTexture;
