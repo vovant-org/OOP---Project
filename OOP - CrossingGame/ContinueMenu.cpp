@@ -15,53 +15,48 @@ namespace
     // Layout
     constexpr float SLOT_W_FRAC = 0.82f;
     constexpr float SLOT_H = 120.f;
-    constexpr float SLOT_GAP = 20.f;
+    // ===== CHANGED (Redesign: khong duoc co khoang trong lon giua cac
+    // save slot) 20 -> 10px, danh sach lien tuc giong save manager =====
+    constexpr float SLOT_GAP = 10.f;
     constexpr float START_Y = 120.f;        // dinh vung danh sach (duoi title)
     constexpr float BOTTOM_RESERVED = 110.f; // khoang chua nut Back + le duoi
     constexpr float CHAR_IMG_SIZE = 96.f;
+    constexpr float CHAR_COL_W = CHAR_IMG_SIZE + 24.f; // be rong cot preview nhan vat
 
-    // 3-slice content for silver/golden box (match AboutMenu / Leaderboard)
-    const sf::IntRect SILVERBOX_CONTENT(86, 323, 1374, 366);
-    constexpr float SILVER_CAP_FRAC = 0.27f;
+    // ===== ADDED (preview trang thai cuoi cung khi save): bo cuc
+    // spritesheet nhan vat, PHAI khop voi CPEOPLE.cpp (FRAME_COLUMNS=4,
+    // DIRECTION_ROWS=5) - moi hang la 1 huong (0=UP,1=DOWN,2=LEFT,
+    // 3=RIGHT,4=DIE), moi cot la 1 frame animation =====
+    constexpr int CHAR_SHEET_COLUMNS = 4;
+    constexpr int CHAR_SHEET_ROWS = 5;
 
-    void drawThreeSliceLocal(sf::RenderWindow& window, const sf::Texture& tex,
-        const sf::IntRect& content, float x, float y, float w, float h)
-    {
-        int capPx = static_cast<int>(content.width * SILVER_CAP_FRAC);
-        if (capPx * 2 > content.width)
-            capPx = content.width / 2;
+    // ===== ADDED (Redesign): kich thuoc/vi tri nut DELETE va badge LOAD
+    // rieng cua tung hang, nam ben phai slot giong bo cuc tham khao =====
+    constexpr float ACTION_BTN_W = 96.f;
+    constexpr float ACTION_BTN_H = 30.f;
+    constexpr float ACTION_BTN_GAP = 8.f;   // khoang cach doc giua LOAD va DELETE
+    constexpr float ACTION_MARGIN_R = 16.f;
 
-        float scale = h / static_cast<float>(content.height);
-        float capScreenW = capPx * scale;
+    // ===== ADDED (Redesign): bang mau pixel-art navy/cyan cho save slot,
+    // thay cho panel ve bang texture 3-slice cu =====
+    const sf::Color PANEL_BG(10, 20, 32);
+    const sf::Color PANEL_BG_INVALID(8, 14, 20);
+    const sf::Color PANEL_PREVIEW_BG(5, 12, 20);
+    const sf::Color PANEL_SEP(28, 58, 68);
+    const sf::Color BORDER_CYAN(58, 150, 168);
+    const sf::Color BORDER_CYAN_DIM(40, 66, 72);
+    const sf::Color BORDER_CYAN_BRIGHT(110, 232, 248);
+    const sf::Color TEXT_INFO(216, 244, 250);
+    const sf::Color TEXT_INFO_DIM(123, 184, 196);
+    const sf::Color LOAD_BG(28, 74, 84);
+    const sf::Color LOAD_BORDER(110, 232, 248);
+    const sf::Color LOAD_TEXT(234, 253, 255);
+    const sf::Color DELETE_BG(48, 16, 16);
+    const sf::Color DELETE_BG_HOVER(80, 24, 24);
+    const sf::Color DELETE_BORDER(190, 80, 80);
+    const sf::Color DELETE_BORDER_HOVER(255, 130, 130);
+    const sf::Color DELETE_TEXT(255, 216, 216);
 
-        sf::Sprite left;
-        left.setTexture(tex);
-        left.setTextureRect(sf::IntRect(content.left, content.top, capPx, content.height));
-        left.setScale(scale, scale);
-        left.setPosition(x, y);
-        window.draw(left);
-
-        sf::Sprite right;
-        right.setTexture(tex);
-        right.setTextureRect(sf::IntRect(content.left + content.width - capPx, content.top,
-            capPx, content.height));
-        right.setScale(scale, scale);
-        right.setPosition(x + w - capScreenW, y);
-        window.draw(right);
-
-        int midSrcW = content.width - capPx * 2;
-        float midScreenW = w - capScreenW * 2.f;
-
-        if (midSrcW > 0 && midScreenW > 0.f)
-        {
-            sf::Sprite mid;
-            mid.setTexture(tex);
-            mid.setTextureRect(sf::IntRect(content.left + capPx, content.top, midSrcW, content.height));
-            mid.setScale(midScreenW / static_cast<float>(midSrcW), scale);
-            mid.setPosition(x + capScreenW, y);
-            window.draw(mid);
-        }
-    }
 }
 
 //==================================================
@@ -204,6 +199,8 @@ void ContinueMenu::refresh()
         slotInfo[i].difficultyMode = sd.difficultyMode;
         slotInfo[i].level = sd.level;
         slotInfo[i].saveTime = sd.saveTime;
+        slotInfo[i].lastDirection = sd.lastDirection;
+        slotInfo[i].lastFrame = sd.lastFrame;
 
         Button btn;
         if (buttonTexture)
@@ -318,6 +315,26 @@ void ContinueMenu::ensureRowVisible(int index)
         scrollOffset = rowBottom - area.height;
 
     clampScroll();
+}
+
+// ===== ADDED (Redesign): nguon tinh toan DUY NHAT cho vi tri/kich thuoc
+// hang save thu i, theo toa do NOI DUNG cuc bo (0..W, bat dau tu 0 cho
+// hang dau) - dung giong het trong draw() va trong xu ly click, tranh
+// truong hop vung ve va vung click bi lech nhau =====
+sf::FloatRect ContinueMenu::slotRect(std::size_t index) const
+{
+    float slotW = W * SLOT_W_FRAC;
+    float x = W / 2.f - slotW / 2.f;
+    float y = static_cast<float>(index) * (SLOT_H + SLOT_GAP);
+    return sf::FloatRect(x, y, slotW, SLOT_H);
+}
+
+sf::FloatRect ContinueMenu::deleteButtonRect(std::size_t index) const
+{
+    sf::FloatRect row = slotRect(index);
+    float x = row.left + row.width - ACTION_BTN_W - ACTION_MARGIN_R;
+    float y = row.top + (row.height / 2.f) + (ACTION_BTN_GAP / 2.f);
+    return sf::FloatRect(x, y, ACTION_BTN_W, ACTION_BTN_H);
 }
 
 void ContinueMenu::drawScrollbar(sf::RenderWindow& window) const
@@ -539,11 +556,29 @@ void ContinueMenu::processEvent(const sf::Event& event,
             return;
         }
 
-        // Cac hang save: tai su dung mouseListPos da tinh o tren (chuot
-        // chua kip di chuyen giua luc bam va luc tha trong cung 1 event)
-        for (std::size_t i = 0; i < slotButtons.size(); ++i)
+        // ===== ADDED (Redesign): nut DELETE rieng cua tung hang - kiem
+        // tra TRUOC vung LOAD/hang vi no nam long ben trong hang do.
+        // Dung deleteButtonRect() (cung 1 cong thuc voi luc ve trong
+        // draw()) thay vi Button::contains() de vung click luon khop
+        // dung vung hien thi =====
+        for (std::size_t i = 0; i < slotInfo.size(); ++i)
         {
-            if (slotButtons[i].contains(mouseListPos))
+            if (deleteButtonRect(i).contains(mouseListPos))
+            {
+                if (audio) audio->playSound("select");
+                CGAME::DeleteSave(slotInfo[i].filePath);
+                refresh();
+                return;
+            }
+        }
+
+        // Cac hang save (LOAD): tai su dung mouseListPos da tinh o tren
+        // (chuot chua kip di chuyen giua luc bam va luc tha trong cung
+        // 1 event). ===== CHANGED: dung slotRect() (khop dung panel thuc
+        // te ve tren man hinh) thay vi slotButtons[i].contains() =====
+        for (std::size_t i = 0; i < slotInfo.size(); ++i)
+        {
+            if (slotRect(i).contains(mouseListPos))
             {
                 selectedIndex = static_cast<int>(i);
                 onBack = false;
@@ -581,122 +616,189 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
     sf::View listView = computeListView(window);
     window.setView(listView);
 
-    float slotW = W * SLOT_W_FRAC;
-    float x = W / 2.f - slotW / 2.f;
+    // ===== ADDED (Redesign): vi tri chuot trong khong gian noi dung
+    // cua listView (view hien tai cua window DA la listView, vi vua
+    // setView(listView) o tren) - dung de hover nut DELETE luc ve =====
+    sf::Vector2f mouseListPosDraw =
+        window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
     for (std::size_t i = 0; i < slotInfo.size(); ++i)
     {
-        // ===== CHANGED: toa do Y la toa do NOI DUNG cuc bo (khong con
-        // START_Y), khop voi cach slotButtons duoc dat trong refresh() =====
-        float y = static_cast<float>(i) * (SLOT_H + SLOT_GAP);
+        // ===== CHANGED (Redesign): slotRect() la nguon toa do DUY NHAT,
+        // dung chung voi processEvent() =====
+        sf::FloatRect r = slotRect(i);
+        float x = r.left, y = r.top;
+        float slotW = r.width;
 
-        // draw slot background using three-slice to preserve corners
-        if (slotBoxTexture)
+        bool valid = slotInfo[i].isValid;
+        bool isSelectedRow = (!onBack && i == static_cast<std::size_t>(selectedIndex));
+
+        //--- Panel nen: pixel-art flat, navy toi + vien cyan ---
+        sf::RectangleShape panel({ slotW, SLOT_H });
+        panel.setPosition(x, y);
+        panel.setFillColor(valid ? PANEL_BG : PANEL_BG_INVALID);
+        panel.setOutlineThickness(isSelectedRow ? 3.f : 2.f);
+        panel.setOutlineColor(isSelectedRow ? BORDER_CYAN_BRIGHT
+            : (valid ? BORDER_CYAN : BORDER_CYAN_DIM));
+        window.draw(panel);
+
+        //--- Cot preview nhan vat (ben trai), tach rieng bang mot vach ---
+        sf::RectangleShape charBox({ CHAR_COL_W, SLOT_H });
+        charBox.setPosition(x, y);
+        charBox.setFillColor(PANEL_PREVIEW_BG);
+        window.draw(charBox);
+
+        sf::RectangleShape charSep({ 2.f, SLOT_H });
+        charSep.setPosition(x + CHAR_COL_W, y);
+        charSep.setFillColor(PANEL_SEP);
+        window.draw(charSep);
+
+        // preview nhan vat: dung DUNG frame/huong tai thoi diem save
+        // cuoi cung (lastDirection/lastFrame), thay vi ve nguyen ca tam
+        // spritesheet 4x5. Neu huong luu la DIE (4) - VD file save cu tu
+        // ban build truoc khi co tinh nang nay, hoac hi hoi hiem gap luc
+        // save dung luc chet - fallback ve DOWN (1) de preview khong
+        // hien tu the "gap" trong Continue Menu =====
+        if (valid && slotInfo[i].characterIndex >= 0 && slotInfo[i].characterIndex < 4)
         {
-            drawThreeSliceLocal(window, *slotBoxTexture, SILVERBOX_CONTENT, x, y, slotW, SLOT_H);
-        }
-        else if (buttonTexture)
-        {
-            sf::Sprite s;
-            s.setTexture(*buttonTexture);
-            float sx = slotW / btnRenderW;
-            float sy = SLOT_H / btnRenderH;
-            s.setScale(sx, sy);
-            s.setPosition(x, y);
-            window.draw(s);
-        }
-        else
-        {
-            sf::RectangleShape rect({ slotW, SLOT_H });
-            rect.setPosition(x, y);
-            rect.setFillColor(sf::Color(40, 40, 40));
-            window.draw(rect);
+            const sf::Texture& charTex = charTextures[slotInfo[i].characterIndex];
+            int sheetW = static_cast<int>(charTex.getSize().x);
+            int sheetH = static_cast<int>(charTex.getSize().y);
+
+            if (sheetW > 0 && sheetH > 0)
+            {
+                int frameW = sheetW / CHAR_SHEET_COLUMNS;
+                int frameH = sheetH / CHAR_SHEET_ROWS;
+
+                int dir = slotInfo[i].lastDirection;
+                if (dir < 0 || dir >= CHAR_SHEET_ROWS - 1) dir = 1;   // DIE hoac gia tri la -> DOWN
+
+                int col = slotInfo[i].lastFrame;
+                if (col < 0 || col >= CHAR_SHEET_COLUMNS) col = 0;
+
+                sf::Sprite cs;
+                cs.setTexture(charTex);
+                cs.setTextureRect(sf::IntRect(col * frameW, dir * frameH, frameW, frameH));
+
+                float scale = CHAR_IMG_SIZE / static_cast<float>(frameH);
+                float drawnW = frameW * scale;
+                cs.setScale(scale, scale);
+                cs.setPosition(x + (CHAR_COL_W - drawnW) / 2.f, y + (SLOT_H - CHAR_IMG_SIZE) / 2.f);
+                window.draw(cs);
+            }
         }
 
-        // draw character image (chi khi doc du lieu thanh cong)
-        if (slotInfo[i].isValid && slotInfo[i].characterIndex >= 0 && slotInfo[i].characterIndex < 4)
-        {
-            sf::Sprite cs;
-            cs.setTexture(charTextures[slotInfo[i].characterIndex]);
-            float scale = CHAR_IMG_SIZE / static_cast<float>(charTextures[slotInfo[i].characterIndex].getSize().y);
-            cs.setScale(scale, scale);
-            cs.setPosition(x + 12.f, y + (SLOT_H - CHAR_IMG_SIZE) / 2.f);
-            window.draw(cs);
-        }
-
-        // draw texts
+        //--- Thong tin save: 2 cot gon, giua slot ---
         if (font)
         {
-            sf::Text nameText;
-            nameText.setFont(*font);
-            nameText.setCharacterSize(22);
-            nameText.setFillColor(sf::Color::White);
+            float infoX = x + CHAR_COL_W + 18.f;
+            float infoRightX = x + CHAR_COL_W + 18.f + (slotW - CHAR_COL_W) * 0.5f;
 
-            // ===== CHANGED (Giai doan 2): dung isValid thay vi exists -
-            // exists gio luon true (file co that tren dia), isValid moi
-            // phan anh dung viec parse noi dung co thanh cong hay khong =====
-            if (slotInfo[i].isValid && !slotInfo[i].playerName.empty())
-                nameText.setString(slotInfo[i].playerName);
-            else if (!slotInfo[i].isValid)
-                nameText.setString("INVALID SAVE");
+            if (!valid)
+            {
+                sf::Text invalidText;
+                invalidText.setFont(*font);
+                invalidText.setCharacterSize(20);
+                invalidText.setFillColor(TEXT_INFO_DIM);
+                invalidText.setString("INVALID SAVE");
+                invalidText.setPosition(infoX, y + (SLOT_H - 20.f) / 2.f);
+                window.draw(invalidText);
+            }
             else
-                nameText.setString(" ");
-
-            nameText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 8.f);
-            window.draw(nameText);
-
-            if (slotInfo[i].isValid)
             {
                 sf::Text infoText;
                 infoText.setFont(*font);
-                infoText.setCharacterSize(18);
-                infoText.setFillColor(sf::Color(200, 200, 200));
+                infoText.setCharacterSize(17);
+                infoText.setFillColor(TEXT_INFO);
 
                 std::ostringstream oss;
+
+                // cot trai: MAP / MODE / DATE
                 int mi = slotInfo[i].mapIndex;
-                std::string mname = (mi >= 0 && mi < 4) ? MAP_NAMES[mi] : "UNKNOWN";
-                oss << "MAP: " << mname;
+                oss << "MAP: " << ((mi >= 0 && mi < 4) ? MAP_NAMES[mi] : "UNKNOWN");
                 infoText.setString(oss.str());
-                infoText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 36.f);
+                infoText.setPosition(infoX, y + 16.f);
                 window.draw(infoText);
 
                 oss.str(""); oss.clear();
                 int md = slotInfo[i].difficultyMode;
                 oss << "MODE: " << ((md >= 0 && md < 3) ? MODE_NAMES[md] : "UNKNOWN");
                 infoText.setString(oss.str());
-                infoText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 58.f);
+                infoText.setPosition(infoX, y + 42.f);
                 window.draw(infoText);
 
+                // cot phai: LEVEL / SCORE
                 oss.str(""); oss.clear();
                 oss << "LEVEL: " << slotInfo[i].level;
                 infoText.setString(oss.str());
-                infoText.setPosition(x + CHAR_IMG_SIZE + 260.f, y + 36.f);
+                infoText.setPosition(infoRightX, y + 16.f);
                 window.draw(infoText);
 
                 oss.str(""); oss.clear();
                 oss << "SCORE: " << slotInfo[i].score;
                 infoText.setString(oss.str());
-                infoText.setPosition(x + CHAR_IMG_SIZE + 260.f, y + 58.f);
+                infoText.setPosition(infoRightX, y + 42.f);
                 window.draw(infoText);
 
+                // DATE: hang duoi cung, trai qua het chieu rong thong tin
                 sf::Text timeText;
                 timeText.setFont(*font);
-                timeText.setCharacterSize(16);
-                timeText.setFillColor(sf::Color(170, 170, 170));
-                timeText.setString(slotInfo[i].saveTime);
-                timeText.setPosition(x + CHAR_IMG_SIZE + 24.f, y + 82.f);
+                timeText.setCharacterSize(14);
+                timeText.setFillColor(TEXT_INFO_DIM);
+                timeText.setString("DATE: " + slotInfo[i].saveTime);
+                timeText.setPosition(infoX, y + 72.f);
                 window.draw(timeText);
             }
+        }
 
-            // draw selection highlight
-            if (!onBack && i == static_cast<std::size_t>(selectedIndex))
+        //--- Badge LOAD (ben phai, phia tren nut DELETE) ---
+        if (valid)
+        {
+            sf::FloatRect loadR(
+                x + slotW - ACTION_BTN_W - ACTION_MARGIN_R,
+                y + (SLOT_H / 2.f) - ACTION_BTN_GAP / 2.f - ACTION_BTN_H,
+                ACTION_BTN_W, ACTION_BTN_H);
+
+            sf::RectangleShape loadBtn({ loadR.width, loadR.height });
+            loadBtn.setPosition(loadR.left, loadR.top);
+            loadBtn.setFillColor(LOAD_BG);
+            loadBtn.setOutlineThickness(1.f);
+            loadBtn.setOutlineColor(LOAD_BORDER);
+            window.draw(loadBtn);
+
+            if (font)
             {
-                sf::RectangleShape frame({ slotW, SLOT_H });
-                frame.setPosition(x, y);
-                frame.setFillColor(sf::Color::Transparent);
-                frame.setOutlineColor(sf::Color(255, 220, 80));
-                frame.setOutlineThickness(3.f);
-                window.draw(frame);
+                sf::Text loadText;
+                loadText.setFont(*font);
+                loadText.setCharacterSize(15);
+                loadText.setFillColor(LOAD_TEXT);
+                loadText.setString("LOAD");
+                centerTextFull(loadText, loadR.left + loadR.width / 2.f, loadR.top + loadR.height / 2.f);
+                window.draw(loadText);
+            }
+        }
+
+        //--- Nut DELETE (luon co, ke ca save hong, de nguoi choi xoa) ---
+        {
+            sf::FloatRect delR = deleteButtonRect(i);
+            bool hovered = delR.contains(mouseListPosDraw);
+
+            sf::RectangleShape delBtn({ delR.width, delR.height });
+            delBtn.setPosition(delR.left, delR.top);
+            delBtn.setFillColor(hovered ? DELETE_BG_HOVER : DELETE_BG);
+            delBtn.setOutlineThickness(1.f);
+            delBtn.setOutlineColor(hovered ? DELETE_BORDER_HOVER : DELETE_BORDER);
+            window.draw(delBtn);
+
+            if (font)
+            {
+                sf::Text delText;
+                delText.setFont(*font);
+                delText.setCharacterSize(14);
+                delText.setFillColor(DELETE_TEXT);
+                delText.setString("DELETE");
+                centerTextFull(delText, delR.left + delR.width / 2.f, delR.top + delR.height / 2.f);
+                window.draw(delText);
             }
         }
     }

@@ -70,6 +70,11 @@ private:
         int difficultyMode = 1;
         int level = 1;
         std::string saveTime;
+
+        // ===== ADDED (preview dung trang thai cuoi cung): huong/frame
+        // cua nhan vat tai thoi diem save, lay tu CGAME::SaveData =====
+        int lastDirection = 1;
+        int lastFrame = 0;
     };
     // ===== CHANGED: std::array<SlotInfo,4> co dinh -> std::vector danh
     // sach dong, kich thuoc = slotButtons.size() =====
@@ -127,6 +132,16 @@ private:
     void ensureRowVisible(int index);   // tu dong cuon de hang dang chon (index) nam trong khung nhin
 
     void drawScrollbar(sf::RenderWindow& window) const;
+
+    // ===== ADDED (Redesign: navy/cyan compact save list): tra ve hinh
+    // chu nhat cua hang save thu i va cua nut DELETE rieng cua hang do,
+    // theo toa do NOI DUNG cuc bo (giong he toa do dung trong draw() va
+    // trong computeListView()). Dung chung 1 nguon tinh toan duy nhat
+    // cho ca ve (draw) lan bat click (processEvent) de tranh lech vung
+    // click so voi vung ve nhu truoc day (slotButtons dung kich thuoc
+    // texture button goc, khong khop slotW/SLOT_H thuc te) =====
+    sf::FloatRect slotRect(std::size_t index) const;
+    sf::FloatRect deleteButtonRect(std::size_t index) const;
 
     static void centerText(sf::Text& t, float cx, float y);
     static void centerTextFull(sf::Text& t, float cx, float cy);

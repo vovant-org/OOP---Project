@@ -83,4 +83,11 @@ public:
 
     float getX() const { return x; }
     float getY() const { return y; }
+
+    // ===== ADDED (Continue Menu preview): expose huong/frame hien tai
+    // de CGAME::SaveGame() ghi lai vao file .sav, phuc vu ContinueMenu
+    // hien dung frame nhan vat tai thoi diem save cuoi cung (thay vi
+    // luon hien 1 frame mac dinh co dinh) =====
+    int GetDirection() const { return direction; }
+    int GetCurrentFrame() const { return currentFrame; }
 };

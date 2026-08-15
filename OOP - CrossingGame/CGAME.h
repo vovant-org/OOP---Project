@@ -156,6 +156,15 @@ public:
         int difficultyMode = 1;
         int level = 1;
         std::string saveTime;               // chuoi thoi gian luu trong noi dung file (co the trong neu file hong)
+
+        // ===== ADDED (Continue Menu preview): huong nhan vat dang quay
+        // (0=UP,1=DOWN,2=LEFT,3=RIGHT,4=DIE, khop CPEOPLE::direction) va
+        // frame animation (0..3) TAI THOI DIEM save cuoi cung - dung de
+        // ContinueMenu crop dung 1 o trong spritesheet 4x5 thay vi ve ca
+        // tam anh. Mac dinh 1/0 (quay xuong, dung yen) cho cac file save
+        // CU chua co 2 dong nay (tuong thich nguoc) =====
+        int lastDirection = 1;
+        int lastFrame = 0;
     };
     static bool PeekSaveData(const std::string& path, SaveData& out);
 

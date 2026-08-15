@@ -1310,6 +1310,18 @@ void CGAME::SaveGame(const std::string& path)
         << difficultyMode << "\n"
         << level << "\n"
         << buf << "\n";
+
+    // ===== ADDED (Continue Menu preview): ghi them huong/frame HIEN TAI
+    // cua player (tai chinh thoi diem bam L de save) - de ContinueMenu
+    // sau nay hien dung preview trang thai cuoi cung, thay vi 1 frame
+    // mac dinh co dinh. Nam O CUOI file (sau saveTime) nen file save CU
+    // (chua co 2 dong nay) van doc duoc binh thuong qua PeekSaveData(),
+    // chi thieu 2 dong bonus nay =====
+    if (player)
+    {
+        out << player->GetDirection() << "\n"
+            << player->GetCurrentFrame() << "\n";
+    }
 }
 
 bool CGAME::LoadGame(const std::string& path)
@@ -1466,6 +1478,23 @@ bool CGAME::PeekSaveData(const std::string& path, SaveData& out)
 
     if (!std::getline(in, line)) line = "";
     out.saveTime = line;
+
+    // ===== ADDED (Continue Menu preview): 2 dong bonus O CUOI file -
+    // huong (0..4) va frame (0..3) cua player tai thoi diem save. TUY
+    // CHON: file save CU khong co 2 dong nay van duoc coi la HOP LE
+    // (isValid=true), chi don gian giu nguyen gia tri mac dinh 1/0 da
+    // dat san trong SaveData - khong duoc lam that bai (return false)
+    // ca file chi vi thieu 2 dong THEM VAO SAU nay =====
+    if (std::getline(in, line))
+    {
+        try { out.lastDirection = std::stoi(line); }
+        catch (...) { out.lastDirection = 1; }
+    }
+    if (std::getline(in, line))
+    {
+        try { out.lastFrame = std::stoi(line); }
+        catch (...) { out.lastFrame = 0; }
+    }
 
     out.isValid = true;
     return true;
