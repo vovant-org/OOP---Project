@@ -90,4 +90,12 @@ public:
     // luon hien 1 frame mac dinh co dinh) =====
     int GetDirection() const { return direction; }
     int GetCurrentFrame() const { return currentFrame; }
+
+    // ===== ADDED (Load Game - khoi phuc dung vi tri/trang thai): dat
+    // lai TRUC TIEP vi tri (px,py), huong quay mat va frame animation -
+    // dung SAU khi Init()/loadTexture() da chay (can frameWidth/Height
+    // san sang de ClampToCanvas + setTextureRect dung). Neu dir la DIE
+    // (4) - VD save dung luc vua chet - ep ve DOWN/frame 0 de nhan vat
+    // "song lai" binh thuong khi Continue thay vi dung hinh nam chet =====
+    void RestoreState(float px, float py, int dir, int frame);
 };

@@ -130,6 +130,14 @@ public:
     void SaveGame(const std::string& path);
     bool LoadGame(const std::string& path);
 
+    // ===== ADDED (Quick Save - phim L): tao san 1 duong dan file save
+    // MOI, DUY NHAT, nam trong thu muc Save/ (tao thu muc neu chua co)
+    // theo dinh dang "Save/save_YYYYMMDD_HHMMSS.sav" - dam bao file luu
+    // ra LUON nam trong Save/ nen ContinueMenu (quet dong ca thu muc
+    // Save/ qua ListAllSaves()) se thay ngay lap tuc, khong can nguoi
+    // choi tu go duong dan =====
+    static std::string GenerateAutoSavePath();
+
     // New API: save slots (0..3)
     static const std::string& GetSavePathForSlot(int slot);
     // Peek full save data
@@ -165,6 +173,14 @@ public:
         // CU chua co 2 dong nay (tuong thich nguoc) =====
         int lastDirection = 1;
         int lastFrame = 0;
+
+        // ===== ADDED (Load Game - khoi phuc dung vi tri): toa do (x,y)
+        // cua nhan vat tren canvas 1280x720 tai thoi diem save cuoi
+        // cung. Mac dinh -1/-1 nghia la "khong co du lieu" (save CU
+        // chua co 2 dong nay) - LoadGame() se GIU NGUYEN vi tri spawn
+        // mac dinh cua Init() trong truong hop nay thay vi doi ve (-1,-1) =====
+        float lastX = -1.f;
+        float lastY = -1.f;
     };
     static bool PeekSaveData(const std::string& path, SaveData& out);
 

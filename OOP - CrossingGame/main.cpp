@@ -165,7 +165,7 @@ int main()
         std::cout << "[ERROR] Cannot load font\n";
         return -1;
     }
-        
+
     sf::Texture settingPanelTexture, settingBoxTexture;
     sf::Texture saveSlotTexture;
     sf::Texture settingPlusTexture, settingMinusTexture;
@@ -629,9 +629,10 @@ int main()
                 menuManager.reapplyView();    // ===== CHANGED =====
             }
 
-            // ===== ADDED: ESC khi dang choi -> mo PauseMenu. Dung continue
-            // de tranh event ESC nay bi forward tiep xuong PauseMenu ngay
-            // trong cung 1 vong lap (PauseMenu cung dang bat ESC = Resume) =====
+            // ===== ADDED (4.3 - Xu ly luu/tai qua console): ESC khi
+            // dang choi -> mo PauseMenu. Dung continue de tranh event
+            // ESC nay bi forward tiep xuong PauseMenu ngay trong cung
+            // 1 vong lap (PauseMenu cung dang bat ESC = Resume) =====
             if (event.type == sf::Event::KeyPressed &&
                 event.key.code == sf::Keyboard::Escape &&
                 menuManager.getState() == AppState::Playing)
@@ -639,6 +640,66 @@ int main()
                 game.Pause();
                 pauseMenu.clearResult();
                 menuManager.setState(AppState::Pause);
+                continue;
+            }
+
+            // ===== ADDED (4.3 - Xu ly luu/tai tro choi): phim 'T' khi
+            // dang choi -> tam dung chuong trinh, IN RA dong yeu cau
+            // nguoi dung nhap duong dan tap tin da luu (qua console dang
+            // chay song song voi cua so SFML), doc bang std::getline().
+            // Neu nhap duong dan hop le va LoadGame() thanh cong thi
+            // thiet lap du lieu (LoadGame() da tu goi Init() ben trong)
+            // roi vao lai tro choi; neu that bai thi bao loi va tiep tuc
+            // choi voi du lieu HIEN TAI (khong lam mat tien trinh dang
+            // choi do). Dung continue de KHONG forward phim T nay xuong
+            // game.HandleInput() (tranh nham voi 1 hanh dong khac cua
+            // nhan vat trong game, neu co) =====
+            if (event.type == sf::Event::KeyPressed &&
+                event.key.code == sf::Keyboard::T &&
+                menuManager.getState() == AppState::Playing)
+            {
+                game.Pause();
+
+                std::cout << "\n===== LOAD GAME =====\n";
+                std::cout << "Nhap duong dan tap tin save can load (VD: Save/city.sav): ";
+                std::string loadPath;
+                std::getline(std::cin, loadPath);
+
+                if (!loadPath.empty() && game.LoadGame(loadPath))
+                {
+                    std::cout << "Da tai file thanh cong. Tiep tuc choi...\n";
+                }
+                else
+                {
+                    std::cout << "Khong the tai file \"" << loadPath
+                        << "\". Tiep tuc choi voi du lieu hien tai.\n";
+                }
+
+                game.Resume();
+                continue;
+            }
+
+            // ===== CHANGED (Quick Save): phim 'L' khi dang choi -> tam
+            // dung, TU DONG luu vao 1 file MOI trong thu muc Save/ (qua
+            // CGAME::GenerateAutoSavePath(), khong con bat nguoi choi tu
+            // go duong dan qua console nua) roi tiep tuc choi NGAY, khong
+            // hoi Y/N. Vi Save/ la CHINH thu muc ma ContinueMenu quet
+            // dong (CGAME::ListAllSaves()), save moi se hien NGAY o dau
+            // danh sach Continue Menu (sap xep theo thoi gian sua doi
+            // gan nhat) ma khong can thao tac gi them =====
+            if (event.type == sf::Event::KeyPressed &&
+                event.key.code == sf::Keyboard::L &&
+                menuManager.getState() == AppState::Playing)
+            {
+                game.Pause();
+
+                std::string autoPath = CGAME::GenerateAutoSavePath();
+                game.SaveGame(autoPath);
+
+                std::cout << "[Quick Save] Da luu game vao \"" << autoPath
+                    << "\" (xem lai trong Continue Menu).\n";
+
+                game.Resume();
                 continue;
             }
 

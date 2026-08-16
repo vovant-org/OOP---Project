@@ -298,6 +298,39 @@ void CPEOPLE::Reset(float startX, float startY)
     sprite.setPosition(x, y);
 }
 
+// ===== ADDED (Load Game - khoi phuc dung vi tri/trang thai) =====
+void CPEOPLE::RestoreState(float px, float py, int dir, int frame)
+{
+    x = px;
+    y = py;
+    ClampToCanvas(x, y, frameWidth, frameHeight);
+
+    if (dir < 0 || dir > 4) dir = 1;
+
+    // DIE: khong the "Continue" o trang thai dang chet - tra ve DOWN
+    // dung yen, giong fallback da dung o preview Continue Menu
+    if (dir == 4) dir = 1;
+    direction = dir;
+
+    if (frame < 0 || frame >= FRAME_COLUMNS) frame = 0;
+    currentFrame = frame;
+
+    isAlive = true;
+    elapsedTime = 0.f;
+    moveCooldownTimer = 0.f;
+
+    isStunned = false;
+    stunTimer = 0.f;
+    bounceVelocity = 0.f;
+    bounceVelocityY = 0.f;
+    windPushVelocity = 0.f;
+
+    sprite.setTextureRect(sf::IntRect(
+        currentFrame * frameWidth, direction * frameHeight,
+        frameWidth, frameHeight));
+    sprite.setPosition(x, y);
+}
+
 void CPEOPLE::TriggerDeath()
 {
     isAlive = false;

@@ -1311,17 +1311,56 @@ void CGAME::SaveGame(const std::string& path)
         << level << "\n"
         << buf << "\n";
 
-    // ===== ADDED (Continue Menu preview): ghi them huong/frame HIEN TAI
-    // cua player (tai chinh thoi diem bam L de save) - de ContinueMenu
-    // sau nay hien dung preview trang thai cuoi cung, thay vi 1 frame
-    // mac dinh co dinh. Nam O CUOI file (sau saveTime) nen file save CU
-    // (chua co 2 dong nay) van doc duoc binh thuong qua PeekSaveData(),
-    // chi thieu 2 dong bonus nay =====
+    // ===== ADDED (Continue Menu preview + Load Game khoi phuc vi tri):
+    // ghi them huong/frame VA toa do (x,y) HIEN TAI cua player (tai
+    // chinh thoi diem bam L de save) - de ContinueMenu hien dung preview
+    // trang thai cuoi cung, VA de LoadGame() dat lai dung vi tri nhan
+    // vat dang dung tren duong thay vi luon spawn lai o vach xuat phat.
+    // Nam O CUOI file (sau saveTime) nen file save CU (chua co cac dong
+    // nay) van doc duoc binh thuong qua PeekSaveData(), chi thieu phan
+    // bonus nay (LoadGame() se fallback ve vi tri spawn mac dinh) =====
     if (player)
     {
         out << player->GetDirection() << "\n"
-            << player->GetCurrentFrame() << "\n";
+            << player->GetCurrentFrame() << "\n"
+            << player->getX() << "\n"
+            << player->getY() << "\n";
     }
+}
+
+// ===== ADDED (Quick Save - phim L): sinh duong dan file save moi, luon
+// nam trong Save/ va khong trung ten voi file da co =====
+std::string CGAME::GenerateAutoSavePath()
+{
+    namespace fs = std::filesystem;
+
+    std::error_code ec;
+    fs::create_directories(SAVE_DIR, ec);   // dam bao thu muc Save/ ton tai
+
+    std::time_t t = std::time(nullptr);
+    std::tm tm;
+#if defined(_MSC_VER)
+    localtime_s(&tm, &t);
+#else
+    std::tm* ptm = std::localtime(&t);
+    if (ptm) tm = *ptm;
+#endif
+
+    char buf[32] = { 0 };
+    std::strftime(buf, sizeof(buf), "%Y%m%d_%H%M%S", &tm);
+
+    std::string path = SAVE_DIR + "/save_" + buf + ".sav";
+
+    // Phong truong hop bam L 2 lan trong cung 1 giay (trung ten file) -
+    // them hau to _2, _3... cho den khi tim duoc ten con trong
+    int suffix = 2;
+    while (fs::exists(path, ec))
+    {
+        path = SAVE_DIR + "/save_" + std::string(buf) + "_" + std::to_string(suffix) + ".sav";
+        ++suffix;
+    }
+
+    return path;
 }
 
 bool CGAME::LoadGame(const std::string& path)
@@ -1363,9 +1402,53 @@ bool CGAME::LoadGame(const std::string& path)
     std::string savedTime;
     std::getline(in, savedTime);
 
+    // ===== ADDED (Load Game - khoi phuc dung vi tri/trang thai): 4 dong
+    // bonus O CUOI file - huong, frame, x, y cua player tai thoi diem
+    // save. TUY CHON: file save CU (truoc khi co tinh nang nay) khong co
+    // cac dong nay - trong truong hop do coi nhu "khong co du lieu vi
+    // tri", giu nguyen hanh vi CU (spawn o vach xuat phat mac dinh cua
+    // Init()) thay vi bao loi/that bai ca viec Load =====
+    bool hasPositionData = false;
+    int savedDirection = 1;
+    int savedFrame = 0;
+    float savedX = -1.f, savedY = -1.f;
+
+    if (std::getline(in, line))
+    {
+        try { savedDirection = std::stoi(line); }
+        catch (...) { savedDirection = 1; }
+
+        if (std::getline(in, line))
+        {
+            try { savedFrame = std::stoi(line); }
+            catch (...) { savedFrame = 0; }
+
+            if (std::getline(in, line))
+            {
+                try { savedX = std::stof(line); }
+                catch (...) { savedX = -1.f; }
+
+                if (std::getline(in, line))
+                {
+                    try { savedY = std::stof(line); }
+                    catch (...) { savedY = -1.f; }
+                    hasPositionData = (savedX >= 0.f && savedY >= 0.f);
+                }
+            }
+        }
+    }
+
     // Apply loaded data
     difficultyMode = savedMode;
-    Init(savedMap, savedCharacter);
+    Init(savedMap, savedCharacter);   // spawn player o vach xuat phat mac dinh
+
+    // Neu file save co du lieu vi tri (save moi, tu ban co Quick Save L)
+    // thi DAT LAI dung vi tri/huong/frame nhan vat dang dung tren duong,
+    // GHI DE len vi tri spawn mac dinh vua duoc Init() thiet lap o tren
+    if (hasPositionData && player)
+    {
+        player->RestoreState(savedX, savedY, savedDirection, savedFrame);
+    }
 
     level = savedLevel;
     score = savedScore;
@@ -1494,6 +1577,16 @@ bool CGAME::PeekSaveData(const std::string& path, SaveData& out)
     {
         try { out.lastFrame = std::stoi(line); }
         catch (...) { out.lastFrame = 0; }
+    }
+    if (std::getline(in, line))
+    {
+        try { out.lastX = std::stof(line); }
+        catch (...) { out.lastX = -1.f; }
+    }
+    if (std::getline(in, line))
+    {
+        try { out.lastY = std::stof(line); }
+        catch (...) { out.lastY = -1.f; }
     }
 
     out.isValid = true;
