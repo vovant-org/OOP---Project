@@ -698,7 +698,7 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
             {
                 sf::Text invalidText;
                 invalidText.setFont(*font);
-                invalidText.setCharacterSize(20);
+                invalidText.setCharacterSize(16);
                 invalidText.setFillColor(TEXT_INFO_DIM);
                 invalidText.setString("INVALID SAVE");
                 invalidText.setPosition(infoX, y + (SLOT_H - 20.f) / 2.f);
@@ -708,7 +708,7 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
             {
                 sf::Text infoText;
                 infoText.setFont(*font);
-                infoText.setCharacterSize(17);
+                infoText.setCharacterSize(16);
                 infoText.setFillColor(TEXT_INFO);
 
                 std::ostringstream oss;
@@ -743,7 +743,7 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
                 // DATE: hang duoi cung, trai qua het chieu rong thong tin
                 sf::Text timeText;
                 timeText.setFont(*font);
-                timeText.setCharacterSize(14);
+                timeText.setCharacterSize(16);
                 timeText.setFillColor(TEXT_INFO_DIM);
                 timeText.setString("DATE: " + slotInfo[i].saveTime);
                 timeText.setPosition(infoX, y + 72.f);
@@ -770,7 +770,7 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
             {
                 sf::Text loadText;
                 loadText.setFont(*font);
-                loadText.setCharacterSize(15);
+                loadText.setCharacterSize(16);
                 loadText.setFillColor(LOAD_TEXT);
                 loadText.setString("LOAD");
                 centerTextFull(loadText, loadR.left + loadR.width / 2.f, loadR.top + loadR.height / 2.f);
@@ -794,7 +794,7 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
             {
                 sf::Text delText;
                 delText.setFont(*font);
-                delText.setCharacterSize(14);
+                delText.setCharacterSize(16);
                 delText.setFillColor(DELETE_TEXT);
                 delText.setString("DELETE");
                 centerTextFull(delText, delR.left + delR.width / 2.f, delR.top + delR.height / 2.f);
