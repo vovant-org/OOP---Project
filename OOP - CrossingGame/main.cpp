@@ -33,8 +33,6 @@ const std::string BUTTON_PATH = "ui/Button/button_normal.png";
 
 const std::string SETTING_PANEL_PATH = "ui/Button/GoldenBox.png";
 const std::string SETTING_BOX_PATH = "ui/Button/SilverBox.png";
-const std::string SETTING_PLUS_PATH = "ui/Icon/Plus.png";
-const std::string SETTING_MINUS_PATH = "ui/Icon/Minus.png";
 const std::string SETTING_SWITCH_ON_PATH = "ui/Icon/Switch_ON.png";
 const std::string SETTING_SWITCH_OFF_PATH = "ui/Icon/Switch_OFF.png";
 const std::string SETTING_TIMES_PATH = "ui/Icon/Times.png";
