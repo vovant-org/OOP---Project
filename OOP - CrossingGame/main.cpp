@@ -33,11 +33,17 @@ const std::string BUTTON_PATH = "ui/Button/button_normal.png";
 
 const std::string SETTING_PANEL_PATH = "ui/Button/GoldenBox.png";
 const std::string SETTING_BOX_PATH = "ui/Button/SilverBox.png";
+const std::string SETTING_PLUS_PATH = "ui/Icon/Plus.png";
+const std::string SETTING_MINUS_PATH = "ui/Icon/Minus.png";
 const std::string SETTING_SWITCH_ON_PATH = "ui/Icon/Switch_ON.png";
 const std::string SETTING_SWITCH_OFF_PATH = "ui/Icon/Switch_OFF.png";
 const std::string SETTING_TIMES_PATH = "ui/Icon/Times.png";
 const std::string SETTING_BACK_PATH = "ui/Logo/BACK.png";
 const std::string SETTING_TITLE_PATH = "ui/Logo/SETTING.png";
+
+// ===== ADDED: icon loa cho thanh kéo Music/Sound trong SettingMenu =====
+const std::string SETTING_SPEAKER_PATH = "ui/Icon/Speaker_Icon.png";
+const std::string SETTING_MUTE_SPEAKER_PATH = "ui/Icon/MuteSpeaker_Icon.png";
 const std::string PAUSE_ICON_PATH = "ui/Icon/Pause.png";   // ===== ADDED =====
 
 // ===== ADDED: card thu gon/mo rong o man hinh About =====
@@ -172,6 +178,9 @@ int main()
     sf::Texture settingBackTexture;
     sf::Texture settingTitleTexture;
 
+    // ===== ADDED: icon loa (bật/tắt tiếng) cho thanh kéo Music/Sound =====
+    sf::Texture settingSpeakerTexture, settingMuteSpeakerTexture;
+
     if (!loadTexture(settingPanelTexture, SETTING_PANEL_PATH))     return -1;
     if (!loadTexture(settingBoxTexture, SETTING_BOX_PATH))         return -1;
     if (!loadTexture(saveSlotTexture, "ui/Save/Save_Slot.png"))   return -1;
@@ -182,6 +191,8 @@ int main()
     if (!loadTexture(settingTimesTexture, SETTING_TIMES_PATH))     return -1;
     if (!loadTexture(settingBackTexture, SETTING_BACK_PATH))       return -1;
     if (!loadTexture(settingTitleTexture, SETTING_TITLE_PATH))     return -1;
+    if (!loadTexture(settingSpeakerTexture, SETTING_SPEAKER_PATH))         return -1;
+    if (!loadTexture(settingMuteSpeakerTexture, SETTING_MUTE_SPEAKER_PATH)) return -1;
 
     // ===== ADDED: icon Pause goc tren-phai khi dang Playing =====
     sf::Texture pauseIconTexture;
@@ -315,6 +326,7 @@ int main()
     settingMenu.setMinusTexture(settingMinusTexture);
     settingMenu.setSwitchTextures(settingSwitchOnTexture, settingSwitchOffTexture);
     settingMenu.setTimesTexture(settingTimesTexture);
+    settingMenu.setSpeakerTextures(settingSpeakerTexture, settingMuteSpeakerTexture);
     settingMenu.setBackButtonTexture(settingBackTexture);
     settingMenu.setTitleTexture(settingTitleTexture);
     settingMenu.setFont(font);

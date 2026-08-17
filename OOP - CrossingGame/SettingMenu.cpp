@@ -1,6 +1,8 @@
 #include "SettingMenu.h"
 #include "AudioManager.h"
 #include <string>
+#include <algorithm>
+#include <cmath>
 
 void SettingMenu::setAudioManager(AudioManager* manager)
 {
@@ -106,7 +108,22 @@ namespace
     constexpr float BOX_SCALE_X = BOX_WIDTH / BOX_TEX_WIDTH;
     constexpr float BOX_SCALE_Y = BOX_HEIGHT / BOX_TEX_HEIGHT;
 
-    constexpr float BOX_X = CONTENT_RIGHT - ICON_SIZE - ICON_GAP - BOX_WIDTH;
+    // ===== CHANGED: Music/Sound không còn nút Plus bên phải nữa (đã thay
+    // bằng slider), nên value box được đẩy sát ra mép phải nội dung =====
+    constexpr float BOX_X = CONTENT_RIGHT - BOX_WIDTH;
+
+    // ===== ADDED: khung SilverBox hiển thị SỐ của Music/Sound được thu nhỏ
+    // lại (so với BOX_WIDTH/BOX_HEIGHT - vẫn giữ nguyên để làm cột tham
+    // chiếu cho công tắc F.S bên dưới), căn theo cùng mép phải CONTENT_RIGHT,
+    // canh giữa theo chiều dọc trong hàng =====
+    constexpr float VALUE_BOX_WIDTH = 130.f;
+    constexpr float VALUE_BOX_HEIGHT = 115.f;
+
+    constexpr float VALUE_BOX_SCALE_X = VALUE_BOX_WIDTH / BOX_TEX_WIDTH;
+    constexpr float VALUE_BOX_SCALE_Y = VALUE_BOX_HEIGHT / BOX_TEX_HEIGHT;
+
+    constexpr float VALUE_BOX_X = CONTENT_RIGHT - VALUE_BOX_WIDTH;
+    constexpr float VALUE_BOX_Y_OFFSET = (BOX_HEIGHT - VALUE_BOX_HEIGHT) / 2.f;
 
     // ===== ADDED: lệch icon xuống để trùng trục ngang (vertical center) với box =====
     constexpr float ICON_Y_OFFSET = (BOX_HEIGHT - ICON_SIZE) / 2.f;
@@ -163,6 +180,31 @@ namespace
 
     // ===== ADDED: bù lệch ngang do font có padding không đều 2 bên =====
     constexpr float LABEL_TEXT_X_OFFSET = -30.f; // âm = dịch trái, dương = dịch phải
+
+    //----------------------------------
+    // ===== ADDED: Speaker Icon + Slider (Music & Sound)
+    //
+    // Layout hàng Music/Sound giờ là:
+    //   [label box] .... [speaker icon] [==== slider ====] [value box]
+    // (đã bỏ nút Minus/Plus, value box vẫn giữ để hiển thị con số)
+    //----------------------------------
+
+    constexpr float SLIDER_GAP = 20.f;             // khoảng cách giữa các phần tử
+    constexpr float SLIDER_HANDLE_RADIUS = 13.f;
+    constexpr float SLIDER_TRACK_HEIGHT = 8.f;
+
+    // Speaker_Icon.png / MuteSpeaker_Icon.png (1254 x 1254, giống các icon khác)
+    // ===== CHANGED: phóng to icon loa (46 -> 64) cho dễ nhìn hơn =====
+    constexpr float SPEAKER_ICON_SIZE = 64.f;
+    constexpr float SPEAKER_ICON_SCALE = SPEAKER_ICON_SIZE / ICON_TEX_SIZE;
+
+    constexpr float SPEAKER_ICON_X = LABEL_BOX_X + LABEL_BOX_WIDTH + SLIDER_GAP;
+    constexpr float SPEAKER_ICON_Y_OFFSET = (BOX_HEIGHT - SPEAKER_ICON_SIZE) / 2.f;
+
+    // Slider chiếm phần còn lại giữa speaker icon và value box (đã thu nhỏ)
+    constexpr float SLIDER_X = SPEAKER_ICON_X + SPEAKER_ICON_SIZE + SLIDER_GAP;
+    constexpr float SLIDER_WIDTH = VALUE_BOX_X - SLIDER_GAP - SLIDER_X;
+    constexpr float SLIDER_Y_OFFSET = (BOX_HEIGHT - SLIDER_TRACK_HEIGHT) / 2.f;
 
     //----------------------------------
     // Value Text
@@ -252,11 +294,12 @@ void SettingMenu::setBackgroundTexture(const sf::Texture& texture,
 
 void SettingMenu::setValueBoxTexture(const sf::Texture& texture)
 {
+    // ===== CHANGED: dùng VALUE_BOX_SCALE (nhỏ hơn) cho khung số Music/Sound =====
     musicBox.setTexture(texture, true);
-    musicBox.setScale(BOX_SCALE_X, BOX_SCALE_Y);
+    musicBox.setScale(VALUE_BOX_SCALE_X, VALUE_BOX_SCALE_Y);
 
     soundBox.setTexture(texture, true);
-    soundBox.setScale(BOX_SCALE_X, BOX_SCALE_Y);
+    soundBox.setScale(VALUE_BOX_SCALE_X, VALUE_BOX_SCALE_Y);
 
     resolutionBox.setTexture(texture, true);
     resolutionBox.setScale(RES_BOX_SCALE_X, RES_BOX_SCALE_Y);
@@ -271,26 +314,29 @@ void SettingMenu::setValueBoxTexture(const sf::Texture& texture)
 
 void SettingMenu::setPlusTexture(const sf::Texture& texture)
 {
-    musicPlusSprite.setTexture(texture, true);
-    musicPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
-
-    soundPlusSprite.setTexture(texture, true);
-    soundPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
-
+    // ===== CHANGED: Music/Sound không còn dùng Plus (đã thay bằng slider),
+    // chỉ Resolution còn giữ =====
     resolutionPlusSprite.setTexture(texture, true);
     resolutionPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
 }
 
 void SettingMenu::setMinusTexture(const sf::Texture& texture)
 {
-    musicMinusSprite.setTexture(texture, true);
-    musicMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
-
-    soundMinusSprite.setTexture(texture, true);
-    soundMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
-
+    // ===== CHANGED: Music/Sound không còn dùng Minus (đã thay bằng slider),
+    // chỉ Resolution còn giữ =====
     resolutionMinusSprite.setTexture(texture, true);
     resolutionMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
+}
+
+// ===== ADDED: ảnh loa thường / loa gạch chéo (mute) cho slider Music/Sound =====
+void SettingMenu::setSpeakerTextures(const sf::Texture& speakerTex,
+    const sf::Texture& muteSpeakerTex)
+{
+    speakerTexture = &speakerTex;
+    muteSpeakerTexture = &muteSpeakerTex;
+
+    updateSpeakerIcon(musicSpeakerIcon, musicVolume);
+    updateSpeakerIcon(soundSpeakerIcon, soundVolume);
 }
 
 void SettingMenu::setSwitchTextures(const sf::Texture& onTexture,
@@ -471,34 +517,54 @@ void SettingMenu::initializeObjects()
     // Value Boxes
     //----------------------------------
 
-    musicBox.setPosition(BOX_X, MUSIC_ROW_Y);
-    musicBox.setScale(BOX_SCALE_X, BOX_SCALE_Y);
+    // ===== CHANGED: khung số Music/Sound dùng VALUE_BOX_X/VALUE_BOX_Y_OFFSET
+    // (nhỏ hơn, căn giữa theo chiều dọc trong hàng) - RES giữ nguyên như cũ =====
+    musicBox.setPosition(VALUE_BOX_X, MUSIC_ROW_Y + VALUE_BOX_Y_OFFSET);
+    musicBox.setScale(VALUE_BOX_SCALE_X, VALUE_BOX_SCALE_Y);
 
-    soundBox.setPosition(BOX_X, SOUND_ROW_Y);
-    soundBox.setScale(BOX_SCALE_X, BOX_SCALE_Y);
+    soundBox.setPosition(VALUE_BOX_X, SOUND_ROW_Y + VALUE_BOX_Y_OFFSET);
+    soundBox.setScale(VALUE_BOX_SCALE_X, VALUE_BOX_SCALE_Y);
 
     resolutionBox.setPosition(RES_BOX_X, RESOLUTION_ROW_Y);
     resolutionBox.setScale(RES_BOX_SCALE_X, RES_BOX_SCALE_Y);
 
     //----------------------------------
-    // Plus / Minus Icons
+    // Speaker Icons (Music & Sound) - bên trái thanh kéo
     //----------------------------------
 
-    musicMinusSprite.setPosition(
-        BOX_X - ICON_GAP - ICON_SIZE, MUSIC_ROW_Y + ICON_Y_OFFSET);
-    musicMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
+    musicSpeakerIcon.setPosition(
+        SPEAKER_ICON_X, MUSIC_ROW_Y + SPEAKER_ICON_Y_OFFSET);
+    musicSpeakerIcon.setScale(SPEAKER_ICON_SCALE, SPEAKER_ICON_SCALE);
 
-    musicPlusSprite.setPosition(
-        BOX_X + BOX_WIDTH + ICON_GAP, MUSIC_ROW_Y + ICON_Y_OFFSET);
-    musicPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
+    soundSpeakerIcon.setPosition(
+        SPEAKER_ICON_X, SOUND_ROW_Y + SPEAKER_ICON_Y_OFFSET);
+    soundSpeakerIcon.setScale(SPEAKER_ICON_SCALE, SPEAKER_ICON_SCALE);
 
-    soundMinusSprite.setPosition(
-        BOX_X - ICON_GAP - ICON_SIZE, SOUND_ROW_Y + ICON_Y_OFFSET);
-    soundMinusSprite.setScale(ICON_SCALE, ICON_SCALE);
+    //----------------------------------
+    // Sliders (Music & Sound) - kéo trái/phải để giảm/tăng âm lượng
+    //----------------------------------
 
-    soundPlusSprite.setPosition(
-        BOX_X + BOX_WIDTH + ICON_GAP, SOUND_ROW_Y + ICON_Y_OFFSET);
-    soundPlusSprite.setScale(ICON_SCALE, ICON_SCALE);
+    auto setupSlider = [](SliderUI& slider, float rowY)
+        {
+            slider.track.setSize(sf::Vector2f(SLIDER_WIDTH, SLIDER_TRACK_HEIGHT));
+            slider.track.setPosition(SLIDER_X, rowY + SLIDER_Y_OFFSET);
+            slider.track.setFillColor(sf::Color(70, 55, 35, 220));
+            slider.track.setOutlineColor(sf::Color(200, 170, 90));
+            slider.track.setOutlineThickness(2.f);
+
+            slider.handle.setRadius(SLIDER_HANDLE_RADIUS);
+            slider.handle.setOrigin(SLIDER_HANDLE_RADIUS, SLIDER_HANDLE_RADIUS);
+            slider.handle.setFillColor(sf::Color(255, 215, 120));
+            slider.handle.setOutlineColor(sf::Color(90, 60, 20));
+            slider.handle.setOutlineThickness(2.f);
+        };
+
+    setupSlider(musicSlider, MUSIC_ROW_Y);
+    setupSlider(soundSlider, SOUND_ROW_Y);
+
+    //----------------------------------
+    // Plus / Minus Icons (chỉ còn dùng cho Resolution)
+    //----------------------------------
 
     resolutionMinusSprite.setPosition(
         RES_BOX_X - ICON_GAP - ICON_SIZE, RESOLUTION_ROW_Y + ICON_Y_OFFSET);
@@ -561,8 +627,8 @@ void SettingMenu::updateTexts()
 
     musicValueText.setString(std::to_string(musicVolume));
     centerTextOnPoint(musicValueText,
-        BOX_X + BOX_WIDTH / 2.f,
-        MUSIC_ROW_Y + BOX_HEIGHT / 2.f);
+        VALUE_BOX_X + VALUE_BOX_WIDTH / 2.f,
+        MUSIC_ROW_Y + VALUE_BOX_Y_OFFSET + VALUE_BOX_HEIGHT / 2.f);
 
     //----------------------------------
     // Sound
@@ -570,8 +636,18 @@ void SettingMenu::updateTexts()
 
     soundValueText.setString(std::to_string(soundVolume));
     centerTextOnPoint(soundValueText,
-        BOX_X + BOX_WIDTH / 2.f,
-        SOUND_ROW_Y + BOX_HEIGHT / 2.f);
+        VALUE_BOX_X + VALUE_BOX_WIDTH / 2.f,
+        SOUND_ROW_Y + VALUE_BOX_Y_OFFSET + VALUE_BOX_HEIGHT / 2.f);
+
+    //----------------------------------
+    // ===== ADDED: Slider handle + Speaker icon (Music & Sound) =====
+    //----------------------------------
+
+    updateSliderHandlePosition(musicSlider, musicVolume);
+    updateSliderHandlePosition(soundSlider, soundVolume);
+
+    updateSpeakerIcon(musicSpeakerIcon, musicVolume);
+    updateSpeakerIcon(soundSpeakerIcon, soundVolume);
 
     //----------------------------------
     // Resolution
@@ -616,6 +692,60 @@ bool SettingMenu::isMouseOver(const sf::Sprite& sprite,
     return sprite.getGlobalBounds().contains(mousePos);
 }
 
+// ===== ADDED: helper cho thanh kéo (slider) Music/Sound =====
+
+void SettingMenu::updateSliderHandlePosition(SliderUI& slider, int volume) const
+{
+    float ratio = std::max(0, std::min(100, volume)) / 100.f;
+
+    float handleX = SLIDER_X + SLIDER_WIDTH * ratio;
+    float handleY = slider.track.getPosition().y + SLIDER_TRACK_HEIGHT / 2.f;
+
+    slider.handle.setPosition(handleX, handleY);
+}
+
+bool SettingMenu::isMouseOverSlider(const SliderUI& slider,
+    const sf::RenderWindow& window) const
+{
+    sf::Vector2f mousePos =
+        window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+    // Mo rong vung bat chuot quanh track (track chi cao 8px, kho bam
+    // dung neu chi tinh dung bounding box goc) - them dem = ban kinh handle
+    sf::FloatRect hitBox = slider.track.getGlobalBounds();
+
+    hitBox.left -= SLIDER_HANDLE_RADIUS;
+    hitBox.width += SLIDER_HANDLE_RADIUS * 2.f;
+    hitBox.top -= SLIDER_HANDLE_RADIUS;
+    hitBox.height += SLIDER_HANDLE_RADIUS * 2.f;
+
+    return hitBox.contains(mousePos);
+}
+
+int SettingMenu::volumeFromMouseX(float mouseX) const
+{
+    float ratio = (mouseX - SLIDER_X) / SLIDER_WIDTH;
+    ratio = std::max(0.f, std::min(1.f, ratio));
+
+    return static_cast<int>(std::round(ratio * 100.f));
+}
+
+void SettingMenu::updateSpeakerIcon(sf::Sprite& icon, int volume) const
+{
+    if (volume <= 0)
+    {
+        if (muteSpeakerTexture != nullptr)
+            icon.setTexture(*muteSpeakerTexture, true);
+    }
+    else
+    {
+        if (speakerTexture != nullptr)
+            icon.setTexture(*speakerTexture, true);
+    }
+
+    icon.setScale(SPEAKER_ICON_SCALE, SPEAKER_ICON_SCALE);
+}
+
 //==================================================
 // Menu
 //==================================================
@@ -635,6 +765,66 @@ void SettingMenu::processEvent(const sf::Event& event,
         return;
     }
 
+    //-----------------------------
+    // ===== ADDED: Slider Music/Sound - bắt đầu kéo (bấm chuột xuống) và
+    // cập nhật volume ngay theo vị trí bấm =====
+    //-----------------------------
+
+    if (event.type == sf::Event::MouseButtonPressed &&
+        event.mouseButton.button == sf::Mouse::Left)
+    {
+        sf::Vector2f mousePos = window.mapPixelToCoords(
+            sf::Vector2i(event.mouseButton.x, event.mouseButton.y));
+
+        if (isMouseOverSlider(musicSlider, window))
+        {
+            isDraggingMusicSlider = true;
+            setMusicVolume(volumeFromMouseX(mousePos.x));
+        }
+        else if (isMouseOverSlider(soundSlider, window))
+        {
+            isDraggingSoundSlider = true;
+            setSoundVolume(volumeFromMouseX(mousePos.x));
+        }
+
+        return;
+    }
+
+    //-----------------------------
+    // ===== ADDED: Slider Music/Sound - đang kéo (di chuyển chuột) =====
+    //-----------------------------
+
+    if (event.type == sf::Event::MouseMoved)
+    {
+        if (isDraggingMusicSlider || isDraggingSoundSlider)
+        {
+            sf::Vector2f mousePos = window.mapPixelToCoords(
+                sf::Vector2i(event.mouseMove.x, event.mouseMove.y));
+
+            if (isDraggingMusicSlider)
+                setMusicVolume(volumeFromMouseX(mousePos.x));
+            else
+                setSoundVolume(volumeFromMouseX(mousePos.x));
+        }
+
+        return;
+    }
+
+    //-----------------------------
+    // ===== ADDED: Slider Music/Sound - thả chuột ra thì dừng kéo. Nếu vừa
+    // kéo slider thì bỏ qua các click khác bên dưới (tránh bấm nhầm Back/
+    // Fullscreen khi thả chuột ngoài vùng slider) =====
+    //-----------------------------
+
+    if (event.type == sf::Event::MouseButtonReleased &&
+        event.mouseButton.button == sf::Mouse::Left &&
+        (isDraggingMusicSlider || isDraggingSoundSlider))
+    {
+        isDraggingMusicSlider = false;
+        isDraggingSoundSlider = false;
+        return;
+    }
+
     if (event.type != sf::Event::MouseButtonReleased)
         return;
 
@@ -642,36 +832,10 @@ void SettingMenu::processEvent(const sf::Event& event,
         return;
 
     //-----------------------------
-    // Music
-    //-----------------------------
-
-    if (isMouseOver(musicPlusSprite, window))
-    {
-        setMusicVolume(musicVolume + 5);
-    }
-    else if (isMouseOver(musicMinusSprite, window))
-    {
-        setMusicVolume(musicVolume - 5);
-    }
-
-    //-----------------------------
-    // Sound
-    //-----------------------------
-
-    else if (isMouseOver(soundPlusSprite, window))
-    {
-        setSoundVolume(soundVolume + 5);
-    }
-    else if (isMouseOver(soundMinusSprite, window))
-    {
-        setSoundVolume(soundVolume - 5);
-    }
-
-    //-----------------------------
     // Fullscreen
     //-----------------------------
 
-    else if (isMouseOver(fullscreenSprite, window))
+    if (isMouseOver(fullscreenSprite, window))
     {
         setFullscreen(!fullscreen);
 
@@ -767,20 +931,23 @@ void SettingMenu::draw(sf::RenderWindow& window) const
     window.draw(resolutionBox);
 
     //-----------------------------
-    // Plus
+    // Plus / Minus (chỉ còn dùng cho Resolution)
     //-----------------------------
 
-    window.draw(musicPlusSprite);
-    window.draw(soundPlusSprite);
     window.draw(resolutionPlusSprite);
-
-    //-----------------------------
-    // Minus
-    //-----------------------------
-
-    window.draw(musicMinusSprite);
-    window.draw(soundMinusSprite);
     window.draw(resolutionMinusSprite);
+
+    //-----------------------------
+    // ===== ADDED: Speaker Icon + Slider (Music & Sound) =====
+    //-----------------------------
+
+    window.draw(musicSpeakerIcon);
+    window.draw(musicSlider.track);
+    window.draw(musicSlider.handle);
+
+    window.draw(soundSpeakerIcon);
+    window.draw(soundSlider.track);
+    window.draw(soundSlider.handle);
 
     //-----------------------------
     // Switch

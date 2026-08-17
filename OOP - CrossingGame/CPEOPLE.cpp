@@ -264,8 +264,8 @@ sf::FloatRect CPEOPLE::GetBoundingBox() const
     sf::FloatRect box = sprite.getGlobalBounds();
 
     // Thu nhỏ hitbox theo % chiều rộng/cao để tránh va chạm "oan"
-    float shrinkX = box.width * 0.25f;   // giảm 25% mỗi bên ngang
-    float shrinkY = box.height * 0.25f;  // giảm 25% mỗi bên dọc
+    float shrinkX = box.width * 0.28f;   // giảm 25% mỗi bên ngang
+    float shrinkY = box.height * 0.28f;  // giảm 25% mỗi bên dọc
 
     box.left += shrinkX;
     box.top += shrinkY;

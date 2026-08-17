@@ -67,14 +67,33 @@ private:
     // Icons
     //----------------------------------
 
-    sf::Sprite musicMinusSprite;
-    sf::Sprite musicPlusSprite;
-
-    sf::Sprite soundMinusSprite;
-    sf::Sprite soundPlusSprite;
-
+    // ===== CHANGED: bỏ nút Minus/Plus cho Music & Sound, thay bằng thanh
+    // kéo (slider) - xem SliderUI bên dưới. Resolution vẫn giữ Minus/Plus =====
     sf::Sprite resolutionMinusSprite;
     sf::Sprite resolutionPlusSprite;
+
+    // ===== ADDED: Speaker icon bên trái thanh kéo Music/Sound - tự đổi
+    // sang MuteSpeaker khi volume = 0 (xem updateSpeakerIcon()) =====
+    sf::Sprite musicSpeakerIcon;
+    sf::Sprite soundSpeakerIcon;
+
+    const sf::Texture* speakerTexture = nullptr;
+    const sf::Texture* muteSpeakerTexture = nullptr;
+
+    // ===== ADDED: thanh kéo âm lượng - track là thanh nền, handle là nút
+    // tròn kéo được (kéo trái = giảm, phải = tăng). Dùng chung layout cho
+    // cả Music và Sound (2 instance riêng, cùng bề rộng/vị trí ngang) =====
+    struct SliderUI
+    {
+        sf::RectangleShape track;
+        sf::CircleShape handle;
+    };
+
+    SliderUI musicSlider;
+    SliderUI soundSlider;
+
+    bool isDraggingMusicSlider = false;
+    bool isDraggingSoundSlider = false;
 
     const sf::Texture* switchOnTexture = nullptr;
     const sf::Texture* switchOffTexture = nullptr;
@@ -177,6 +196,21 @@ private:
     bool isMouseOver(const sf::Sprite& sprite,
         const sf::RenderWindow& window) const;
 
+    // ===== ADDED: helper cho thanh kéo (slider) Music/Sound =====
+
+    // Đặt lại vị trí nút tròn (handle) trên track theo volume hiện tại (0-100)
+    void updateSliderHandlePosition(SliderUI& slider, int volume) const;
+
+    // Chuột có đang ở trong vùng bắt (track + đệm quanh handle) không
+    bool isMouseOverSlider(const SliderUI& slider,
+        const sf::RenderWindow& window) const;
+
+    // Quy đổi toạ độ X của chuột trên màn hình -> giá trị volume 0-100
+    int volumeFromMouseX(float mouseX) const;
+
+    // Đổi ảnh Speaker <-> MuteSpeaker theo volume (0 = mute)
+    void updateSpeakerIcon(sf::Sprite& icon, int volume) const;
+
 public:
 
     //----------------------------------
@@ -207,6 +241,11 @@ public:
         const sf::Texture& offTexture);
 
     void setTimesTexture(const sf::Texture& texture);
+
+    // ===== ADDED: ảnh loa (Speaker_Icon.png) và loa gạch chéo
+    // (MuteSpeaker_Icon.png) hiển thị bên trái thanh kéo Music/Sound =====
+    void setSpeakerTextures(const sf::Texture& speakerTex,
+        const sf::Texture& muteSpeakerTex);
 
     // ===== ADDED =====
     void setBackButtonTexture(const sf::Texture& texture);
