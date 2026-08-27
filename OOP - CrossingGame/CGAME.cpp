@@ -1504,6 +1504,22 @@ bool CGAME::PeekSaveInfo(const std::string& path,
     return true;
 }
 
+// ===== ADDED (Screenshot preview) =====
+std::string CGAME::GetThumbnailPathFor(const std::string& savePath)
+{
+    std::string path = savePath;
+
+    const std::string ext = ".sav";
+    if (path.size() >= ext.size() &&
+        path.compare(path.size() - ext.size(), ext.size(), ext) == 0)
+    {
+        path.erase(path.size() - ext.size());
+    }
+
+    path += ".png";
+    return path;
+}
+
 bool CGAME::PeekSaveData(const std::string& path, SaveData& out)
 {
     // ===== CHANGED (Giai doan 1 - Continue Menu redesign) =====
@@ -1530,6 +1546,15 @@ bool CGAME::PeekSaveData(const std::string& path, SaveData& out)
         ec.clear();
         auto ftime = std::filesystem::last_write_time(path, ec);
         out.lastWriteTimeUnix = ec ? 0 : FileTimeToUnix(ftime);
+
+        // ===== ADDED (Screenshot preview): kiem tra co file anh .png
+        // cung ten hay khong (chup luc bam L). Chi dien thumbnailPath
+        // neu file anh THAT SU ton tai tren dia, de ContinueMenu biet
+        // khi nao fallback ve preview nhan vat cu =====
+        ec.clear();
+        std::string thumbPath = GetThumbnailPathFor(path);
+        if (std::filesystem::exists(thumbPath, ec) && !ec)
+            out.thumbnailPath = thumbPath;
     }
 
     std::ifstream in(path);
@@ -1641,6 +1666,14 @@ bool CGAME::DeleteSave(const std::string& path)
         std::cout << "[CGAME] Cannot delete save: " << path << " (" << ec.message() << ")\n";
         return false;
     }
+
+    // ===== ADDED (Screenshot preview): xoa luon file anh thumbnail cung
+    // ten (neu co) de khong de lai file .png "mo coi" trong thu muc
+    // Save/ sau khi save da bi xoa. Best-effort - khong lam that bai ca
+    // ham neu khong xoa duoc anh (VD anh khong ton tai) =====
+    std::error_code ecThumb;
+    std::filesystem::remove(GetThumbnailPathFor(path), ecThumb);
+
     return removed;
 }
 

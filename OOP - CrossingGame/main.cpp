@@ -20,6 +20,50 @@
 #include "LeaderboardMenu.h"   // ===== ADDED =====
 #include "AboutMenu.h"          // ===== ADDED =====
 
+// ===== ADDED (Screenshot preview - Quick Save phim L): chup lai NGUYEN
+// VEN noi dung hien tai cua "window" (dung luc nay la man hinh choi vua
+// duoc ve xong o vong lap truoc, vi ham nay chi duoc goi khi dang
+// AppState::Playing), roi thu nho ve kich thuoc thumbnail (giu nguyen ti
+// le khung hinh) va luu ra file PNG tai "thumbPath". Dung sf::RenderTexture
+// (thay vi sf::Image::resize thu cong) de tan dung phep noi suy mem
+// (setSmooth) khi thu nho, cho anh preview khong bi rang cua =====
+static void CaptureGameplayThumbnail(sf::RenderWindow& window, const std::string& thumbPath)
+{
+    sf::Vector2u winSize = window.getSize();
+    if (winSize.x == 0 || winSize.y == 0) return;
+
+    // 1) Chup nguyen ven noi dung window hien tai vao 1 texture
+    sf::Texture fullTex;
+    if (!fullTex.create(winSize.x, winSize.y)) return;
+    fullTex.update(window);
+
+    // 2) Tinh kich thuoc thumbnail (chieu rong toi da 320px), giu nguyen
+    // ti le khung hinh cua window de anh khong bi meo
+    const float THUMB_MAX_W = 320.f;
+    float scale = THUMB_MAX_W / static_cast<float>(winSize.x);
+    unsigned int thumbW = static_cast<unsigned int>(winSize.x * scale + 0.5f);
+    unsigned int thumbH = static_cast<unsigned int>(winSize.y * scale + 0.5f);
+    if (thumbW < 1) thumbW = 1;
+    if (thumbH < 1) thumbH = 1;
+
+    // 3) Ve lai texture goc, da thu nho, vao 1 RenderTexture nho hon
+    sf::RenderTexture rt;
+    if (!rt.create(thumbW, thumbH)) return;
+
+    fullTex.setSmooth(true);
+    sf::Sprite sprite(fullTex);
+    sprite.setScale(static_cast<float>(thumbW) / winSize.x,
+        static_cast<float>(thumbH) / winSize.y);
+
+    rt.clear();
+    rt.draw(sprite);
+    rt.display();
+
+    // 4) Xuat ra file PNG canh file .sav (xem CGAME::GetThumbnailPathFor)
+    sf::Image thumbImg = rt.getTexture().copyToImage();
+    thumbImg.saveToFile(thumbPath);
+}
+
 //==================================================
 // Hằng số
 //==================================================
@@ -705,6 +749,15 @@ int main()
 
                 std::string autoPath = CGAME::GenerateAutoSavePath();
                 game.SaveGame(autoPath);
+
+                // ===== ADDED (Screenshot preview): chup lai man hinh
+                // choi NGAY LUC bam L (window luc nay dang hien dung
+                // khung hinh gameplay cuoi cung, vi Pause() o tren chi
+                // dung logic chu khong xoa noi dung da ve) va luu thanh
+                // 1 file .png cung ten voi file .sav vua tao - de
+                // ContinueMenu doc lai qua CGAME::GetThumbnailPathFor()
+                // va hien lam anh preview thay cho preview nhan vat cu =====
+                CaptureGameplayThumbnail(window, CGAME::GetThumbnailPathFor(autoPath));
 
                 std::cout << "[Quick Save] Da luu game vao \"" << autoPath
                     << "\" (xem lai trong Continue Menu).\n";

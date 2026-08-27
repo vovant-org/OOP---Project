@@ -21,7 +21,13 @@ namespace
     constexpr float START_Y = 120.f;        // dinh vung danh sach (duoi title)
     constexpr float BOTTOM_RESERVED = 110.f; // khoang chua nut Back + le duoi
     constexpr float CHAR_IMG_SIZE = 96.f;
-    constexpr float CHAR_COL_W = CHAR_IMG_SIZE + 24.f; // be rong cot preview nhan vat
+    // ===== CHANGED (Screenshot preview): cot preview gio uu tien hien
+    // thi anh CHUP MAN HINH CHOI (16:9, ngang) thay vi 1 sprite nhan vat
+    // vuong - can rong hon truoc (120 -> 190) de anh khong bi thu qua
+    // nho/mat chi tiet. Sprite nhan vat (fallback cho save cu chua co
+    // anh) van ve vua trong cung 1 cot nay, chi can giua binh thuong =====
+    constexpr float CHAR_COL_W = 190.f; // be rong cot preview (nhan vat / thumbnail)
+    constexpr float THUMB_PADDING = 6.f; // le trong quanh anh thumbnail, trong cot preview
 
     // ===== ADDED (preview trang thai cuoi cung khi save): bo cuc
     // spritesheet nhan vat, PHAI khop voi CPEOPLE.cpp (FRAME_COLUMNS=4,
@@ -180,6 +186,12 @@ void ContinueMenu::refresh()
     slotButtons.resize(saves.size());
     slotInfo.resize(saves.size());
 
+    // ===== ADDED (Screenshot preview): reset danh sach texture thumbnail,
+    // 1-1 voi slotInfo. Texture mac dinh (rong) o cac vi tri chua nap
+    // duoc anh - draw() se tu fallback ve sprite nhan vat =====
+    thumbTextures.clear();
+    thumbTextures.resize(saves.size());
+
     float slotW = W * SLOT_W_FRAC;
     float x = W / 2.f - slotW / 2.f;
 
@@ -201,6 +213,17 @@ void ContinueMenu::refresh()
         slotInfo[i].saveTime = sd.saveTime;
         slotInfo[i].lastDirection = sd.lastDirection;
         slotInfo[i].lastFrame = sd.lastFrame;
+        slotInfo[i].thumbnailPath = sd.thumbnailPath;
+
+        // ===== ADDED (Screenshot preview): nap truoc anh thumbnail (neu
+        // co) ngay trong refresh() (khong con draw() vi draw() la const
+        // va chi duoc goi 1 lan moi khi vao lai Continue Menu, khong
+        // phai moi frame) - tranh doc dia lien tuc =====
+        if (!sd.thumbnailPath.empty())
+        {
+            thumbTextures[i].loadFromFile(sd.thumbnailPath);
+            thumbTextures[i].setSmooth(true);
+        }
 
         Button btn;
         if (buttonTexture)
@@ -653,13 +676,50 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
         charSep.setFillColor(PANEL_SEP);
         window.draw(charSep);
 
-        // preview nhan vat: dung DUNG frame/huong tai thoi diem save
-        // cuoi cung (lastDirection/lastFrame), thay vi ve nguyen ca tam
-        // spritesheet 4x5. Neu huong luu la DIE (4) - VD file save cu tu
-        // ban build truoc khi co tinh nang nay, hoac hi hoi hiem gap luc
-        // save dung luc chet - fallback ve DOWN (1) de preview khong
-        // hien tu the "gap" trong Continue Menu =====
-        if (valid && slotInfo[i].characterIndex >= 0 && slotInfo[i].characterIndex < 4)
+        // ===== CHANGED (Screenshot preview): uu tien ve anh CHUP MAN
+        // HINH CHOI (thumbTextures[i]) tai thoi diem nguoi choi bam L de
+        // save, thay cho preview 1 sprite nhan vat dung yen. Anh duoc
+        // "contain" (giu nguyen ti le, khong bi meo) vao giua cot preview.
+        // Chi khi KHONG co anh (save cu tu truoc khi co tinh nang nay,
+        // hoac file .png bi thieu/hong) moi fallback ve preview sprite
+        // nhan vat theo dung frame/huong luc save nhu truoc day =====
+        bool drewThumbnail = false;
+
+        if (valid && i < thumbTextures.size())
+        {
+            const sf::Texture& thumbTex = thumbTextures[i];
+            sf::Vector2u thumbSize = thumbTex.getSize();
+
+            if (thumbSize.x > 0 && thumbSize.y > 0)
+            {
+                float boxW = CHAR_COL_W - THUMB_PADDING * 2.f;
+                float boxH = SLOT_H - THUMB_PADDING * 2.f;
+
+                float scale = std::min(boxW / static_cast<float>(thumbSize.x),
+                    boxH / static_cast<float>(thumbSize.y));
+
+                float drawnW = thumbSize.x * scale;
+                float drawnH = thumbSize.y * scale;
+
+                sf::Sprite thumbSprite;
+                thumbSprite.setTexture(thumbTex);
+                thumbSprite.setScale(scale, scale);
+                thumbSprite.setPosition(x + (CHAR_COL_W - drawnW) / 2.f,
+                    y + (SLOT_H - drawnH) / 2.f);
+                window.draw(thumbSprite);
+
+                drewThumbnail = true;
+            }
+        }
+
+        // preview nhan vat (fallback): dung DUNG frame/huong tai thoi
+        // diem save cuoi cung (lastDirection/lastFrame), thay vi ve
+        // nguyen ca tam spritesheet 4x5. Neu huong luu la DIE (4) - VD
+        // file save cu tu ban build truoc khi co tinh nang nay, hoac hi
+        // hoi hiem gap luc save dung luc chet - fallback ve DOWN (1) de
+        // preview khong hien tu the "gap" trong Continue Menu =====
+        if (!drewThumbnail && valid &&
+            slotInfo[i].characterIndex >= 0 && slotInfo[i].characterIndex < 4)
         {
             const sf::Texture& charTex = charTextures[slotInfo[i].characterIndex];
             int sheetW = static_cast<int>(charTex.getSize().x);
