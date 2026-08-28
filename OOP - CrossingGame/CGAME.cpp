@@ -40,6 +40,16 @@ namespace
     constexpr unsigned int HUD_TIME_FONT_SIZE = 35;  // size chu (so voi 22 cua Score/Level/HP)
     constexpr float HUD_TIME_MARGIN_TOP = 14.f;      // khoang cach tu mep tren man hinh
 
+    // ===== ADDED (Thong bao "GAME SAVED!"): cau hinh thoi gian hien thi -
+    // tong cong SAVE_NOTIFY_DURATION giay, trong do SAVE_NOTIFY_FADE giay
+    // CUOI CUNG se mo dan (fade-out) thay vi bien mat dot ngot. Vi tri ve
+    // o gan DAY man hinh (CANVAS_H - SAVE_NOTIFY_MARGIN_BOTTOM) de khong
+    // che HUD Score/Level/HP (goc tren-trai) hay cac nut Pause Menu
+    // (nam giua man hinh) =====
+    constexpr float SAVE_NOTIFY_DURATION = 2.f;
+    constexpr float SAVE_NOTIFY_FADE = 0.6f;
+    constexpr float SAVE_NOTIFY_MARGIN_BOTTOM = 56.f;
+
     // Duong dan map, dung thu tu index giong MapSelection
     // (0=City 1=Ancient 2=Hell 3=Sky)
     const std::string MAP_PATHS[4] =
@@ -906,6 +916,17 @@ void CGAME::HandleInput(sf::Event& event)
 
 void CGAME::Update(float dt)
 {
+    // ===== ADDED (Thong bao "GAME SAVED!"): dem nguoc DOC LAP voi trang
+    // thai Pause/GameOver/Win ben duoi - dat O DAU ham, TRUOC moi early
+    // return, de dong chu khong bi "dong bang" mai khi game dang tam
+    // dung/da ket thuc =====
+    if (saveNotifyTimer > 0.f)
+    {
+        saveNotifyTimer -= dt;
+        if (saveNotifyTimer < 0.f)
+            saveNotifyTimer = 0.f;
+    }
+
     if (isPaused)
         return;
 
@@ -1084,6 +1105,15 @@ void CGAME::SetFont(const sf::Font& font)
     hudTimeText.setFillColor(sf::Color(255, 220, 80));
     hudTimeText.setOutlineColor(sf::Color::Black);
     hudTimeText.setOutlineThickness(2.f);
+
+    // ===== ADDED (Thong bao "GAME SAVED!") =====
+    saveNotifyText.setFont(font);
+    saveNotifyText.setString("GAME SAVED!");
+    saveNotifyText.setCharacterSize(28);
+    saveNotifyText.setStyle(sf::Text::Bold);
+    saveNotifyText.setFillColor(sf::Color(120, 255, 150));
+    saveNotifyText.setOutlineColor(sf::Color::Black);
+    saveNotifyText.setOutlineThickness(2.f);
 }
 
 void CGAME::Draw()
@@ -1170,6 +1200,33 @@ void CGAME::Draw()
         hudTimeText.setPosition(CANVAS_W / 2.f, HUD_TIME_MARGIN_TOP);
 
         mWindow.draw(hudTimeText);
+    }
+
+    // ===== ADDED (Thong bao "GAME SAVED!"): chi ve khi con dem nguoc
+    // (saveNotifyTimer > 0), can giua ngang gan DAY man hinh. Trong
+    // SAVE_NOTIFY_FADE giay CUOI CUNG, alpha giam dan tuyen tinh ve 0
+    // (fade-out) thay vi bien mat dot ngot =====
+    if (saveNotifyTimer > 0.f)
+    {
+        float alphaF = 255.f;
+        if (saveNotifyTimer < SAVE_NOTIFY_FADE)
+            alphaF = 255.f * (saveNotifyTimer / SAVE_NOTIFY_FADE);
+        alphaF = std::max(0.f, std::min(255.f, alphaF));
+        sf::Uint8 alpha = static_cast<sf::Uint8>(alphaF);
+
+        sf::Color fill = saveNotifyText.getFillColor();
+        fill.a = alpha;
+        saveNotifyText.setFillColor(fill);
+
+        sf::Color outline = saveNotifyText.getOutlineColor();
+        outline.a = alpha;
+        saveNotifyText.setOutlineColor(outline);
+
+        sf::FloatRect b = saveNotifyText.getLocalBounds();
+        saveNotifyText.setOrigin(b.left + b.width / 2.f, b.top + b.height / 2.f);
+        saveNotifyText.setPosition(CANVAS_W / 2.f, CANVAS_H - SAVE_NOTIFY_MARGIN_BOTTOM);
+
+        mWindow.draw(saveNotifyText);
     }
 }
 
@@ -1326,6 +1383,12 @@ void CGAME::SaveGame(const std::string& path)
             << player->getX() << "\n"
             << player->getY() << "\n";
     }
+}
+
+// ===== ADDED (Thong bao "GAME SAVED!") =====
+void CGAME::ShowSaveNotification()
+{
+    saveNotifyTimer = SAVE_NOTIFY_DURATION;
 }
 
 // ===== ADDED (Quick Save - phim L): sinh duong dan file save moi, luon
@@ -1504,6 +1567,22 @@ bool CGAME::PeekSaveInfo(const std::string& path,
     return true;
 }
 
+// ===== ADDED (Screenshot preview) =====
+std::string CGAME::GetThumbnailPathFor(const std::string& savePath)
+{
+    std::string path = savePath;
+
+    const std::string ext = ".sav";
+    if (path.size() >= ext.size() &&
+        path.compare(path.size() - ext.size(), ext.size(), ext) == 0)
+    {
+        path.erase(path.size() - ext.size());
+    }
+
+    path += ".png";
+    return path;
+}
+
 bool CGAME::PeekSaveData(const std::string& path, SaveData& out)
 {
     // ===== CHANGED (Giai doan 1 - Continue Menu redesign) =====
@@ -1530,6 +1609,15 @@ bool CGAME::PeekSaveData(const std::string& path, SaveData& out)
         ec.clear();
         auto ftime = std::filesystem::last_write_time(path, ec);
         out.lastWriteTimeUnix = ec ? 0 : FileTimeToUnix(ftime);
+
+        // ===== ADDED (Screenshot preview): kiem tra co file anh .png
+        // cung ten hay khong (chup luc bam L). Chi dien thumbnailPath
+        // neu file anh THAT SU ton tai tren dia, de ContinueMenu biet
+        // khi nao fallback ve preview nhan vat cu =====
+        ec.clear();
+        std::string thumbPath = GetThumbnailPathFor(path);
+        if (std::filesystem::exists(thumbPath, ec) && !ec)
+            out.thumbnailPath = thumbPath;
     }
 
     std::ifstream in(path);
@@ -1641,6 +1729,14 @@ bool CGAME::DeleteSave(const std::string& path)
         std::cout << "[CGAME] Cannot delete save: " << path << " (" << ec.message() << ")\n";
         return false;
     }
+
+    // ===== ADDED (Screenshot preview): xoa luon file anh thumbnail cung
+    // ten (neu co) de khong de lai file .png "mo coi" trong thu muc
+    // Save/ sau khi save da bi xoa. Best-effort - khong lam that bai ca
+    // ham neu khong xoa duoc anh (VD anh khong ton tai) =====
+    std::error_code ecThumb;
+    std::filesystem::remove(GetThumbnailPathFor(path), ecThumb);
+
     return removed;
 }
 

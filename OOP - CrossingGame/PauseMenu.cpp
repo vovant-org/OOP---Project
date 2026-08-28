@@ -18,7 +18,7 @@ namespace
 
 PauseMenu::PauseMenu()
 {
-    buttons.resize(4);
+    buttons.resize(5);   // ===== CHANGED: 4 -> 5 (them nut "SAVE GAME") =====
     updateFocus();
 }
 

@@ -16,6 +16,11 @@ enum class PauseMenuButton
 {
     Resume = 0,
     Restart,
+    // ===== ADDED (nut "SAVE GAME"): luu game NGAY tu Pause Menu, cung
+    // hanh vi voi Quick Save phim L (goi CGAME::GenerateAutoSavePath() +
+    // SaveGame() + chup thumbnail + ShowSaveNotification()) - xem
+    // main.cpp, khu vuc xu ly PauseMenuResult::SaveGame =====
+    SaveGame,
     Settings,
     MainMenu
 };
@@ -29,6 +34,8 @@ enum class PauseMenuResult
     None = 0,
     Resume,
     Restart,
+    SaveGame,   // ===== ADDED: phai giu DUNG THU TU voi PauseMenuButton
+    // o tren, vi processEvent() suy result tu (selectedIndex+1) =====
     Settings,
     MainMenu
 };

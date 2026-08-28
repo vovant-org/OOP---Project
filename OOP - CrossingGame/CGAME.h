@@ -79,6 +79,14 @@ private:
     sf::Text hudHPText;
     sf::Text hudTimeText;   // ===== ADDED: chi ve neu HasTimeLimit() =====
 
+    // ===== ADDED (Thong bao "GAME SAVED!"): hien thi ngan sau khi luu
+    // game thanh cong (bam L luc dang choi, HOAC bam nut "SAVE GAME"
+    // trong Pause Menu - xem CGAME::ShowSaveNotification()). saveNotifyTimer
+    // dem NGUOC tu SAVE_NOTIFY_DURATION giay ve 0; trong SAVE_NOTIFY_FADE
+    // giay cuoi se mo dan (fade-out) thay vi bien mat dot ngot =====
+    sf::Text saveNotifyText;
+    float saveNotifyTimer = 0.f;
+
     // Doi nhac nen theo map khi Init()
     AudioManager* audio = nullptr;
 
@@ -129,6 +137,14 @@ public:
 
     void SaveGame(const std::string& path);
     bool LoadGame(const std::string& path);
+
+    // ===== ADDED (Thong bao "GAME SAVED!"): goi ham nay NGAY SAU MOI
+    // lan luu game thanh cong (Quick Save phim L, hoac nut "SAVE GAME"
+    // trong Pause Menu) de bat/lam MOI dem nguoc hien thi dong chu
+    // "GAME SAVED!" tren man hinh choi (xem CGAME::Draw()). Goi lai
+    // trong luc dong chu cu con dang hien se don gian RESET lai dem
+    // nguoc ve day du, khong bi cong don =====
+    void ShowSaveNotification();
 
     // ===== ADDED (Quick Save - phim L): tao san 1 duong dan file save
     // MOI, DUY NHAT, nam trong thu muc Save/ (tao thu muc neu chua co)
@@ -181,8 +197,23 @@ public:
         // mac dinh cua Init() trong truong hop nay thay vi doi ve (-1,-1) =====
         float lastX = -1.f;
         float lastY = -1.f;
+
+        // ===== ADDED (Screenshot preview): duong dan toi file anh
+        // thumbnail (.png) chup lai MAN HINH CHOI thuc te tai thoi diem
+        // nguoi choi bam L de save, neu co. Rong ("") neu khong tim thay
+        // file anh tuong ung (VD save cu tu ban truoc khi co tinh nang
+        // nay) - ContinueMenu se fallback ve preview nhan vat tinh nhu
+        // truoc day trong truong hop do =====
+        std::string thumbnailPath;
     };
     static bool PeekSaveData(const std::string& path, SaveData& out);
+
+    // ===== ADDED (Screenshot preview): suy ra duong dan file anh
+    // thumbnail (.png) tuong ung voi 1 file save (.sav), bang cach thay
+    // phan mo rong ".sav" -> ".png". Dung chung boi ca noi LUU (main.cpp,
+    // ngay sau khi bam L) lan noi DOC (PeekSaveData) de dam bao 2 ben
+    // luon khop ten file voi nhau =====
+    static std::string GetThumbnailPathFor(const std::string& savePath);
 
     // ===== ADDED (Giai doan 1 - Continue Menu redesign) =====
     // Quet toan bo thu muc Save/ va tra ve TAT CA file .sav tim thay
