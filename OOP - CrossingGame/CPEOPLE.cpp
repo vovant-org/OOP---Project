@@ -42,6 +42,27 @@ namespace
         px = std::max(halfW, std::min(px, CANVAS_W - halfW));
         py = std::max(fullH, std::min(py, CANVAS_H));
     }
+
+    // ===== ADDED: so sanh 2 hang (row) cua spritesheet (ca FRAME_COLUMNS
+    // o) xem co giong pixel-for-pixel khong. ModManager::ApplySkin dan
+    // CUNG 1 anh vao CA 20 o spritesheet, nen voi 1 "mod skin" hang LEFT
+    // va RIGHT se giong het nhau; con nhan vat goc (Chicken/Knight/Dog/
+    // Luffy) co frame LEFT/RIGHT ve rieng nen se khac nhau =====
+    bool RowsPixelEqual(const sf::Image& img, int rowA, int rowB,
+        int frameWidth, int frameHeight)
+    {
+        int width = frameWidth * FRAME_COLUMNS;
+        for (int y = 0; y < frameHeight; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (img.getPixel(x, rowA * frameHeight + y)
+                    != img.getPixel(x, rowB * frameHeight + y))
+                    return false;
+            }
+        }
+        return true;
+    }
 }
 
 //==================================================
@@ -63,8 +84,21 @@ CPEOPLE::CPEOPLE(float startX, float startY)
     stunTimer(0.f),
     bounceVelocity(0.f),
     bounceVelocityY(0.f),
-    windPushVelocity(0.f)
+    windPushVelocity(0.f),
+    flipSkinMode(false),
+    facingRight(false)
 {
+}
+
+// ===== ADDED: ap dung dau scale ngang theo facingRight (chi co tac dung
+// khi flipSkinMode = true). Origin da canh giua theo chieu ngang
+// (setOrigin(frameWidth/2.f, ...)) nen lat quanh origin KHONG lam thay
+// doi sprite.getGlobalBounds() -> GetBoundingBox() (hitbox) giu nguyen,
+// chi phan hien thi (skin) doi huong =====
+void CPEOPLE::UpdateVisualFlip()
+{
+    float signX = (flipSkinMode && facingRight) ? -1.f : 1.f;
+    sprite.setScale(signX * CHAR_SCALE, CHAR_SCALE);
 }
 
 //==================================================
@@ -84,13 +118,22 @@ bool CPEOPLE::loadTexture(const std::string& path)
     frameWidth = texture.getSize().x / FRAME_COLUMNS;
     frameHeight = texture.getSize().y / DIRECTION_ROWS;
 
+    // ===== ADDED: tu dong nhan dien "mod skin" 1-anh-tinh (xem
+    // ModManager::ApplySkin) bang cach so sanh hang LEFT (row 2) va
+    // RIGHT (row 3) cua spritesheet vua load. Giong het nhau => dang la
+    // skin mod (chi co 1 huong ve goc, mac dinh quay trai) => bat
+    // flipSkinMode de tu lat ngang khi di chuyen sang phai =====
+    sf::Image sheetImg = texture.copyToImage();
+    flipSkinMode = RowsPixelEqual(sheetImg, 2, 3, frameWidth, frameHeight);
+    facingRight = false;
+
     sprite.setTextureRect(sf::IntRect(
         0, direction * frameHeight, frameWidth, frameHeight));
 
     // Origin giua-duoi: x,y dai dien vi tri "chan dung" cua nhan vat
     sprite.setOrigin(frameWidth / 2.f, (float)frameHeight);
 
-    sprite.setScale(CHAR_SCALE, CHAR_SCALE);
+    UpdateVisualFlip();
     sprite.setPosition(x, y);
 
     return true;
@@ -155,8 +198,10 @@ void CPEOPLE::MoveLeft()
 
     currentFrame = 0;
     elapsedTime = 0.f;
+    facingRight = false;   // ===== ADDED: skin quay trai (huong goc)
     sprite.setTextureRect(sf::IntRect(
         0, direction * frameHeight, frameWidth, frameHeight));
+    UpdateVisualFlip();
     sprite.setPosition(x, y);
 }
 
@@ -175,8 +220,10 @@ void CPEOPLE::MoveRight()
 
     currentFrame = 0;
     elapsedTime = 0.f;
+    facingRight = true;   // ===== ADDED: skin quay phai (lat ngang)
     sprite.setTextureRect(sf::IntRect(
         0, direction * frameHeight, frameWidth, frameHeight));
+    UpdateVisualFlip();
     sprite.setPosition(x, y);
 }
 
@@ -292,9 +339,11 @@ void CPEOPLE::Reset(float startX, float startY)
     bounceVelocity = 0.f;
     bounceVelocityY = 0.f;
     windPushVelocity = 0.f;
+    facingRight = false;   // ===== ADDED: ve lai huong goc (trai) khi Reset
 
     sprite.setTextureRect(sf::IntRect(
         0, direction * frameHeight, frameWidth, frameHeight));
+    UpdateVisualFlip();
     sprite.setPosition(x, y);
 }
 
@@ -325,9 +374,18 @@ void CPEOPLE::RestoreState(float px, float py, int dir, int frame)
     bounceVelocityY = 0.f;
     windPushVelocity = 0.f;
 
+    // ===== ADDED: file save cu khong luu facingRight rieng - suy ra tu
+    // huong da luu: dir=RIGHT(3) => quay phai, dir=LEFT(2) => quay trai;
+    // con UP/DOWN(0/1) khong co du lieu cu de biet huong ngang truoc do,
+    // danh mac dinh quay trai (giong huong goc cua skin) =====
+    if (direction == 3) facingRight = true;
+    else if (direction == 2) facingRight = false;
+    else facingRight = false;
+
     sprite.setTextureRect(sf::IntRect(
         currentFrame * frameWidth, direction * frameHeight,
         frameWidth, frameHeight));
+    UpdateVisualFlip();
     sprite.setPosition(x, y);
 }
 

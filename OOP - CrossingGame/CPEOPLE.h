@@ -34,6 +34,23 @@ private:
     // (van bam phim di chuyen binh thuong duoc, nhung kho giu dung vi tri) =====
     float windPushVelocity;
 
+    // ===== ADDED: ho tro "skin" 1-anh-tinh tu ModManager (xem
+    // ModManager::ApplySkin - dan CUNG 1 anh vao ca 20 o spritesheet).
+    // flipSkinMode = true duoc TU DONG nhan dien trong loadTexture() (so
+    // sanh hang LEFT/RIGHT), KHONG anh huong nhan vat goc (Chicken/Knight/
+    // Dog/Luffy) vi cac nhan vat do co frame LEFT/RIGHT ve rieng, khac nhau.
+    // facingRight = huong ngang hien tai cua skin (chi doi khi MoveLeft/
+    // MoveRight, GIU NGUYEN khi MoveUp/MoveDown - dung yeu cau "len/xuong
+    // giu huong nhin truoc do cua trai/phai") =====
+    bool flipSkinMode;
+    bool facingRight;
+
+    // Tinh lai dau (+/-) cua scale ngang theo facingRight/flipSkinMode va
+    // ap dung vao sprite. Lat quanh origin da canh giua chieu ngang nen
+    // KHONG lam thay doi sprite.getGlobalBounds() -> GetBoundingBox()
+    // (hitbox) khong doi, chi phan hien thi (skin) doi huong.
+    void UpdateVisualFlip();
+
 public:
     CPEOPLE(float startX, float startY);
     bool loadTexture(const std::string& path);

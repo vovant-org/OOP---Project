@@ -204,6 +204,12 @@
     <ClCompile Include="AboutMenu.cpp">
       <Filter>Source Files\ui</Filter>
     </ClCompile>
+    <ClCompile Include="ModMenu.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ModManager.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CANIMAL.h">
@@ -286,6 +292,12 @@
     </ClInclude>
     <ClInclude Include="AboutMenu.h">
       <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ModMenu.h">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ModManager.h">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="LeaderboardMenu.h">
       <Filter>Header Files\ui</Filter>

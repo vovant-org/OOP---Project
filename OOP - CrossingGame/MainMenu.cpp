@@ -13,7 +13,7 @@ void MainMenu::setAudioManager(AudioManager* manager)
 
 MainMenu::MainMenu()
 {
-    buttons.resize(6);
+    buttons.resize(7);   // ===== CHANGED: +1 nut MOD =====
 
     updateFocus();
 }

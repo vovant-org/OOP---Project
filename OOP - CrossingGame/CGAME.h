@@ -181,23 +181,8 @@ public:
         // mac dinh cua Init() trong truong hop nay thay vi doi ve (-1,-1) =====
         float lastX = -1.f;
         float lastY = -1.f;
-
-        // ===== ADDED (Screenshot preview): duong dan toi file anh
-        // thumbnail (.png) chup lai MAN HINH CHOI thuc te tai thoi diem
-        // nguoi choi bam L de save, neu co. Rong ("") neu khong tim thay
-        // file anh tuong ung (VD save cu tu ban truoc khi co tinh nang
-        // nay) - ContinueMenu se fallback ve preview nhan vat tinh nhu
-        // truoc day trong truong hop do =====
-        std::string thumbnailPath;
     };
     static bool PeekSaveData(const std::string& path, SaveData& out);
-
-    // ===== ADDED (Screenshot preview): suy ra duong dan file anh
-    // thumbnail (.png) tuong ung voi 1 file save (.sav), bang cach thay
-    // phan mo rong ".sav" -> ".png". Dung chung boi ca noi LUU (main.cpp,
-    // ngay sau khi bam L) lan noi DOC (PeekSaveData) de dam bao 2 ben
-    // luon khop ten file voi nhau =====
-    static std::string GetThumbnailPathFor(const std::string& savePath);
 
     // ===== ADDED (Giai doan 1 - Continue Menu redesign) =====
     // Quet toan bo thu muc Save/ va tra ve TAT CA file .sav tim thay

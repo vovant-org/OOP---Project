@@ -19,50 +19,8 @@
 #include "ModeSelection.h"  // ===== ADDED =====
 #include "LeaderboardMenu.h"   // ===== ADDED =====
 #include "AboutMenu.h"          // ===== ADDED =====
-
-// ===== ADDED (Screenshot preview - Quick Save phim L): chup lai NGUYEN
-// VEN noi dung hien tai cua "window" (dung luc nay la man hinh choi vua
-// duoc ve xong o vong lap truoc, vi ham nay chi duoc goi khi dang
-// AppState::Playing), roi thu nho ve kich thuoc thumbnail (giu nguyen ti
-// le khung hinh) va luu ra file PNG tai "thumbPath". Dung sf::RenderTexture
-// (thay vi sf::Image::resize thu cong) de tan dung phep noi suy mem
-// (setSmooth) khi thu nho, cho anh preview khong bi rang cua =====
-static void CaptureGameplayThumbnail(sf::RenderWindow& window, const std::string& thumbPath)
-{
-    sf::Vector2u winSize = window.getSize();
-    if (winSize.x == 0 || winSize.y == 0) return;
-
-    // 1) Chup nguyen ven noi dung window hien tai vao 1 texture
-    sf::Texture fullTex;
-    if (!fullTex.create(winSize.x, winSize.y)) return;
-    fullTex.update(window);
-
-    // 2) Tinh kich thuoc thumbnail (chieu rong toi da 320px), giu nguyen
-    // ti le khung hinh cua window de anh khong bi meo
-    const float THUMB_MAX_W = 320.f;
-    float scale = THUMB_MAX_W / static_cast<float>(winSize.x);
-    unsigned int thumbW = static_cast<unsigned int>(winSize.x * scale + 0.5f);
-    unsigned int thumbH = static_cast<unsigned int>(winSize.y * scale + 0.5f);
-    if (thumbW < 1) thumbW = 1;
-    if (thumbH < 1) thumbH = 1;
-
-    // 3) Ve lai texture goc, da thu nho, vao 1 RenderTexture nho hon
-    sf::RenderTexture rt;
-    if (!rt.create(thumbW, thumbH)) return;
-
-    fullTex.setSmooth(true);
-    sf::Sprite sprite(fullTex);
-    sprite.setScale(static_cast<float>(thumbW) / winSize.x,
-        static_cast<float>(thumbH) / winSize.y);
-
-    rt.clear();
-    rt.draw(sprite);
-    rt.display();
-
-    // 4) Xuat ra file PNG canh file .sav (xem CGAME::GetThumbnailPathFor)
-    sf::Image thumbImg = rt.getTexture().copyToImage();
-    thumbImg.saveToFile(thumbPath);
-}
+#include "ModManager.h"         // ===== ADDED: logic import/reset skin =====
+#include "ModMenu.h"            // ===== ADDED: man hinh MOD =====
 
 //==================================================
 // Hằng số
@@ -307,7 +265,8 @@ int main()
         setupBtn(mainMenu.getButton(MainMenuButton::Settings), "SETTINGS", startY + spacing * 2);
         setupBtn(mainMenu.getButton(MainMenuButton::Leaderboard), "LEADERBOARD", startY + spacing * 3);
         setupBtn(mainMenu.getButton(MainMenuButton::About), "ABOUT", startY + spacing * 4);
-        setupBtn(mainMenu.getButton(MainMenuButton::Exit), "EXIT", startY + spacing * 5);
+        setupBtn(mainMenu.getButton(MainMenuButton::Mod), "MOD", startY + spacing * 5);   // ===== ADDED =====
+        setupBtn(mainMenu.getButton(MainMenuButton::Exit), "EXIT", startY + spacing * 6);
     }
 
     //--------------------------------------------------
@@ -486,6 +445,22 @@ int main()
     aboutMenu.setSectionBoxTexture(aboutCardBoxTexture); // ThinSliverBox - nen tung card
     aboutMenu.setArrowTexture(aboutCardArrowTexture);    // DownArrow - nut thu gon/mo rong tung card
 
+    // ===== ADDED: ModManager - logic import/reset skin (doc/ghi file
+    // spritesheet cua nhan vat DANG DUOC CHON trong ModMenu tren dia) =====
+    ModManager modManager("Character/Chicken_character.png");
+
+    // ===== ADDED: ModMenu - man hinh MOD, cho nguoi choi tu import
+    // anh tu may lam skin thay the CHO BAT KY nhan vat nao (dung < >
+    // hoac phim TRAI/PHAI de chon nhan vat, giong CharacterSelection) =====
+    ModMenu modMenu;
+    modMenu.setWindowSize((float)WIN_W, (float)WIN_H);
+    modMenu.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
+    modMenu.loadFont(FONT_PATH);
+    modMenu.loadArrowTexture("ui/Icon/LeftArrow.png");
+    modMenu.setupButtons(buttonTexture, btnScaleX, btnScaleY);
+    modMenu.setModManager(&modManager);
+    modMenu.setupLayout();
+
     //--------------------------------------------------
     // ===== ADDED: nut icon Pause, goc tren-phai man hinh, chi hien
     // va bam duoc khi dang o state Playing =====
@@ -545,6 +520,7 @@ int main()
     continueMenu.setAudioManager(&audio);   // ===== ADDED =====
     leaderboardMenu.setAudioManager(&audio);   // ===== ADDED =====
     aboutMenu.setAudioManager(&audio);         // ===== ADDED =====
+    modMenu.setAudioManager(&audio);           // ===== ADDED =====
     game.SetAudioManager(&audio);           // ===== ADDED: nhac nen theo map =====
 
     //--------------------------------------------------
@@ -573,6 +549,7 @@ int main()
     menuManager.registerMenu(AppState::ContinueSelect, &continueMenu); // ===== ADDED =====
     menuManager.registerMenu(AppState::Leaderboard, &leaderboardMenu); // ===== ADDED =====
     menuManager.registerMenu(AppState::About, &aboutMenu);             // ===== ADDED =====
+    menuManager.registerMenu(AppState::ModMenu, &modMenu);             // ===== ADDED =====
     // AppState::Playing / Exit: chưa có Menu tương ứng (CGAME chưa xong) -
     // cứ để trống, MenuManager tự bỏ qua processEvent/update/draw cho các
     // state này (xem getCurrentMenu() trả nullptr).
@@ -750,15 +727,6 @@ int main()
                 std::string autoPath = CGAME::GenerateAutoSavePath();
                 game.SaveGame(autoPath);
 
-                // ===== ADDED (Screenshot preview): chup lai man hinh
-                // choi NGAY LUC bam L (window luc nay dang hien dung
-                // khung hinh gameplay cuoi cung, vi Pause() o tren chi
-                // dung logic chu khong xoa noi dung da ve) va luu thanh
-                // 1 file .png cung ten voi file .sav vua tao - de
-                // ContinueMenu doc lai qua CGAME::GetThumbnailPathFor()
-                // va hien lam anh preview thay cho preview nhan vat cu =====
-                CaptureGameplayThumbnail(window, CGAME::GetThumbnailPathFor(autoPath));
-
                 std::cout << "[Quick Save] Da luu game vao \"" << autoPath
                     << "\" (xem lai trong Continue Menu).\n";
 
@@ -890,6 +858,13 @@ int main()
                 settingMenu.clearResult();
                 settingsReturnState = AppState::MainMenu;     // ===== ADDED =====
                 menuManager.setState(AppState::Settings);     // ===== CHANGED =====
+                break;
+
+            case MainMenuResult::Mod:   // ===== ADDED =====
+                mainMenu.clearResult();
+                modMenu.refresh();
+                modMenu.clearResult();
+                menuManager.setState(AppState::ModMenu);
                 break;
 
             case MainMenuResult::Exit:
@@ -1175,6 +1150,35 @@ int main()
             {
             case AboutMenuResult::Back:
                 aboutMenu.clearResult();
+                menuManager.setState(AppState::MainMenu);
+                break;
+
+            default: break;
+            }
+            break;
+
+            //========================
+        case AppState::ModMenu:   // ===== ADDED =====
+            //========================
+            switch (modMenu.getResult())
+            {
+            case ModMenuResult::Back:
+                modMenu.clearResult();
+
+                // Skin co the vua bi doi (BAT KY nhan vat nao trong 4)
+                // trong luc dang o ModMenu - nap lai CA 4 texture cho
+                // CharacterSelection va LeaderboardMenu de ca 2 hien
+                // dung skin moi ngay khi quay ve MainMenu (khong can
+                // thoat/mo lai game).
+                charSelect.loadCharacterTexture(0, "Character/Chicken_character.png");
+                charSelect.loadCharacterTexture(1, "Character/Knight_character.png");
+                charSelect.loadCharacterTexture(2, "Character/Dog_character.png");
+                charSelect.loadCharacterTexture(3, "Character/Luffy_character.png");
+                leaderboardMenu.loadCharacterTexture(0, "Character/Chicken_character.png");
+                leaderboardMenu.loadCharacterTexture(1, "Character/Knight_character.png");
+                leaderboardMenu.loadCharacterTexture(2, "Character/Dog_character.png");
+                leaderboardMenu.loadCharacterTexture(3, "Character/Luffy_character.png");
+
                 menuManager.setState(AppState::MainMenu);
                 break;
 

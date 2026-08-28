@@ -20,6 +20,7 @@ enum class MainMenuButton
     Settings,
     Leaderboard,
     About,
+    Mod,        // ===== ADDED: mo man hinh MOD (import skin tuy chinh) =====
     Exit
 };
 
@@ -36,6 +37,7 @@ enum class MainMenuResult
     Settings,
     Leaderboard,
     About,
+    Mod,        // ===== ADDED =====
     Exit
 };
 

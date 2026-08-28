@@ -23,5 +23,6 @@ enum class AppState
     GameOver,   // ===== ADDED: overlay khi CGAME::IsGameOver() =====
     Win,        // ===== ADDED: overlay khi CGAME::IsWin() =====
     About,      // ===== ADDED: man hinh gioi thieu game =====
+    ModMenu,    // ===== ADDED: man hinh MOD - import skin tuy chinh =====
     Exit
 };
