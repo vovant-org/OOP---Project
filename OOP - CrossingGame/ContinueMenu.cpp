@@ -21,7 +21,15 @@ namespace
     constexpr float START_Y = 120.f;        // dinh vung danh sach (duoi title)
     constexpr float BOTTOM_RESERVED = 110.f; // khoang chua nut Back + le duoi
     constexpr float CHAR_IMG_SIZE = 96.f;
-    constexpr float CHAR_COL_W = CHAR_IMG_SIZE + 24.f; // be rong cot preview nhan vat
+    // ===== CHANGED (Screenshot preview): cot preview gio uu tien hien
+    // anh chup MAN HINH CHOI THAT SU (ti le 16:9) thay vi 1 sprite nhan
+    // vat vuong, nen can rong hon truoc de anh khong bi bop meo/qua nho.
+    // THUMB_H giu bang chieu cao cu (CHAR_IMG_SIZE) de con lam chuan
+    // cho truong hop fallback (save cu chua co anh -> ve lai sprite nhan
+    // vat nhu truoc), THUMB_W tinh theo ti le 16:9 tu THUMB_H =====
+    constexpr float THUMB_H = CHAR_IMG_SIZE;
+    constexpr float THUMB_W = THUMB_H * (16.f / 9.f);
+    constexpr float CHAR_COL_W = THUMB_W + 24.f; // be rong cot preview (anh man hinh hoac nhan vat)
 
     // ===== ADDED (preview trang thai cuoi cung khi save): bo cuc
     // spritesheet nhan vat, PHAI khop voi CPEOPLE.cpp (FRAME_COLUMNS=4,
@@ -180,6 +188,13 @@ void ContinueMenu::refresh()
     slotButtons.resize(saves.size());
     slotInfo.resize(saves.size());
 
+    // ===== ADDED (Screenshot preview): nap lai TOAN BO anh thumbnail
+    // moi lan refresh() (danh sach save co the da doi - them/xoa/load
+    // lai), tranh dung anh cu cua 1 hang khac bi lech index =====
+    slotThumbTextures.clear();
+    slotThumbTextures.resize(saves.size());
+    slotThumbLoaded.assign(saves.size(), false);
+
     float slotW = W * SLOT_W_FRAC;
     float x = W / 2.f - slotW / 2.f;
 
@@ -201,6 +216,17 @@ void ContinueMenu::refresh()
         slotInfo[i].saveTime = sd.saveTime;
         slotInfo[i].lastDirection = sd.lastDirection;
         slotInfo[i].lastFrame = sd.lastFrame;
+        slotInfo[i].thumbnailPath = sd.thumbnailPath;
+
+        // ===== ADDED (Screenshot preview): nap anh chup man hinh choi
+        // that su (neu co) ngay khi refresh() danh sach, thay vi nap
+        // lai moi lan draw() (ton hieu nang) =====
+        if (sd.isValid && !sd.thumbnailPath.empty())
+        {
+            slotThumbLoaded[i] = slotThumbTextures[i].loadFromFile(sd.thumbnailPath);
+            if (slotThumbLoaded[i])
+                slotThumbTextures[i].setSmooth(true);
+        }
 
         Button btn;
         if (buttonTexture)
@@ -653,13 +679,39 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
         charSep.setFillColor(PANEL_SEP);
         window.draw(charSep);
 
-        // preview nhan vat: dung DUNG frame/huong tai thoi diem save
-        // cuoi cung (lastDirection/lastFrame), thay vi ve nguyen ca tam
-        // spritesheet 4x5. Neu huong luu la DIE (4) - VD file save cu tu
-        // ban build truoc khi co tinh nang nay, hoac hi hoi hiem gap luc
-        // save dung luc chet - fallback ve DOWN (1) de preview khong
-        // hien tu the "gap" trong Continue Menu =====
-        if (valid && slotInfo[i].characterIndex >= 0 && slotInfo[i].characterIndex < 4)
+        // ===== CHANGED (Screenshot preview): uu tien ve ANH CHUP MAN
+        // HINH CHOI THAT SU tai thoi diem nguoi choi bam L de save (nap
+        // san trong refresh() vao slotThumbTextures[i]). Chi khi save
+        // KHONG co anh (file cu tu ban build truoc tinh nang nay, hoac
+        // nap file that bai) thi moi fallback ve cach cu: ve 1 frame
+        // trong spritesheet nhan vat theo lastDirection/lastFrame =====
+        bool hasThumb = valid && i < slotThumbLoaded.size() && slotThumbLoaded[i];
+
+        if (hasThumb)
+        {
+            const sf::Texture& thumbTex = slotThumbTextures[i];
+            sf::Vector2u thumbSize = thumbTex.getSize();
+
+            if (thumbSize.x > 0 && thumbSize.y > 0)
+            {
+                float scale = std::min(THUMB_W / static_cast<float>(thumbSize.x),
+                    THUMB_H / static_cast<float>(thumbSize.y));
+                float drawnW = thumbSize.x * scale;
+                float drawnH = thumbSize.y * scale;
+
+                sf::Sprite ts;
+                ts.setTexture(thumbTex);
+                ts.setScale(scale, scale);
+                ts.setPosition(x + (CHAR_COL_W - drawnW) / 2.f, y + (SLOT_H - drawnH) / 2.f);
+                window.draw(ts);
+            }
+            else
+            {
+                hasThumb = false;   // anh 0x0 (khong the xay ra binh thuong) -> fallback an toan
+            }
+        }
+
+        if (!hasThumb && valid && slotInfo[i].characterIndex >= 0 && slotInfo[i].characterIndex < 4)
         {
             const sf::Texture& charTex = charTextures[slotInfo[i].characterIndex];
             int sheetW = static_cast<int>(charTex.getSize().x);

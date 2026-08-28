@@ -75,6 +75,12 @@ private:
         // cua nhan vat tai thoi diem save, lay tu CGAME::SaveData =====
         int lastDirection = 1;
         int lastFrame = 0;
+
+        // ===== ADDED (Screenshot preview): duong dan file .png chup lai
+        // MAN HINH CHOI THAT SU tai thoi diem nguoi choi bam L de save,
+        // lay tu CGAME::SaveData::thumbnailPath. Rong ("") neu save cu
+        // chua co anh - se fallback ve sprite nhan vat tinh nhu truoc =====
+        std::string thumbnailPath;
     };
     // ===== CHANGED: std::array<SlotInfo,4> co dinh -> std::vector danh
     // sach dong, kich thuoc = slotButtons.size() =====
@@ -82,6 +88,14 @@ private:
 
     std::array<sf::Texture, 4> charTextures;
     bool charTexturesLoaded = false;
+
+    // ===== ADDED (Screenshot preview): anh thu nho man hinh choi THAT
+    // SU cua tung hang save, nap tu slotInfo[i].thumbnailPath trong
+    // refresh(). Song song 1-1 voi slotInfo/slotButtons theo index.
+    // thumbLoaded[i]=false nghia la save khong co anh (file cu) hoac
+    // nap file that bai -> draw() se fallback ve sprite nhan vat =====
+    std::vector<sf::Texture> slotThumbTextures;
+    std::vector<bool> slotThumbLoaded;
 
     Button backButton;
 

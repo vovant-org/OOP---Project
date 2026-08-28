@@ -90,6 +90,18 @@ private:
     // Doi nhac nen theo map khi Init()
     AudioManager* audio = nullptr;
 
+    // ===== CHANGED (Screenshot preview - lam LAI cho DANG TIN CAY hon):
+    // tach toan bo logic VE canh gameplay (map/vehicles/animals/player/
+    // HUD) ra 1 ham dung chung, nhan vao 1 sf::RenderTarget BAT KY thay
+    // vi LUON ve thang vao mWindow. Draw() (ve ra man hinh that) va
+    // SaveThumbnail() (ve ra 1 RenderTexture offscreen de xuat PNG) deu
+    // goi ham nay - dam bao 2 noi LUON hien thi giong het nhau, VA quan
+    // trong hon: SaveThumbnail() khong con phai "doc lai" front-buffer
+    // cua cua so (sf::Texture::update(window)) - cach lam CU nay khong
+    // dang tin cay tren moi driver/che do swap-chain (co the ra anh den/
+    // trong nen preview bi mat, dung fallback ve sprite nhu cu) =====
+    void DrawScene(sf::RenderTarget& target, bool includeTransientOverlays = true);
+
 public:
     CGAME(sf::RenderWindow& window);
     ~CGAME();
@@ -145,6 +157,16 @@ public:
     // trong luc dong chu cu con dang hien se don gian RESET lai dem
     // nguoc ve day du, khong bi cong don =====
     void ShowSaveNotification();
+
+    // ===== CHANGED (Screenshot preview - lam LAI cho DANG TIN CAY hon):
+    // ve LAI toan bo canh gameplay HIEN TAI (dung DrawScene(), y het
+    // Draw()) vao 1 sf::RenderTexture offscreen kich thuoc "maxWidth" x
+    // (maxWidth * 9/16), roi xuat ra file PNG tai "path". Tra ve true
+    // neu luu thanh cong. Khong con doc lai front-buffer cua window
+    // (sf::Texture::update(window)) nhu cach lam CU - cach do phu thuoc
+    // driver/che do swap-chain nen co the cho anh den/rong (khien
+    // Continue Menu bi mat preview, fallback ve sprite nhan vat) =====
+    bool SaveThumbnail(const std::string& path, unsigned int maxWidth = 320);
 
     // ===== ADDED (Quick Save - phim L): tao san 1 duong dan file save
     // MOI, DUY NHAT, nam trong thu muc Save/ (tao thu muc neu chua co)
