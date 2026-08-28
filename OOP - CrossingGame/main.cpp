@@ -19,6 +19,8 @@
 #include "ModeSelection.h"  // ===== ADDED =====
 #include "LeaderboardMenu.h"   // ===== ADDED =====
 #include "AboutMenu.h"          // ===== ADDED =====
+#include "ModManager.h"         // ===== ADDED (Mod - custom skin) =====
+#include "ModMenu.h"            // ===== ADDED (Mod - custom skin) =====
 
 // ===== ADDED (Screenshot preview - Quick Save phim L): chup lai NGUYEN
 // VEN noi dung hien tai cua "window" (dung luc nay la man hinh choi vua
@@ -326,7 +328,9 @@ int main()
         setupBtn(mainMenu.getButton(MainMenuButton::Settings), "SETTINGS", startY + spacing * 2);
         setupBtn(mainMenu.getButton(MainMenuButton::Leaderboard), "LEADERBOARD", startY + spacing * 3);
         setupBtn(mainMenu.getButton(MainMenuButton::About), "ABOUT", startY + spacing * 4);
-        setupBtn(mainMenu.getButton(MainMenuButton::Exit), "EXIT", startY + spacing * 5);
+        // ===== ADDED (Mod - custom skin): nut MOD, nam giua ABOUT va EXIT =====
+        setupBtn(mainMenu.getButton(MainMenuButton::Mod), "MOD", startY + spacing * 5);
+        setupBtn(mainMenu.getButton(MainMenuButton::Exit), "EXIT", startY + spacing * 6);
     }
 
     //--------------------------------------------------
@@ -509,6 +513,21 @@ int main()
     aboutMenu.setSectionBoxTexture(aboutCardBoxTexture); // ThinSliverBox - nen tung card
     aboutMenu.setArrowTexture(aboutCardArrowTexture);    // DownArrow - nut thu gon/mo rong tung card
 
+    // ===== ADDED (Mod - custom skin): ModManager xu ly logic doi skin,
+    // muc tieu mac dinh la nhan vat dau tien (Chicken) - giong
+    // modCharacters[0] trong ModMenu. ModMenu se tu goi SetTarget() moi
+    // khi nguoi choi bam < > de doi nhan vat dang mod =====
+    ModManager modManager("Character/Chicken_character.png");
+
+    ModMenu modMenu;
+    modMenu.setWindowSize((float)WIN_W, (float)WIN_H);
+    modMenu.setBackgroundTexture(bgTexture, bgScaleX, bgScaleY);
+    modMenu.loadFont(FONT_PATH);
+    modMenu.setModManager(&modManager);
+    modMenu.loadArrowTexture("ui/Icon/LeftArrow.png");
+    modMenu.setupButtons(buttonTexture, btnScaleX, btnScaleY);
+    modMenu.setupLayout();
+
     //--------------------------------------------------
     // ===== ADDED: nut icon Pause, goc tren-phai man hinh, chi hien
     // va bam duoc khi dang o state Playing =====
@@ -568,6 +587,7 @@ int main()
     continueMenu.setAudioManager(&audio);   // ===== ADDED =====
     leaderboardMenu.setAudioManager(&audio);   // ===== ADDED =====
     aboutMenu.setAudioManager(&audio);         // ===== ADDED =====
+    modMenu.setAudioManager(&audio);           // ===== ADDED (Mod - custom skin) =====
     game.SetAudioManager(&audio);           // ===== ADDED: nhac nen theo map =====
 
     //--------------------------------------------------
@@ -596,6 +616,7 @@ int main()
     menuManager.registerMenu(AppState::ContinueSelect, &continueMenu); // ===== ADDED =====
     menuManager.registerMenu(AppState::Leaderboard, &leaderboardMenu); // ===== ADDED =====
     menuManager.registerMenu(AppState::About, &aboutMenu);             // ===== ADDED =====
+    menuManager.registerMenu(AppState::ModMenu, &modMenu);             // ===== ADDED (Mod - custom skin) =====
     // AppState::Playing / Exit: chưa có Menu tương ứng (CGAME chưa xong) -
     // cứ để trống, MenuManager tự bỏ qua processEvent/update/draw cho các
     // state này (xem getCurrentMenu() trả nullptr).
@@ -893,6 +914,13 @@ int main()
                 mainMenu.clearResult();
                 aboutMenu.clearResult();
                 menuManager.setState(AppState::About);
+                break;
+
+            case MainMenuResult::Mod:   // ===== ADDED (Mod - custom skin) =====
+                mainMenu.clearResult();
+                modMenu.refresh();
+                modMenu.clearResult();
+                menuManager.setState(AppState::ModMenu);
                 break;
 
             case MainMenuResult::Settings:
@@ -1199,6 +1227,20 @@ int main()
             {
             case AboutMenuResult::Back:
                 aboutMenu.clearResult();
+                menuManager.setState(AppState::MainMenu);
+                break;
+
+            default: break;
+            }
+            break;
+
+            //========================
+        case AppState::ModMenu:   // ===== ADDED (Mod - custom skin) =====
+            //========================
+            switch (modMenu.getResult())
+            {
+            case ModMenuResult::Back:
+                modMenu.clearResult();
                 menuManager.setState(AppState::MainMenu);
                 break;
 
