@@ -53,6 +53,12 @@ void SaveNamePrompt::setFont(const sf::Font& font)
     inputText.setCharacterSize(22);
     inputText.setFillColor(sf::Color::White);
 
+    // ===== ADDED (Load by name): dong bao loi mau do, nam duoi o nhap =====
+    errorText.setFont(font);
+    errorText.setString("");
+    errorText.setCharacterSize(15);
+    errorText.setFillColor(sf::Color(255, 90, 90));
+
     confirmButton.setFont(font);
     confirmButton.setText("CONFIRM");
     confirmButton.setCharacterSize(20);
@@ -81,17 +87,50 @@ void SaveNamePrompt::setButtonTexture(const sf::Texture& tex, float scaleX, floa
     layout();
 }
 
+// ===== ADDED (dung chung cho nhieu ngu canh - xem SaveNamePrompt.h) =====
+void SaveNamePrompt::setTitle(const std::string& title)
+{
+    titleText.setString(title);
+    layout();
+}
+
+void SaveNamePrompt::setHint(const std::string& hint)
+{
+    hintText.setString(hint);
+    layout();
+}
+
+void SaveNamePrompt::setButtonLabels(const std::string& confirmLabel, const std::string& cancelLabel)
+{
+    confirmButton.setText(confirmLabel);
+    cancelButton.setText(cancelLabel);
+}
+
+void SaveNamePrompt::setErrorMessage(const std::string& message)
+{
+    errorText.setString(message);
+
+    if (hasFont)
+        centerText(errorText, canvasW / 2.f, errorY);
+}
+
 //==================================================
 // Open / Input
 //==================================================
 
-void SaveNamePrompt::open()
+void SaveNamePrompt::open(bool openedByKeyboardShortcut)
 {
     // ===== ADDED: reset ve trang thai rong moi lan mo, tranh giu lai
     // ten cua lan Quick Save truoc do hien lai trong o nhap =====
     nameInput.clear();
     result = SaveNamePromptResult::None;
     updateInputDisplay();
+    setErrorMessage("");   // ===== ADDED (Load by name): xoa loi cua lan mo truoc =====
+
+    // ===== ADDED: xem giai thich o khai bao ham open() trong
+    // SaveNamePrompt.h - CHI bat co nay khi dialog duoc mo bang phim
+    // tat, de chan ky tu "rot" tu chinh phim vua bam (L hoac T) =====
+    ignoreNextTextEvent = openedByKeyboardShortcut;
 }
 
 const std::string& SaveNamePrompt::getNameInput() const
@@ -131,7 +170,11 @@ void SaveNamePrompt::layout()
     overlay.setFillColor(sf::Color(0, 0, 0, 160));
     overlay.setPosition(0.f, 0.f);
 
-    const float panelW = 560.f, panelH = 260.f;
+    // ===== CHANGED (Load by name): tang panelH (260 -> 300) de co cho
+    // cho dong bao loi (errorText) nam giua o nhap va 2 nut, khong lam
+    // vo layout cu khi dung cho truong hop "nhap ten LUC SAVE" (khong co
+    // loi, dong nay chi don gian de trong) =====
+    const float panelW = 560.f, panelH = 300.f;
     const float panelX = canvasW / 2.f - panelW / 2.f;
     const float panelY = canvasH / 2.f - panelH / 2.f;
 
@@ -144,12 +187,12 @@ void SaveNamePrompt::layout()
     if (hasFont)
     {
         centerText(titleText, canvasW / 2.f, panelY + 20.f);
-        centerText(hintText, canvasW / 2.f, panelY + 66.f);
+        centerText(hintText, canvasW / 2.f, panelY + 64.f);
     }
 
     const float boxW = 460.f, boxH = 52.f;
     const float boxX = canvasW / 2.f - boxW / 2.f;
-    const float boxY = panelY + 100.f;
+    const float boxY = panelY + 96.f;
 
     inputBox.setSize({ boxW, boxH });
     inputBox.setPosition(boxX, boxY);
@@ -160,10 +203,16 @@ void SaveNamePrompt::layout()
     if (hasFont)
         inputText.setPosition(boxX + 14.f, boxY + boxH / 2.f);
 
-    // ===== ADDED: 2 nut CONFIRM/CANCEL nam ngang, can giua duoi o nhap,
-    // dung btnRenderW/H (kich thuoc THAT SU sau scale) de tinh vi tri
-    // chinh xac thay vi doan chung =====
-    const float btnY = boxY + boxH + 26.f;
+    // ===== ADDED (Load by name): dong bao loi, ngay duoi o nhap. Luon
+    // tinh vi tri (kem khi rong) de setErrorMessage() sau nay can giua
+    // dung cho ma khong can goi lai layout() =====
+    errorY = boxY + boxH + 16.f;
+    if (hasFont)
+        centerText(errorText, canvasW / 2.f, errorY);
+
+    // ===== CHANGED: 2 nut CONFIRM/CANCEL nam ngang, can giua, day
+    // xuong duoi thap hon truoc (co them cho cho errorText) =====
+    const float btnY = errorY + 30.f;
     const float gap = 24.f;
     const float totalW = btnRenderW * 2.f + gap;
     const float startX = canvasW / 2.f - totalW / 2.f;
@@ -218,22 +267,33 @@ void SaveNamePrompt::processEvent(const sf::Event& event,
     //-----------------------------
     if (event.type == sf::Event::TextEntered)
     {
-        unsigned int code = event.text.unicode;
-
-        if (code == 8)   // Backspace
+        // ===== ADDED: bo qua DUY NHAT 1 su kien TextEntered dau tien
+        // ngay sau open() - xem giai thich trong SaveNamePrompt.h =====
+        if (ignoreNextTextEvent)
         {
-            if (!nameInput.empty())
-                nameInput.pop_back();
-            updateInputDisplay();
+            ignoreNextTextEvent = false;
         }
-        // ===== ADDED: chi nhan ky tu ASCII in duoc (32-126). Font pixel
-        // dang dung (PixelOperator) khong co du glyph tieng Viet co dau,
-        // va file .sav doc/ghi tung dong bang std::getline() nen gioi han
-        // ASCII de tranh cac van de encoding UTF-8 khi doc lai sau nay =====
-        else if (code >= 32 && code < 127 && nameInput.size() < MAX_NAME_LEN)
+        else
         {
-            nameInput.push_back(static_cast<char>(code));
-            updateInputDisplay();
+            unsigned int code = event.text.unicode;
+
+            if (code == 8)   // Backspace
+            {
+                if (!nameInput.empty())
+                    nameInput.pop_back();
+                updateInputDisplay();
+                setErrorMessage("");   // ===== ADDED (Load by name): xoa loi cu khi nguoi choi sua lai ten =====
+            }
+            // ===== ADDED: chi nhan ky tu ASCII in duoc (32-126). Font pixel
+            // dang dung (PixelOperator) khong co du glyph tieng Viet co dau,
+            // va file .sav doc/ghi tung dong bang std::getline() nen gioi han
+            // ASCII de tranh cac van de encoding UTF-8 khi doc lai sau nay =====
+            else if (code >= 32 && code < 127 && nameInput.size() < MAX_NAME_LEN)
+            {
+                nameInput.push_back(static_cast<char>(code));
+                updateInputDisplay();
+                setErrorMessage("");   // ===== ADDED (Load by name) =====
+            }
         }
     }
 
@@ -304,7 +364,14 @@ void SaveNamePrompt::draw(sf::RenderWindow& window) const
     window.draw(inputBox);
 
     if (hasFont)
+    {
         window.draw(inputText);
+
+        // ===== ADDED (Load by name): chi ve khi co noi dung, tranh ve
+        // 1 sf::Text rong (khong anh huong gi nhung cho ro rang) =====
+        if (!errorText.getString().isEmpty())
+            window.draw(errorText);
+    }
 
     confirmButton.draw(window);
     cancelButton.draw(window);

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <filesystem>   // ===== ADDED (nhap ten save - xoa thumbnail rac khi Cancel) =====
 #include <system_error> // ===== ADDED: std::error_code cho std::filesystem::remove =====
+#include <cctype>       // ===== ADDED (Load by name): std::tolower khi so sanh ten khong phan biet hoa/thuong =====
 
 #include "AppState.h"        
 #include "MenuManager.h"   
@@ -573,6 +574,25 @@ int main()
         saveNamePrompt.setButtonTexture(buttonTexture, promptBtnScaleX, promptBtnScaleY);
     }
 
+    // ===== ADDED (Load by name - phim 'T' o Main Menu): dung chung
+    // class SaveNamePrompt (chi doi title/hint/nhan nut) cho ngu canh
+    // "nhap ten save can Load" thay vi "nhap ten save moi". Tach thanh
+    // 1 BIEN RIENG (khong dung chung voi saveNamePrompt) vi 2 cai co
+    // AppState/luong xu ly khac nhau hoan toan (xem main.cpp, khu vuc
+    // AppState::LoadByNamePrompt) =====
+    SaveNamePrompt loadByNamePrompt;
+    loadByNamePrompt.setWindowSize((float)WIN_W, (float)WIN_H);
+    loadByNamePrompt.setFont(font);
+    loadByNamePrompt.setTitle("LOAD GAME");
+    loadByNamePrompt.setHint("Nhap ten save da luu truoc do (Enter: Load, Esc: Huy)");
+    loadByNamePrompt.setButtonLabels("LOAD", "CANCEL");
+    {
+        float promptBtnW = 170.f, promptBtnH = 64.f;
+        float promptBtnScaleX = promptBtnW / buttonTexture.getSize().x;
+        float promptBtnScaleY = promptBtnH / buttonTexture.getSize().y;
+        loadByNamePrompt.setButtonTexture(buttonTexture, promptBtnScaleX, promptBtnScaleY);
+    }
+
     //--------------------------------------------------
     // ===== ADDED: nut icon Pause, goc tren-phai man hinh, chi hien
     // va bam duoc khi dang o state Playing =====
@@ -634,6 +654,7 @@ int main()
     aboutMenu.setAudioManager(&audio);         // ===== ADDED =====
     modMenu.setAudioManager(&audio);           // ===== ADDED (Mod - custom skin) =====
     saveNamePrompt.setAudioManager(&audio);    // ===== ADDED (nhap ten save) =====
+    loadByNamePrompt.setAudioManager(&audio);  // ===== ADDED (Load by name) =====
     game.SetAudioManager(&audio);           // ===== ADDED: nhac nen theo map =====
 
     //--------------------------------------------------
@@ -664,6 +685,7 @@ int main()
     menuManager.registerMenu(AppState::About, &aboutMenu);             // ===== ADDED =====
     menuManager.registerMenu(AppState::ModMenu, &modMenu);             // ===== ADDED (Mod - custom skin) =====
     menuManager.registerMenu(AppState::SaveNamePrompt, &saveNamePrompt); // ===== ADDED (nhap ten save) =====
+    menuManager.registerMenu(AppState::LoadByNamePrompt, &loadByNamePrompt); // ===== ADDED (Load by name) =====
     // AppState::Playing / Exit: chưa có Menu tương ứng (CGAME chưa xong) -
     // cứ để trống, MenuManager tự bỏ qua processEvent/update/draw cho các
     // state này (xem getCurrentMenu() trả nullptr).
@@ -824,6 +846,20 @@ int main()
                 continue;
             }
 
+            // ===== ADDED (Load by name): phim 'T' o Main Menu -> mo
+            // dialog nhap TEN save (playerName) can Load, dung LAI class
+            // SaveNamePrompt (xem loadByNamePrompt o tren) thay vi bat
+            // nguoi choi go duong dan qua console nhu phim 'T' luc dang
+            // Playing o tren =====
+            if (event.type == sf::Event::KeyPressed &&
+                event.key.code == sf::Keyboard::T &&
+                menuManager.getState() == AppState::MainMenu)
+            {
+                loadByNamePrompt.open(true);   // ===== CHANGED: mo bang phim tat 'T' =====
+                menuManager.setState(AppState::LoadByNamePrompt);
+                continue;
+            }
+
             // ===== CHANGED (nhap ten save): phim 'L' khi dang choi -> tam
             // dung, chup san thumbnail + sinh san duong dan .sav MOI
             // (PrepareQuickSave(), luc man hinh con dang la gameplay
@@ -839,7 +875,7 @@ int main()
                 game.Pause();
 
                 pendingSavePath = PrepareQuickSave(window);
-                saveNamePrompt.open();
+                saveNamePrompt.open(true);   // ===== CHANGED: mo bang phim tat 'L' =====
                 saveNamePromptReturnState = AppState::Playing;
                 menuManager.setState(AppState::SaveNamePrompt);
 
@@ -1350,6 +1386,76 @@ int main()
             }
             break;
 
+            //========================
+        case AppState::LoadByNamePrompt:   // ===== ADDED (Load by name) =====
+            //========================
+            switch (loadByNamePrompt.getResult())
+            {
+            case SaveNamePromptResult::Confirm:
+            {
+                loadByNamePrompt.clearResult();
+
+                std::string typedName = loadByNamePrompt.getNameInput();
+
+                // ===== ADDED (Load by name): tim save co playerName
+                // TRUNG KHOP (khong phan biet hoa/thuong) voi ten vua
+                // go. ListAllSaves() da tra ve danh sach sap xep theo
+                // thoi gian sua doi GAN NHAT truoc, nen neu co nhieu
+                // save cung ten, save duoc chon la save MOI NHAT =====
+                std::string foundPath;
+
+                if (!typedName.empty())
+                {
+                    auto toLower = [](std::string s) {
+                        for (auto& c : s)
+                            c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+                        return s;
+                        };
+                    std::string typedLower = toLower(typedName);
+
+                    for (const auto& sd : CGAME::ListAllSaves())
+                    {
+                        if (sd.isValid && toLower(sd.playerName) == typedLower)
+                        {
+                            foundPath = sd.filePath;
+                            break;
+                        }
+                    }
+                }
+
+                if (!foundPath.empty() && game.LoadGame(foundPath))
+                {
+                    selectedMapIndex = game.GetCurrentMap();
+                    selectedCharIndex = game.GetCharacterIndex();
+                    selectedMode = game.GetDifficultyMode();
+
+                    customNightmareActive = false;
+
+                    menuManager.setState(AppState::Playing);
+                }
+                else
+                {
+                    // ===== ADDED: khong tim thay (hoac go rong) -> bao
+                    // loi NGAY TRONG dialog, o LAI AppState::LoadByNamePrompt
+                    // de nguoi choi sua lai ten va thu lai, khong bi
+                    // bat quay ve Main Menu =====
+                    loadByNamePrompt.setErrorMessage(
+                        typedName.empty()
+                        ? "Vui long nhap ten save can load"
+                        : "Khong tim thay save nao ten \"" + typedName + "\"");
+                }
+                break;
+            }
+
+            case SaveNamePromptResult::Cancel:
+                loadByNamePrompt.clearResult();
+                menuManager.setState(AppState::MainMenu);
+                break;
+
+            default: break;
+            }
+            break;
+
         default: break;
         }
 
@@ -1372,6 +1478,14 @@ int main()
             // ===== ADDED: ve man hinh game dong bang lam nen, roi ve
             // PauseMenu/GameOverMenu/WinMenu/SaveNamePrompt (co overlay mo den) len tren =====
             game.Draw();
+            menuManager.draw(window);
+        }
+        // ===== ADDED (Load by name): tuong tu nhu tren, nhung nen la
+        // Main Menu (dong bang) thay vi man hinh choi, vi dialog nay chi
+        // mo tu MainMenu (phim 'T') =====
+        else if (menuManager.getState() == AppState::LoadByNamePrompt)
+        {
+            mainMenu.draw(window);
             menuManager.draw(window);
         }
         else

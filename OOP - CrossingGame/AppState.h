@@ -28,5 +28,10 @@ enum class AppState
     // HOAC nut "SAVE GAME" trong Pause Menu - xem SaveNamePrompt.h va
     // main.cpp (bien "saveNamePromptReturnState") =====
     SaveNamePrompt,
+    // ===== ADDED: overlay nhap TEN SAVE CAN LOAD, mo tu phim 'T' o
+    // Main Menu - tim trong Save/ file nao co playerName trung ten vua
+    // go, neu co thi Load luon, neu khong thi bao loi ngay trong dialog
+    // (xem main.cpp, khu vuc xu ly phim 'T' o MainMenu) =====
+    LoadByNamePrompt,
     Exit
 };
