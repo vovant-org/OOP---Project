@@ -2,6 +2,8 @@
 // Luồng: MainMenu → CharacterSelection → MapSelection → Game
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <filesystem>   // ===== ADDED (nhap ten save - xoa thumbnail rac khi Cancel) =====
+#include <system_error> // ===== ADDED: std::error_code cho std::filesystem::remove =====
 
 #include "AppState.h"        
 #include "MenuManager.h"   
@@ -21,6 +23,7 @@
 #include "AboutMenu.h"          // ===== ADDED =====
 #include "ModManager.h"         // ===== ADDED (Mod - custom skin) =====
 #include "ModMenu.h"            // ===== ADDED (Mod - custom skin) =====
+#include "SaveNamePrompt.h"     // ===== ADDED (nhap ten save) =====
 
 // ===== ADDED (Screenshot preview - Quick Save phim L): chup lai NGUYEN
 // VEN noi dung hien tai cua "window" (dung luc nay la man hinh choi vua
@@ -66,22 +69,40 @@ static void CaptureGameplayThumbnail(sf::RenderWindow& window, const std::string
     thumbImg.saveToFile(thumbPath);
 }
 
-// ===== ADDED (Quick Save dung chung): thuc hien 1 lan luu game HOAN
-// CHINH - sinh duong dan moi, ghi file .sav, chup + luu thumbnail .png
-// cung ten, roi bat thong bao "GAME SAVED!" tren man hinh choi. Dung
-// chung boi CA phim tat 'L' (luc dang Playing) LAN nut "SAVE GAME"
-// trong Pause Menu, de 2 noi nay luon luu game giong het nhau, khong bi
-// lech logic khi sau nay can sua doi =====
-static void PerformQuickSave(CGAME& game, sf::RenderWindow& window)
+// ===== CHANGED (nhap ten save): tach lam 2 buoc rieng thay vi 1 ham
+// PerformQuickSave() duy nhat, de co the CHEN mot buoc "nguoi choi go
+// ten" o giua - xem SaveNamePrompt.h va main.cpp (khu vuc xu ly phim
+// 'L' / nut "SAVE GAME" / AppState::SaveNamePrompt):
+//
+//   1) PrepareQuickSave() - goi NGAY luc bam 'L'/"SAVE GAME", khi man
+//      hinh con dang la gameplay/pause SACH (chua ve dialog nhap ten
+//      len tren) - sinh san duong dan .sav MOI va chup+luu san anh
+//      thumbnail cung ten. Chua ghi file .sav luc nay (chua biet ten
+//      nguoi choi se go).
+//   2) FinalizeQuickSave() - goi SAU KHI nguoi choi bam CONFIRM tren
+//      dialog nhap ten - gan playerName roi moi thuc su ghi file .sav
+//      + bat thong bao "GAME SAVED!".
+//
+// Neu nguoi choi bam CANCEL o dialog, main.cpp se tu xoa anh thumbnail
+// da chup o buoc (1) (vi luc do khong co file .sav nao trong Save/
+// tham chieu toi no nua) =====
+static std::string PrepareQuickSave(sf::RenderWindow& window)
 {
     std::string autoPath = CGAME::GenerateAutoSavePath();
-    game.SaveGame(autoPath);
 
     CaptureGameplayThumbnail(window, CGAME::GetThumbnailPathFor(autoPath));
 
+    return autoPath;
+}
+
+static void FinalizeQuickSave(CGAME& game, const std::string& path, const std::string& playerName)
+{
+    game.SetPlayerName(playerName);
+    game.SaveGame(path);
+
     game.ShowSaveNotification();
 
-    std::cout << "[Quick Save] Da luu game vao \"" << autoPath
+    std::cout << "[Quick Save] Da luu game vao \"" << path
         << "\" (xem lai trong Continue Menu).\n";
 }
 
@@ -292,6 +313,16 @@ int main()
     // ===== ADDED: SettingMenu co the duoc mo tu MainMenu HOAC tu
     // PauseMenu -> can biet quay ve dau khi bam Back =====
     AppState settingsReturnState = AppState::MainMenu;
+
+    // ===== ADDED (nhap ten save): SaveNamePrompt co the duoc mo tu
+    // 'L' luc dang Playing HOAC tu nut "SAVE GAME" trong Pause Menu ->
+    // can biet quay ve dau (Playing/Pause) sau khi Confirm/Cancel.
+    // "pendingSavePath" la duong dan .sav DA duoc sinh san (va anh
+    // thumbnail DA duoc chup san tu luc con o Playing/Pause, truoc khi
+    // dialog nay ve len tren man hinh) - cho toi khi nguoi choi bam
+    // CONFIRM moi thuc su goi game.SaveGame() voi ten ho vua go =====
+    AppState saveNamePromptReturnState = AppState::Playing;
+    std::string pendingSavePath;
 
     // ===== ADDED: cho gameover co 1 khoang delay nho de choi het
     // animation chet truoc khi hien GameOverMenu =====
@@ -528,6 +559,20 @@ int main()
     modMenu.setupButtons(buttonTexture, btnScaleX, btnScaleY);
     modMenu.setupLayout();
 
+    // ===== ADDED (nhap ten save): overlay nho hien khi bam 'L' hoac
+    // nut "SAVE GAME" trong Pause Menu. Dung 2 nut CONFIRM/CANCEL RIENG,
+    // nho hon nut menu binh thuong (240x100), cho vua trong 1 dialog nho
+    // giua man hinh =====
+    SaveNamePrompt saveNamePrompt;
+    saveNamePrompt.setWindowSize((float)WIN_W, (float)WIN_H);
+    saveNamePrompt.setFont(font);
+    {
+        float promptBtnW = 170.f, promptBtnH = 64.f;
+        float promptBtnScaleX = promptBtnW / buttonTexture.getSize().x;
+        float promptBtnScaleY = promptBtnH / buttonTexture.getSize().y;
+        saveNamePrompt.setButtonTexture(buttonTexture, promptBtnScaleX, promptBtnScaleY);
+    }
+
     //--------------------------------------------------
     // ===== ADDED: nut icon Pause, goc tren-phai man hinh, chi hien
     // va bam duoc khi dang o state Playing =====
@@ -588,6 +633,7 @@ int main()
     leaderboardMenu.setAudioManager(&audio);   // ===== ADDED =====
     aboutMenu.setAudioManager(&audio);         // ===== ADDED =====
     modMenu.setAudioManager(&audio);           // ===== ADDED (Mod - custom skin) =====
+    saveNamePrompt.setAudioManager(&audio);    // ===== ADDED (nhap ten save) =====
     game.SetAudioManager(&audio);           // ===== ADDED: nhac nen theo map =====
 
     //--------------------------------------------------
@@ -617,6 +663,7 @@ int main()
     menuManager.registerMenu(AppState::Leaderboard, &leaderboardMenu); // ===== ADDED =====
     menuManager.registerMenu(AppState::About, &aboutMenu);             // ===== ADDED =====
     menuManager.registerMenu(AppState::ModMenu, &modMenu);             // ===== ADDED (Mod - custom skin) =====
+    menuManager.registerMenu(AppState::SaveNamePrompt, &saveNamePrompt); // ===== ADDED (nhap ten save) =====
     // AppState::Playing / Exit: chưa có Menu tương ứng (CGAME chưa xong) -
     // cứ để trống, MenuManager tự bỏ qua processEvent/update/draw cho các
     // state này (xem getCurrentMenu() trả nullptr).
@@ -777,23 +824,25 @@ int main()
                 continue;
             }
 
-            // ===== CHANGED (Quick Save): phim 'L' khi dang choi -> tam
-            // dung, TU DONG luu vao 1 file MOI trong thu muc Save/ (qua
-            // CGAME::GenerateAutoSavePath(), khong con bat nguoi choi tu
-            // go duong dan qua console nua) roi tiep tuc choi NGAY, khong
-            // hoi Y/N. Vi Save/ la CHINH thu muc ma ContinueMenu quet
-            // dong (CGAME::ListAllSaves()), save moi se hien NGAY o dau
-            // danh sach Continue Menu (sap xep theo thoi gian sua doi
-            // gan nhat) ma khong can thao tac gi them =====
+            // ===== CHANGED (nhap ten save): phim 'L' khi dang choi -> tam
+            // dung, chup san thumbnail + sinh san duong dan .sav MOI
+            // (PrepareQuickSave(), luc man hinh con dang la gameplay
+            // SACH), roi mo dialog SaveNamePrompt de nguoi choi go ten
+            // cho file save nay TRUOC KHI thuc su ghi ra dia. Viec ghi
+            // file .sav that su (FinalizeQuickSave) duoc thuc hien SAU,
+            // trong khu vuc xu ly AppState::SaveNamePrompt, ngay khi
+            // nguoi choi bam CONFIRM =====
             if (event.type == sf::Event::KeyPressed &&
                 event.key.code == sf::Keyboard::L &&
                 menuManager.getState() == AppState::Playing)
             {
                 game.Pause();
 
-                PerformQuickSave(game, window);
+                pendingSavePath = PrepareQuickSave(window);
+                saveNamePrompt.open();
+                saveNamePromptReturnState = AppState::Playing;
+                menuManager.setState(AppState::SaveNamePrompt);
 
-                game.Resume();
                 continue;
             }
 
@@ -1069,18 +1118,20 @@ int main()
                 menuManager.setState(AppState::Playing);
                 break;
 
-                // ===== ADDED (nut "SAVE GAME" trong Pause Menu): luu game
-                // NGAY tai day, dung chung PerformQuickSave() voi phim tat
-                // 'L' (xem dinh nghia PerformQuickSave o dau file) - nen se
-                // tao file .sav moi + anh thumbnail + bat dong chu "GAME
-                // SAVED!" y het nhau. KHONG doi AppState (o lai Pause) de
-                // nguoi choi thay ngay dong chu xac nhan tren nen man hinh
-                // choi, con game da dang o trang thai isPaused=true san roi
-                // nen khong can goi lai game.Pause()/game.Resume() bao quanh
-                // nhu o phim 'L' (do o do dang o AppState::Playing) =====
+                // ===== CHANGED (nhap ten save): nut "SAVE GAME" trong
+                // Pause Menu gio cung mo dialog SaveNamePrompt (dung
+                // PrepareQuickSave() de chup san thumbnail + sinh san
+                // duong dan .sav, giong het phim tat 'L') thay vi luu
+                // ngay lap tuc. O lai overlay (Pause -> SaveNamePrompt)
+                // nen KHONG can goi game.Pause()/Resume() bao quanh -
+                // game van dang isPaused=true san roi =====
             case PauseMenuResult::SaveGame:
                 pauseMenu.clearResult();
-                PerformQuickSave(game, window);
+
+                pendingSavePath = PrepareQuickSave(window);
+                saveNamePrompt.open();
+                saveNamePromptReturnState = AppState::Pause;
+                menuManager.setState(AppState::SaveNamePrompt);
                 break;
 
             case PauseMenuResult::Settings:
@@ -1248,6 +1299,57 @@ int main()
             }
             break;
 
+            //========================
+        case AppState::SaveNamePrompt:   // ===== ADDED (nhap ten save) =====
+            //========================
+            switch (saveNamePrompt.getResult())
+            {
+            case SaveNamePromptResult::Confirm:
+                saveNamePrompt.clearResult();
+
+                FinalizeQuickSave(game, pendingSavePath, saveNamePrompt.getNameInput());
+                pendingSavePath.clear();
+
+                if (saveNamePromptReturnState == AppState::Playing)
+                {
+                    game.Resume();
+                    menuManager.setState(AppState::Playing);
+                }
+                else
+                {
+                    menuManager.setState(AppState::Pause);
+                }
+                break;
+
+            case SaveNamePromptResult::Cancel:
+                saveNamePrompt.clearResult();
+
+                // ===== ADDED: nguoi choi huy giua chung -> KHONG ghi
+                // file .sav, va xoa luon anh thumbnail da chup san o
+                // PrepareQuickSave() (vi khong con file .sav nao trong
+                // Save/ tham chieu toi no nua, de lai se thanh file rac) =====
+                if (!pendingSavePath.empty())
+                {
+                    std::error_code ec;
+                    std::filesystem::remove(CGAME::GetThumbnailPathFor(pendingSavePath), ec);
+                    pendingSavePath.clear();
+                }
+
+                if (saveNamePromptReturnState == AppState::Playing)
+                {
+                    game.Resume();
+                    menuManager.setState(AppState::Playing);
+                }
+                else
+                {
+                    menuManager.setState(AppState::Pause);
+                }
+                break;
+
+            default: break;
+            }
+            break;
+
         default: break;
         }
 
@@ -1264,10 +1366,11 @@ int main()
         }
         else if (menuManager.getState() == AppState::Pause ||
             menuManager.getState() == AppState::GameOver ||
-            menuManager.getState() == AppState::Win)
+            menuManager.getState() == AppState::Win ||
+            menuManager.getState() == AppState::SaveNamePrompt)   // ===== CHANGED (nhap ten save) =====
         {
             // ===== ADDED: ve man hinh game dong bang lam nen, roi ve
-            // PauseMenu/GameOverMenu/WinMenu (co overlay mo den) len tren =====
+            // PauseMenu/GameOverMenu/WinMenu/SaveNamePrompt (co overlay mo den) len tren =====
             game.Draw();
             menuManager.draw(window);
         }

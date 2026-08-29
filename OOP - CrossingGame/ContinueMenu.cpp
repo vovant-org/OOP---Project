@@ -765,31 +765,47 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
 
                 std::ostringstream oss;
 
+                // ===== ADDED (ten save nguoi choi tu dat): hang dau tien,
+                // chay het chieu rong cot thong tin, noi bat hon cac dong
+                // con lai (mau vang giong tieu de) de de phan biet giua
+                // cac slot khi co nhieu save. Neu nguoi choi khong go ten
+                // (bam Enter/CONFIRM voi o nhap rong) thi playerName se
+                // rong -> hien "UNNAMED SAVE" thay vi de trong =====
+                sf::Text nameText;
+                nameText.setFont(*font);
+                nameText.setCharacterSize(18);
+                nameText.setStyle(sf::Text::Bold);
+                nameText.setFillColor(sf::Color(255, 220, 80));
+                nameText.setString(slotInfo[i].playerName.empty()
+                    ? "UNNAMED SAVE" : slotInfo[i].playerName);
+                nameText.setPosition(infoX, y + 10.f);
+                window.draw(nameText);
+
                 // cot trai: MAP / MODE / DATE
                 int mi = slotInfo[i].mapIndex;
                 oss << "MAP: " << ((mi >= 0 && mi < 4) ? MAP_NAMES[mi] : "UNKNOWN");
                 infoText.setString(oss.str());
-                infoText.setPosition(infoX, y + 16.f);
+                infoText.setPosition(infoX, y + 40.f);
                 window.draw(infoText);
 
                 oss.str(""); oss.clear();
                 int md = slotInfo[i].difficultyMode;
                 oss << "MODE: " << ((md >= 0 && md < 3) ? MODE_NAMES[md] : "UNKNOWN");
                 infoText.setString(oss.str());
-                infoText.setPosition(infoX, y + 42.f);
+                infoText.setPosition(infoX, y + 64.f);
                 window.draw(infoText);
 
                 // cot phai: LEVEL / SCORE
                 oss.str(""); oss.clear();
                 oss << "LEVEL: " << slotInfo[i].level;
                 infoText.setString(oss.str());
-                infoText.setPosition(infoRightX, y + 16.f);
+                infoText.setPosition(infoRightX, y + 40.f);
                 window.draw(infoText);
 
                 oss.str(""); oss.clear();
                 oss << "SCORE: " << slotInfo[i].score;
                 infoText.setString(oss.str());
-                infoText.setPosition(infoRightX, y + 42.f);
+                infoText.setPosition(infoRightX, y + 64.f);
                 window.draw(infoText);
 
                 // DATE: hang duoi cung, trai qua het chieu rong thong tin
@@ -798,7 +814,7 @@ void ContinueMenu::draw(sf::RenderWindow& window) const
                 timeText.setCharacterSize(16);
                 timeText.setFillColor(TEXT_INFO_DIM);
                 timeText.setString("DATE: " + slotInfo[i].saveTime);
-                timeText.setPosition(infoX, y + 72.f);
+                timeText.setPosition(infoX, y + 90.f);
                 window.draw(timeText);
             }
         }

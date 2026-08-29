@@ -210,6 +210,9 @@
     <ClCompile Include="ModManager.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="SaveNamePrompt.cpp">
+      <Filter>Source Files\entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CANIMAL.h">
@@ -337,6 +340,9 @@
     </ClInclude>
     <ClInclude Include="MeteoriteManager.h">
       <Filter>Header Files\AdvancedFunction</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveNamePrompt.h">
+      <Filter>Header Files\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

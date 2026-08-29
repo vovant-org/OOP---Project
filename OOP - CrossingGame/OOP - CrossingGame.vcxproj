@@ -190,6 +190,7 @@
     <ClCompile Include="ModeSelection.cpp" />
     <ClCompile Include="PauseMenu.cpp" />
     <ClCompile Include="RollingRockManager.cpp" />
+    <ClCompile Include="SaveNamePrompt.cpp" />
     <ClCompile Include="SettingMenu.cpp" />
     <ClCompile Include="TrafficLight.cpp" />
     <ClCompile Include="TrainManager.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="ObstacleHelper.h" />
     <ClInclude Include="PauseMenu.h" />
     <ClInclude Include="RollingRockManager.h" />
+    <ClInclude Include="SaveNamePrompt.h" />
     <ClInclude Include="SettingMenu.h" />
     <ClInclude Include="TrafficLight.h" />
     <ClInclude Include="TrainManager.h" />

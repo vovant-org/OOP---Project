@@ -1328,6 +1328,17 @@ void CGAME::OnLevelComplete()
 // Save/Load — Bước 6
 //==================================================
 
+// ===== ADDED (nhap ten save): xem CGAME.h =====
+void CGAME::SetPlayerName(const std::string& name)
+{
+    playerName = name;
+}
+
+const std::string& CGAME::GetPlayerName() const
+{
+    return playerName;
+}
+
 void CGAME::SaveGame(const std::string& path)
 {
     std::ofstream out(path);

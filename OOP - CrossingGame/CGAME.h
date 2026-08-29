@@ -150,6 +150,14 @@ public:
     void SaveGame(const std::string& path);
     bool LoadGame(const std::string& path);
 
+    // ===== ADDED (nhap ten save): cho phep gan playerName TRUOC khi goi
+    // SaveGame(), de ten nguoi choi tu go (qua SaveNamePrompt) duoc ghi
+    // vao file .sav va hien thi lai trong Continue Menu. Khong dat gioi
+    // han do dai o day - viec gioi han so ky tu da lam ben SaveNamePrompt
+    // luc nguoi choi go =====
+    void SetPlayerName(const std::string& name);
+    const std::string& GetPlayerName() const;
+
     // ===== ADDED (Thong bao "GAME SAVED!"): goi ham nay NGAY SAU MOI
     // lan luu game thanh cong (Quick Save phim L, hoac nut "SAVE GAME"
     // trong Pause Menu) de bat/lam MOI dem nguoc hien thi dong chu

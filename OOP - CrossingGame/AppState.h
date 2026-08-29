@@ -24,5 +24,9 @@ enum class AppState
     Win,        // ===== ADDED: overlay khi CGAME::IsWin() =====
     About,      // ===== ADDED: man hinh gioi thieu game =====
     ModMenu,    // ===== ADDED: man hinh MOD - import skin tuy chinh =====
+    // ===== ADDED: overlay nhap ten save, mo tu phim 'L' (dang Playing)
+    // HOAC nut "SAVE GAME" trong Pause Menu - xem SaveNamePrompt.h va
+    // main.cpp (bien "saveNamePromptReturnState") =====
+    SaveNamePrompt,
     Exit
-};
+};
